@@ -40,10 +40,10 @@
 | Author | 文本 | 作者 |
 | Start Time | 日期 | 开始阅读时间 |
 | Finish Time | 日期 | 完成阅读时间 |
-| My Rating | 数字 | 评分（1-5） |
+| My Rating | 数字 | 评分（1-10） |
 | Pages | 数字 | 页数 |
 | Douban Link | URL | 豆瓣链接 |
-| Douban Cover Link | URL | 豆瓣封面图链接 |
+| Douban Cover Link | URL | 封面图链接（推荐 neodb.social） |
 | Review | 文本 | 书评 |
 
 **"已读"判断标准**：Finish Time 字段不为空
