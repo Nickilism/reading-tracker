@@ -1,0 +1,37 @@
+name: Deploy Reading Tracker
+
+on:
+  # 方式1: Airtable Automation 触发
+  repository_dispatch:
+    types: [airtable-update]
+
+  # 方式2: 手动触发
+  workflow_dispatch:
+
+  # 方式3: 定时备份（每天 UTC 6:00 = 北京时间 14:00）
+  schedule:
+    - cron: '0 6 * * *'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate Reading Tracker
+        env:
+          AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
+        run: node reading-tracker-github.js
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages
