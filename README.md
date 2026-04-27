@@ -123,10 +123,12 @@ git push -u origin main
    - Event: "New or Updated Record"
    - Base: 选择你的 Base
    - Table: 选择 Books 表
-4. **Action**: 选择 **GitHub**
-   - Event: "Create a repository dispatch event"
-   - Repository: `你的用户名/reading-tracker`
-   - Event Type: `airtable-update`
+4. **Action**: 选择 **GitHub App**（搜索 "GitHub"）
+   - 新建一个自定义的 Action："Create a repository dispatch event"
+   - 配置：
+     - **Repository**: `你的用户名/reading-tracker`
+     - **Event Type**: `airtable-update`
+     - **Customer Event Body**（可选）：留空或填 `{}`
 5. 测试并开启 Zap
 
 ### 第九步：验证
