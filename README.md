@@ -2,7 +2,12 @@
 
 将 Airtable 中的阅读记录自动生成 HTML 页面，部署到 GitHub Pages 实现在线访问。
 
+演示地址：
+
+https://nickilism.github.io/reading-tracker/2026_reading_tracker.html
+
 ## 功能
+
 
 - 自动同步 Airtable 阅读数据
 - 生成美观的阅读记录展示页面
@@ -56,33 +61,12 @@
 
 1. **获取书籍信息**
    - 在 [neodb.social](https://neodb.social) 搜索书籍
-   - 复制书籍的 ISBN 或标题
+   - 获取书籍 URL
 
 2. **使用 iOS Shortcuts 自动化**
-   - 创建 Shortcut 调用 Airtable API
-   - 自动填入书名、作者、封面链接等信息
-   - 你也可以用 [Library PnP](https://shortcuts.liukangmatthews.com/) 等现成的 Shortcuts
-
-3. **更新 Airtable**
-   - Shortcut 通过 Airtable REST API 创建/更新记录
-   - 只需在 neodb 标记"已读"后运行 Shortcut
-
-### Airtable API 基本用法
-
-```bash
-# 创建记录
-curl -X POST "https://api.airtable.com/v0/你的BaseID/Books" \
-  -H "Authorization: Bearer 你的API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "fields": {
-      "Title": "书名",
-      "Author": "作者",
-      "Finish Time": "2026-04-27",
-      "My Rating": 8
-    }
-  }'
-```
+   - 创建 Shortcut 调用 neodb.social API
+   - 自动获取书名、作者、封面链接等信息
+   - 通过 Airtable API 创建
 
 ### iOS Shortcuts 示例
 
