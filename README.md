@@ -48,6 +48,51 @@
 
 **"已读"判断标准**：Finish Time 字段不为空
 
+## 向 Airtable 添加数据的推荐方式
+
+由于手动输入较繁琐，推荐使用以下自动化流程：
+
+### 方案：neodb.social + iOS Shortcuts + Airtable API
+
+1. **获取书籍信息**
+   - 在 [neodb.social](https://neodb.social) 搜索书籍
+   - 复制书籍的 ISBN 或标题
+
+2. **使用 iOS Shortcuts 自动化**
+   - 创建 Shortcut 调用 Airtable API
+   - 自动填入书名、作者、封面链接等信息
+   - 你也可以用 [Library PnP](https://shortcuts.liukangmatthews.com/) 等现成的 Shortcuts
+
+3. **更新 Airtable**
+   - Shortcut 通过 Airtable REST API 创建/更新记录
+   - 只需在 neodb 标记"已读"后运行 Shortcut
+
+### Airtable API 基本用法
+
+```bash
+# 创建记录
+curl -X POST "https://api.airtable.com/v0/你的BaseID/Books" \
+  -H "Authorization: Bearer 你的API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fields": {
+      "Title": "书名",
+      "Author": "作者",
+      "Finish Time": "2026-04-27",
+      "My Rating": 8
+    }
+  }'
+```
+
+### iOS Shortcuts 示例
+
+1. 下载 iOS Shortcuts App
+2. 创建新的 Shortcut
+3. 添加操作：
+   - **"Get text from input"** - 输入 ISBN 或书名
+   - **"URL"** - 构建 Airtable API 请求
+   - **"Get contents of URL"** - 发送 POST 请求到 Airtable
+
 ## 部署步骤
 
 ### 第一步：创建 GitHub 仓库
