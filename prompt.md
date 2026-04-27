@@ -1,111 +1,172 @@
 # 阅读记录在线系统
 
-## 项目背景
+将 Airtable 中的阅读记录自动生成 HTML 页面，部署到 GitHub Pages 实现在线访问。
 
-本项目用于将 Airtable 中的阅读记录生成 HTML 页面，并部署到 GitHub Pages 实现在线访问。
+## 功能
+
+- 自动同步 Airtable 阅读数据
+- 生成美观的阅读记录展示页面
+- 支持按年份筛选和统计
+- 自动事件触发或定时更新
+
+## 前提条件
+
+- Airtable 账户（Free/Pro/Enterprise 均可）
+- GitHub 账户
+- Zapier 账户（用于连接 Airtable 和 GitHub）
 
 ## 技术架构
 
-- **数据源**: Airtable Books 表（Base ID: appJJmTgbDFTEnJxz）
-- **生成工具**: reading-tracker-github.js（Node.js）
+- **数据源**: Airtable Books 表
+- **生成工具**: Node.js 脚本
 - **托管平台**: GitHub Pages
-- **自动化**: GitHub Actions
+- **自动化**: GitHub Actions + Zapier
 
 ## 核心文件
 
-- `reading-tracker-github.js` - 主生成脚本，从 Airtable 获取数据生成 HTML
-- `template.js` - HTML 模板
-- `.github/workflows/deploy.yml` - GitHub Actions 工作流
+| 文件 | 说明 |
+|------|------|
+| `reading-tracker-github.js` | 主脚本，从 Airtable 获取数据生成 HTML |
+| `template.js` | HTML 模板文件 |
+| `.github/workflows/deploy.yml` | GitHub Actions 工作流 |
 
-## 触发机制
+## Airtable 表结构要求
 
-1. **事件驱动**（主要）: Airtable Automation 发送 webhook 到 GitHub Actions
-2. **手动触发**: GitHub Actions 页面手动运行
-3. **定时备份**: 每天 UTC 6:00 自动运行
+你的 Airtable Books 表需要包含以下字段：
 
-## 环境变量
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| Title | 文本 | 书名 |
+| Author | 文本 | 作者 |
+| Start Time | 日期 | 开始阅读时间 |
+| Finish Time | 日期 | 完成阅读时间 |
+| My Rating | 数字 | 评分（1-5） |
+| Pages | 数字 | 页数 |
+| Douban Link | URL | 豆瓣链接 |
+| Douban Cover Link | URL | 豆瓣封面图链接 |
+| Review | 文本 | 书评 |
 
-- `AIRTABLE_API_KEY` - 存储在 GitHub Secrets 中
-
-## GitHub Pages
-
-- 部署分支: `gh-pages`
-- 访问地址: `https://用户名.github.io/reading-tracker/`
-
-## 当前进度
-
-- [x] reading-tracker-github.js 已创建
-- [x] deploy.yml 已创建
-- [ ] GitHub 仓库已创建并上传代码
-- [ ] GitHub Secrets 已配置
-- [ ] GitHub Pages 已启用
-- [ ] Airtable Automation 已配置
-- [ ] 测试完成
+**"已读"判断标准**：Finish Time 字段不为空
 
 ## 部署步骤
 
 ### 第一步：创建 GitHub 仓库
 
 1. 登录 GitHub，创建新仓库 `reading-tracker`
-2. 不要勾选 "Add a README file"（因为我们要推送已有文件）
+2. 不要勾选 "Add a README file"
 
-### 第二步：克隆仓库到本地
+### 第二步：配置本地仓库
 
-在 VSCode 中：
-1. `Ctrl+Shift+P` → `Git: Clone`
-2. 粘贴仓库 URL
-3. 选择本地文件夹（不要选 `reading-tracker-github` 文件夹）
-4. 克隆完成后，把 `reading-tracker-github` 文件夹里的所有文件复制到克隆的仓库
+```bash
+# 克隆仓库
+git clone https://github.com/你的用户名/reading-tracker.git
+cd reading-tracker
 
-### 第三步：推送代码
+# 初始化（如果需要从零开始）
+# 复制本项目所有文件到仓库目录
+```
 
-1. VSCode Source Control 面板会显示所有更改
-2. 提交（Commit）并推送（Push）
+### 第三步：修改配置
 
-### 第四步：配置 GitHub Secrets
+在开始使用前，你需要修改以下配置：
+
+#### 1. 修改 Airtable Base ID
+
+编辑 `reading-tracker-github.js` 第37行：
+
+```javascript
+const BASE_ID = '你的Airtable Base ID';
+```
+
+获取方法：在 Airtable URL 中找到 Base ID，格式为 `appXXXXXXXXXXXXXX`
+
+#### 2. 修改 GitHub 仓库地址
+
+编辑 `.github/workflows/deploy.yml` 中的 Zapier webhook URL 或 GitHub dispatch URL
+
+### 第四步：推送代码到 GitHub
+
+```bash
+git add -A
+git commit -m "Initial commit"
+git push -u origin main
+```
+
+### 第五步：配置 GitHub Secrets
 
 1. 进入仓库 **Settings** → **Secrets and variables** → **Actions**
 2. 点击 **New repository secret**
 3. 名称：`AIRTABLE_API_KEY`
-4. 值：你的 Airtable API Token（以 `patiYWpgJBIfOkTSP` 开头的那个）
+4. 值：你的 Airtable API Token
 
-### 第五步：配置 GitHub Pages
+获取 Airtable API Token：
+1. 登录 [Airtable](https://airtable.com)
+2. 点击右上角头像 → **Developer hub**
+3. 点击 **Create new token**
+4. 勾选 `data.records:read` 权限
+5. 复制生成的 token
+
+### 第六步：运行第一次部署
+
+1. 进入 GitHub 仓库 **Actions** 页面
+2. 选择 "Deploy Reading Tracker"
+3. 点击 **Run workflow**
+4. 等待完成
+
+### 第七步：启用 GitHub Pages
 
 1. 进入仓库 **Settings** → **Pages**
-2. **Source**: 选择 `gh-pages` 分支
-3. **Path**: `/ (root)`
+2. **Source**: 选择 `Deploy from a branch`
+3. **Branch**: 选择 `gh-pages`，path 选 `/ (root)`
 4. 点击 **Save**
 
-### 第六步：配置 Personal Access Token
+### 第八步：配置 Zapier 自动触发
 
-1. GitHub **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)**
-2. 点击 **Generate new token**
-3. 勾选 **repo** 权限
-4. 复制生成的 token
+1. 登录 [Zapier](https://zapier.com)
+2. 创建新 Zap
+3. **Trigger**: 选择 **Airtable**
+   - Event: "New or Updated Record"
+   - Base: 选择你的 Base
+   - Table: 选择 Books 表
+4. **Action**: 选择 **GitHub**
+   - Event: "Create a repository dispatch event"
+   - Repository: `你的用户名/reading-tracker`
+   - Event Type: `airtable-update`
+5. 测试并开启 Zap
 
-### 第七步：配置 Airtable Automation
+### 第九步：验证
 
-1. 打开 Airtable，进入 **Books** 表
-2. 点击 **Automations** → **Create automation**
-3. 配置：
-   - **触发**: When record is created or updated
-   - **条件**: Finish Time is not empty
-   - **操作**: Send HTTP request
-     - URL: `https://api.github.com/repos/你的用户名/reading-tracker/dispatches`
-     - Method: POST
-     - Headers:
-       - `Accept: application/vnd.github+json`
-       - `Authorization: Bearer 你的PAT_token`
-       - `X-GitHub-Event: push`
-     - Body: `{"event_type": "airtable-update"}`
+访问 `https://你的用户名.github.io/reading-tracker/2026_reading_tracker.html`
 
-### 第八步：测试
+## 触发方式
 
-1. 手动触发：GitHub Actions → Deploy Reading Tracker → Run workflow
-2. 验证 GitHub Pages 访问正常
+| 方式 | 说明 |
+|------|------|
+| **Zapier 自动触发** | Airtable 记录更新时自动触发（推荐） |
+| **手动触发** | GitHub Actions 页面手动运行 |
+| **定时触发** | 每周一、周四 UTC 6:00 自动运行 |
+
+## 自定义
+
+### 修改显示的年份
+
+编辑 `reading-tracker-github.js` 第155行：
+
+```javascript
+const year = process.argv[2] || String(new Date().getFullYear());
+```
+
+### 修改页面样式
+
+编辑 `template.js` 文件
+
+### 修改国家前缀映射
+
+编辑 `reading-tracker-github.js` 第40-58行的 `COUNTRY_PREFIX_MAP`
 
 ## 相关文档
 
 - [GitHub Actions 文档](https://docs.github.com/en/actions)
 - [GitHub Pages 文档](https://docs.github.com/en/pages)
-- [Airtable Automation 文档](https://support.airtable.com/docs/automation)
+- [Zapier Airtable 集成](https://zapier.com/apps/airtable/integrations)
+- [Airtable API 文档](https://support.airtable.com/docs/automation)
