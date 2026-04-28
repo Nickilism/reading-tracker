@@ -472,7 +472,7 @@
     <div class="booklist-content" id="booklist-content"></div>
   </div>
 
-  <footer id="footer">数据来源 Airtable · Books · 导出于 2026-04-27</footer>
+  <footer id="footer">数据来源 Airtable · Books · 导出于 2026-04-28</footer>
 </div>
 
 <script>
@@ -480,7 +480,7 @@
 // 以下变量由生成脚本注入
 
 const YEAR = 2026;
-const GENERATED_DATE = "2026-04-27";
+const GENERATED_DATE = "2026-04-28";
 
 // 12个月颜色配置
 const MONTH_COLORS = [
@@ -705,7 +705,7 @@ function renderWall(list) {
   const wallEl = document.getElementById('cover-wall');
   wallEl.innerHTML = '';
   // 按 finish 时间升序排列
-  const sorted = [...list].sort((a, b) => a.finish.localeCompare(b.finish));
+  const sorted = getSortedList(list);
   sorted.forEach(b => {
     const item = document.createElement('div');
     item.className = 'cover-item';
