@@ -35,6 +35,19 @@ const template = `<!DOCTYPE html>
       --border: rgba(0,0,0,0.1);
       --accent: #0075de;
       --shadow-hover: 0 2px 6px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
+      --star-empty: rgba(0,0,0,0.15);
+    }
+
+    [data-theme="dark"] {
+      --bg: #121214;
+      --bg-alt: #1c1c1f;
+      --text: rgba(255,255,255,0.92);
+      --text-secondary: #9e9a96;
+      --text-muted: #6b6762;
+      --border: rgba(255,255,255,0.1);
+      --accent: #0075de;
+      --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
+      --star-empty: rgba(255,255,255,0.15);
     }
 
     /* ===== Base ===== */
@@ -45,6 +58,7 @@ const template = `<!DOCTYPE html>
       min-height: 100vh;
       padding: 1rem;
       line-height: 1.5;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     @media (min-width: 768px) {
@@ -93,6 +107,36 @@ const template = `<!DOCTYPE html>
       letter-spacing: -1.5px;
     }
 
+    .title-block h1 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      cursor: pointer;
+      transition: all 0.15s;
+      padding: 0;
+      vertical-align: middle;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--text);
+    }
+
+    .theme-icon {
+      font-size: 13px;
+      line-height: 1;
+    }
+
     @media (min-width: 768px) {
       .title-block h1 { font-size: 2.25rem; letter-spacing: -1px; }
       .year-badge { font-size: 4rem; }
@@ -123,7 +167,7 @@ const template = `<!DOCTYPE html>
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 14px 16px;
-      transition: box-shadow 0.2s;
+      transition: box-shadow 0.2s, background 0.2s ease, border-color 0.2s ease;
     }
 
     .stat:hover {
@@ -153,6 +197,7 @@ const template = `<!DOCTYPE html>
       border-radius: 12px;
       padding: 1.25rem;
       margin-bottom: 1.5rem;
+      transition: background 0.2s ease, border-color 0.2s ease;
     }
 
     .section-title {
@@ -200,6 +245,7 @@ const template = `<!DOCTYPE html>
       border-radius: 12px;
       padding: 1.25rem;
       margin-bottom: 1.5rem;
+      transition: background 0.2s ease, border-color 0.2s ease;
     }
 
     .chart-container {
@@ -331,6 +377,7 @@ const template = `<!DOCTYPE html>
       border: 1px solid var(--border);
       border-radius: 12px;
       overflow: hidden;
+      transition: border-color 0.2s ease;
     }
 
     .booklist-toggle {
@@ -351,7 +398,7 @@ const template = `<!DOCTYPE html>
       transition: background 0.15s;
     }
 
-    .booklist-toggle:hover { background: #eeebe7; }
+    .booklist-toggle:hover { background: var(--bg-alt); filter: brightness(0.95); }
 
     .sort-bar {
       display: flex;
@@ -460,13 +507,13 @@ const template = `<!DOCTYPE html>
     }
 
     .star-half {
-      background: linear-gradient(to right, #f5a623 0%, #f5a623 50%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.15) 100%);
+      background: linear-gradient(to right, #f5a623 0%, #f5a623 50%, var(--star-empty) 50%, var(--star-empty) 100%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .star-empty { color: rgba(0,0,0,0.15); }
+    .star-empty { color: var(--star-empty); }
     .rating-num { font-size: 10px; color: var(--text-muted); font-weight: 600; }
     .pages-tag { font-size: 10px; color: var(--text-muted); }
 
@@ -507,7 +554,12 @@ const template = `<!DOCTYPE html>
     <!-- ===== Header ===== -->
     <header>
       <div class="title-block">
-        <h1>阅读记录</h1>
+        <h1>
+          阅读记录
+          <button class="theme-toggle" id="theme-toggle" aria-label="切换主题">
+            <span class="theme-icon">☀️</span>
+          </button>
+        </h1>
         <p id="subtitle">{{MONTH_RANGE}} {{YEAR}}</p>
       </div>
       <div class="year-badge">{{YEAR}}</div>
@@ -673,6 +725,45 @@ const template = `<!DOCTYPE html>
     const books = {{BOOKS_JSON}};
 
     // ========== 数据注入结束 ==========
+
+    // ===== 主题切换 =====
+    (function() {
+      const STORAGE_KEY = 'reading-tracker-theme';
+      const toggleBtn = document.getElementById('theme-toggle');
+      const icon = toggleBtn?.querySelector('.theme-icon');
+
+      function getPreferredTheme() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) return stored;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem(STORAGE_KEY, theme);
+        if (icon) {
+          icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+        }
+      }
+
+      function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+      }
+
+      applyTheme(getPreferredTheme());
+
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', toggleTheme);
+      }
+
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem(STORAGE_KEY)) {
+          applyTheme(e.matches ? 'dark' : 'light');
+        }
+      });
+    })();
 
     // ===== 初始化 =====
     const actualMonths = [...new Set(books.map(b => b.month))].sort((a, b) => a - b);
@@ -939,6 +1030,9 @@ const template = `<!DOCTYPE html>
 
     // ===== 图表 =====
     const maxMonthlyCount = Math.max(...actualMonths.map(m => monthCounts[m]));
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const chartTextColor = isDark ? '#9e9a96' : '#615d59';
+    const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
     new Chart(document.getElementById('monthChart'), {
       type: 'bar',
       data: {
@@ -962,12 +1056,12 @@ const template = `<!DOCTYPE html>
           y: {
             beginAtZero: true,
             max: Math.max(maxMonthlyCount + 1, 4),
-            ticks: { stepSize: 1, font: { family: 'Inter', size: 11 }, color: '#a39e98' },
-            grid: { color: 'rgba(0,0,0,0.05)' },
+            ticks: { stepSize: 1, font: { family: 'Inter', size: 11 }, color: chartTextColor },
+            grid: { color: chartGridColor },
             border: { display: false }
           },
           x: {
-            ticks: { font: { family: 'Inter', size: 12 }, color: '#615d59' },
+            ticks: { font: { family: 'Inter', size: 12 }, color: chartTextColor },
             grid: { display: false },
             border: { display: false }
           }
@@ -979,7 +1073,7 @@ const template = `<!DOCTYPE html>
           const { ctx, data, scales } = chart;
           ctx.save();
           ctx.font = '600 11px Inter';
-          ctx.fillStyle = '#615d59';
+          ctx.fillStyle = chartTextColor;
           ctx.textAlign = 'center';
           data.datasets[0].data.forEach((value, index) => {
             if (value > 0) {
