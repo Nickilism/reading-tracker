@@ -29,6 +29,9 @@ jobs:
         with:
           node-version: '24'
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Generate Reading Tracker
         env:
           AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
