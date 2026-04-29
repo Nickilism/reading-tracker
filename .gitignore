@@ -20,5 +20,5 @@ npm-debug.log*
 node_modules/
 
 # Generated files (can be regenerated)
-*_reading_tracker.html
+# *_reading_tracker.html  # 已在 workflow 中处理
 !reading archive/*.html
