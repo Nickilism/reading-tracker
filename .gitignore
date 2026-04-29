@@ -1,0 +1,21 @@
+# Environment variables (contains API keys)
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# Generated files (can be regenerated)
+*_reading_tracker.html
+!reading archive/*.html
