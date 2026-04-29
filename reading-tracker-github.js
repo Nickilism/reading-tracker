@@ -24,6 +24,8 @@
 
 const https = require('https');
 const fs = require('fs');
+process.env.DOTENV_CONFIG_QUIET = 'true';
+require('dotenv').config({ debug: false });
 
 // API Key 从环境变量读取
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
@@ -32,8 +34,9 @@ if (!AIRTABLE_API_KEY) {
   process.exit(1);
 }
 
-// Load template: require() returns the string directly (not evaluated)
-const TEMPLATE = require('./template.js');
+// Load template: read file as raw string, extract template literal content
+const templateContent = fs.readFileSync('./template.js', 'utf8');
+const TEMPLATE = templateContent.match(/const template = `([\s\S]*)`;/)[1];
 const BASE_ID = 'appJJmTgbDFTEnJxz';
 const TABLE_NAME = 'Books';
 
