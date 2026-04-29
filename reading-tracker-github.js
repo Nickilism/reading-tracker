@@ -33,8 +33,8 @@ if (!AIRTABLE_API_KEY) {
   process.exit(1);
 }
 
-// Load template: require() returns the string directly (not evaluated)
-const TEMPLATE = require('./template.js');
+// Load template: read file as raw string (not evaluated)
+const TEMPLATE = fs.readFileSync('./template.js', 'utf8');
 const BASE_ID = 'appJJmTgbDFTEnJxz';
 const TABLE_NAME = 'Books';
 
