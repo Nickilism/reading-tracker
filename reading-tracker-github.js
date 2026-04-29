@@ -35,7 +35,7 @@ if (!AIRTABLE_API_KEY) {
 
 // Load template: read file as raw string, extract template literal content
 const templateContent = fs.readFileSync('./template.js', 'utf8');
-const TEMPLATE = templateContent.match(/const template = `([\s\S]*?)`;/)[1];
+const TEMPLATE = templateContent.match(/const template = `([\s\S]*)`;/)[1];
 const BASE_ID = 'appJJmTgbDFTEnJxz';
 const TABLE_NAME = 'Books';
 
