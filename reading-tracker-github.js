@@ -24,6 +24,7 @@
 
 const https = require('https');
 const fs = require('fs');
+require('dotenv').config();
 
 // API Key 从环境变量读取
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;

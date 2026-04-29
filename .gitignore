@@ -16,6 +16,9 @@ Thumbs.db
 *.log
 npm-debug.log*
 
+# Node modules
+node_modules/
+
 # Generated files (can be regenerated)
 *_reading_tracker.html
 !reading archive/*.html
