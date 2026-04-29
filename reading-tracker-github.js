@@ -24,6 +24,7 @@
 
 const https = require('https');
 const fs = require('fs');
+process.env.DOTENV_LOG_MUTE = 'true';
 require('dotenv').config();
 
 // API Key 从环境变量读取
