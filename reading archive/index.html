@@ -1,11 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh" data-theme="light">
+<html lang="zh" id="html">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="">
-  <script>window.onerror=function(m,s,l,c){return true;};</script>
-  <script>var _h=document.querySelector('html');_h&&(_h.setAttribute('data-theme',localStorage.getItem('theme_color')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')));</script>
   <title>阅读记录归档</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -37,7 +35,7 @@
       --shadow-hover: 0 2px 6px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
     }
 
-    [data-theme="dark"] {
+    .theme-dark {
       --bg: #121214;
       --bg-alt: #1c1c1f;
       --text: rgba(255,255,255,0.92);
@@ -256,38 +254,46 @@
     (function() {
       const toggleBtn = document.getElementById('theme-toggle');
       const icon = toggleBtn?.querySelector('.theme-icon');
+      const themeColor = document.querySelector('meta[name="theme-color"]');
 
-      function getPreferredTheme() {
-        const stored = localStorage.getItem('theme_color');
-        if (stored) return stored;
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      // darkMode: 0=跟随系统, 1=强制亮色, 2=强制暗色
+      let darkMode = 0;
+      if (navigator.cookieEnabled) {
+        darkMode = parseInt(localStorage.getItem('darkMode')) || 0;
       }
 
-      function applyTheme(theme) {
-        document.querySelector('html').setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
+      function applyTheme() {
+        const matchMedia = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if ((!darkMode && matchMedia) || darkMode === 2) {
+          document.getElementById('html').className = 'theme-dark';
+          if (themeColor) themeColor.setAttribute('content', '#1f1f22');
+        } else {
+          document.getElementById('html').className = '';
+          if (themeColor) themeColor.setAttribute('content', '#ffffff');
+        }
         if (icon) {
-          icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+          const isDark = document.getElementById('html').classList.contains('theme-dark');
+          icon.textContent = isDark ? '🌙' : '☀️';
         }
       }
 
       function toggleTheme() {
-        const current = document.querySelector('html').getAttribute('data-theme');
-        const next = current === 'dark' ? 'light' : 'dark';
-        applyTheme(next);
+        const isDark = document.getElementById('html').classList.contains('theme-dark');
+        darkMode = isDark ? 1 : 2;
+        localStorage.setItem('darkMode', darkMode);
+        applyTheme();
       }
 
       if (toggleBtn) {
         toggleBtn.addEventListener('click', toggleTheme);
       }
 
-      // Initialize theme
-      applyTheme(getPreferredTheme());
+      applyTheme();
 
-      // Listen for system theme changes
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (!localStorage.getItem('theme')) {
-          applyTheme(e.matches ? 'dark' : 'light');
+      // 监听系统主题变化（仅在用户未手动选择时生效）
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (darkMode === 0) {
+          applyTheme();
         }
       });
     })();
