@@ -50,7 +50,6 @@
       --accent: #0075de;
       --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
       --star-empty: rgba(255,255,255,0.15);
-      color-scheme: dark;
     }
 
     /* ===== Base ===== */
@@ -723,41 +722,49 @@
 
     // ===== 主题切换 =====
     (function() {
-      const STORAGE_KEY = 'reading-tracker-theme';
+      const STORAGE_KEY = 'darkMode';
       const toggleBtn = document.getElementById('theme-toggle');
       const icon = toggleBtn?.querySelector('.theme-icon');
+      const themeColor = document.querySelector('meta[name="theme-color"]');
 
-      function getPreferredTheme() {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) return stored;
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      // darkMode: 0=跟随系统, 1=强制亮色, 2=强制暗色
+      let darkMode = 0;
+      if (navigator.cookieEnabled) {
+        darkMode = parseInt(localStorage.getItem(STORAGE_KEY)) || 0;
       }
 
-      function applyTheme(theme) {
-        document.getElementById('html').className = theme === 'dark' ? 'theme-dark' : '';
-        localStorage.setItem(STORAGE_KEY, theme);
-        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-        if (themeColorMeta) {
-          themeColorMeta.setAttribute('content', theme === 'dark' ? '#121214' : '#ffffff');
+      function applyTheme() {
+        const matchMedia = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if ((!darkMode && matchMedia) || darkMode === 2) {
+          document.getElementById('html').className = 'theme-dark';
+          if (themeColor) themeColor.setAttribute('content', '#1f1f22');
+        } else {
+          document.getElementById('html').className = '';
+          if (themeColor) themeColor.setAttribute('content', '#ffffff');
         }
         if (icon) {
-          icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+          const isDark = document.getElementById('html').classList.contains('theme-dark');
+          icon.textContent = isDark ? '🌙' : '☀️';
         }
       }
 
       function toggleTheme() {
-        const current = document.getElementById('html').classList.contains('theme-dark') ? 'dark' : 'light';
-        const next = current === 'dark' ? 'light' : 'dark';
-        applyTheme(next);
+        const isDark = document.getElementById('html').classList.contains('theme-dark');
+        darkMode = isDark ? 1 : 2;
+        localStorage.setItem(STORAGE_KEY, darkMode);
+        applyTheme();
       }
+
+      applyTheme();
 
       if (toggleBtn) {
         toggleBtn.addEventListener('click', toggleTheme);
       }
 
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (!localStorage.getItem(STORAGE_KEY)) {
-          applyTheme(e.matches ? 'dark' : 'light');
+      // 监听系统主题变化（仅在用户未手动选择时生效）
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (darkMode === 0) {
+          applyTheme();
         }
       });
     })();
