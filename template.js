@@ -11,11 +11,12 @@
  */
 
 const template = `<!DOCTYPE html>
-<html lang="zh">
+<html lang="zh" id="html">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="">
   <title>{{YEAR}} 阅读记录</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -51,7 +52,7 @@ const template = `<!DOCTYPE html>
       --star-empty: rgba(0,0,0,0.15);
     }
 
-    [data-theme="dark"] {
+    .theme-dark {
       --bg: #121214;
       --bg-alt: #1c1c1f;
       --text: rgba(255,255,255,0.92);
@@ -744,7 +745,7 @@ const template = `<!DOCTYPE html>
       }
 
       function applyTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
+        document.getElementById('html').className = theme === 'dark' ? 'theme-dark' : '';
         localStorage.setItem(STORAGE_KEY, theme);
         if (icon) {
           icon.textContent = theme === 'dark' ? '🌙' : '☀️';
@@ -752,7 +753,7 @@ const template = `<!DOCTYPE html>
       }
 
       function toggleTheme() {
-        const current = document.documentElement.getAttribute('data-theme');
+        const current = document.getElementById('html').classList.contains('theme-dark') ? 'dark' : 'light';
         const next = current === 'dark' ? 'light' : 'dark';
         applyTheme(next);
       }
@@ -1035,7 +1036,7 @@ const template = `<!DOCTYPE html>
 
     // ===== 图表 =====
     const maxMonthlyCount = Math.max(...actualMonths.map(m => monthCounts[m]));
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const isDark = document.getElementById('html').classList.contains('theme-dark');
     const chartTextColor = isDark ? '#9e9a96' : '#615d59';
     const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
     new Chart(document.getElementById('monthChart'), {
