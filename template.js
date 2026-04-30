@@ -62,6 +62,7 @@ const template = `<!DOCTYPE html>
       --accent: #0075de;
       --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
       --star-empty: rgba(255,255,255,0.15);
+      color-scheme: dark;
     }
 
     /* ===== Base ===== */
@@ -747,6 +748,10 @@ const template = `<!DOCTYPE html>
       function applyTheme(theme) {
         document.getElementById('html').className = theme === 'dark' ? 'theme-dark' : '';
         localStorage.setItem(STORAGE_KEY, theme);
+        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+        if (themeColorMeta) {
+          themeColorMeta.setAttribute('content', theme === 'dark' ? '#121214' : '#ffffff');
+        }
         if (icon) {
           icon.textContent = theme === 'dark' ? '🌙' : '☀️';
         }
@@ -757,8 +762,6 @@ const template = `<!DOCTYPE html>
         const next = current === 'dark' ? 'light' : 'dark';
         applyTheme(next);
       }
-
-      applyTheme(getPreferredTheme());
 
       if (toggleBtn) {
         toggleBtn.addEventListener('click', toggleTheme);
