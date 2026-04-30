@@ -120,16 +120,11 @@ const template = `<!DOCTYPE html>
       width: 28px;
       height: 28px;
       border-radius: 9999px;
-      border: 1px solid var(--border);
-      background: var(--bg);
+      border: none;
+      background: transparent;
       cursor: pointer;
-      transition: all 0.15s;
       padding: 0;
       vertical-align: middle;
-    }
-
-    .theme-toggle:hover {
-      border-color: var(--text);
     }
 
     .theme-icon {

@@ -21,4 +21,7 @@ node_modules/
 
 # Generated files (can be regenerated)
 # *_reading_tracker.html  # 已在 workflow 中处理
+
+# Claude Code guidance
+CLAUDE.md
 !reading archive/*.html
