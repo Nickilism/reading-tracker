@@ -23,16 +23,14 @@
       --shadow-hover: 0 2px 6px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #121214;
-        --bg-alt: #1c1c1f;
-        --text: rgba(255,255,255,0.92);
-        --text-secondary: #9e9a96;
-        --text-muted: #6b6762;
-        --border: rgba(255,255,255,0.1);
-        --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
-      }
+    [data-theme="dark"] {
+      --bg: #121214;
+      --bg-alt: #1c1c1f;
+      --text: rgba(255,255,255,0.92);
+      --text-secondary: #9e9a96;
+      --text-muted: #6b6762;
+      --border: rgba(255,255,255,0.1);
+      --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
     }
 
     body {
@@ -54,6 +52,9 @@
       border-bottom: 1px solid var(--border);
       padding-bottom: 1.25rem;
       margin-bottom: 2rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
     }
 
     h1 {
@@ -71,6 +72,27 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       font-weight: 500;
+    }
+
+    .theme-toggle {
+      background: var(--bg-alt);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .theme-toggle:hover {
+      background: var(--border);
+    }
+
+    .theme-toggle:active {
+      transform: scale(0.95);
     }
 
     .archive-list {
@@ -159,8 +181,13 @@
 <body>
   <div class="page">
     <header>
-      <h1>阅读记录归档</h1>
-      <p class="subtitle">Reading Tracker Archive</p>
+      <div>
+        <h1>阅读记录归档</h1>
+        <p class="subtitle">Reading Tracker Archive</p>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" aria-label="切换主题">
+        <span class="theme-icon">☀️</span>
+      </button>
     </header>
 
     <div class="archive-list">
@@ -210,5 +237,46 @@
       </a>
     </footer>
   </div>
+
+  <script>
+    (function() {
+      const toggleBtn = document.getElementById('theme-toggle');
+      const icon = toggleBtn?.querySelector('.theme-icon');
+
+      function getPreferredTheme() {
+        const stored = localStorage.getItem('theme');
+        if (stored) return stored;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        if (icon) {
+          icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+        }
+      }
+
+      function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+      }
+
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', toggleTheme);
+      }
+
+      // Initialize theme
+      applyTheme(getPreferredTheme());
+
+      // Listen for system theme changes
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+          applyTheme(e.matches ? 'dark' : 'light');
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
