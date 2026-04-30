@@ -1,21 +1,9 @@
-/**
- * template.js - 阅读记录 HTML 模板
- *
- * 生成脚本通过 String.replace() 注入以下变量：
- *   {{YEAR}}          - 年份
- *   {{GENERATED_DATE}} - 生成日期
- *   {{BOOKS_JSON}}    - 书籍数据 JSON
- *
- * 结构说明：
- *   HTML 模板 → CSS 样式 → JavaScript 逻辑
- */
-
-const template = `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{YEAR}} 阅读记录</title>
+  <title>2019 阅读记录</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <style>
@@ -555,9 +543,9 @@ const template = `<!DOCTYPE html>
             <span class="theme-icon">☀️</span>
           </button>
         </h1>
-        <p id="subtitle">{{MONTH_RANGE}} {{YEAR}}</p>
+        <p id="subtitle">{{MONTH_RANGE}} 2019</p>
       </div>
-      <div class="year-badge">{{YEAR}}</div>
+      <div class="year-badge">2019</div>
     </header>
 
     <!-- ===== Stats Grid ===== -->
@@ -623,7 +611,7 @@ const template = `<!DOCTYPE html>
     </div>
 
     <!-- ===== Footer ===== -->
-    <footer id="footer">数据来源 Airtable · Books · 导出于 {{GENERATED_DATE}}</footer>
+    <footer id="footer">数据来源 Airtable · Books · 导出于 2026-04-29</footer>
 
   </div>
 
@@ -631,8 +619,8 @@ const template = `<!DOCTYPE html>
     // ========== 数据注入开始 ==========
     // 以下变量由生成脚本注入
 
-    const YEAR = {{YEAR}};
-    const GENERATED_DATE = "{{GENERATED_DATE}}";
+    const YEAR = 2019;
+    const GENERATED_DATE = "2026-04-29";
 
     // 12个月颜色配置
     const MONTH_COLORS = [
@@ -717,7 +705,7 @@ const template = `<!DOCTYPE html>
     }
 
     // 书籍数据（由生成脚本注入）
-    const books = {{BOOKS_JSON}};
+    const books = [{"title":"刀锋","author":"[英] 毛姆","start":"2018-12-22","finish":"2019-01-28","rating":8.5,"pages":"464","doubanLink":"https://book.douban.com/subject/26896878/","cover":"https://neodb.social/m/book/2021/09/155a94b23f-6133-4cfd-9157-9e0d00c345ec.jpg","review":"读的第二本毛姆的小说，微信阅读，耗时9个多小时","month":1,"country":"英国"},{"title":"流浪地球","author":"刘慈欣","start":"2019-02-10","finish":"2019-02-12","rating":7.8,"pages":"293","doubanLink":"https://book.douban.com/subject/3266609/","cover":"https://neodb.social/m/book/2021/09/15b58fb37b-0313-46ac-b2d9-e52db5d97ca0.jpg","review":"","month":2,"country":"中国"},{"title":"局外人","author":"[法] 阿尔贝·加缪","start":"2019-01-30","finish":"2019-02-13","rating":8,"pages":"128","doubanLink":"https://book.douban.com/subject/4908885/","cover":"https://neodb.social/m/item/book/2026/02/11/b72ae794-7277-4244-a303-01b04580c004.jpeg","review":"","month":2,"country":"法国"},{"title":"献给虚无的供物","author":"（日）中井英夫","start":"2019-02-14","finish":"2019-03-09","rating":8.3,"pages":"484","doubanLink":"https://book.douban.com/subject/10515231/","cover":"https://neodb.social/m/book/2021/09/16f44650ed-a0fc-4682-9a4d-559b8aa84c43.jpg","review":"","month":3,"country":"日本"},{"title":"正面管教","author":"[美]简·尼尔森","start":"2019-05-06","finish":"2019-06-14","rating":8.3,"pages":"276","doubanLink":"https://book.douban.com/subject/3420606","cover":"https://neodb.social/m/book/2021/10/125fbc1caa-e7a7-41d3-bb37-2e5fd913dc5c.jpg","review":"","month":6,"country":"美国"},{"title":"空椅子","author":"（美）杰夫里·迪弗","start":"2019-06-29","finish":"2019-07-10","rating":8,"pages":"487","doubanLink":"https://book.douban.com/subject/3130849/","cover":"https://neodb.social/m/book/2021/09/174d98f2a2-a32f-48d9-af77-f72f0bdf0b93.jpg","review":"","month":7,"country":"美国"},{"title":"肠子","author":"[美] 恰克·帕拉尼克","start":"2019-07-13","finish":"2019-08-05","rating":7,"pages":"408","doubanLink":"https://book.douban.com/subject/5920385","cover":"https://neodb.social/m/book/2021/09/156007b797-851a-426c-bb39-c5d92aca9f69.jpg","review":"","month":8,"country":"美国"},{"title":"苏菲的世界","author":"[挪] 乔斯坦·贾德","start":"2019-06-10","finish":"2019-10-05","rating":8.8,"pages":"528","doubanLink":"https://book.douban.com/subject/2284311/","cover":"https://neodb.social/m/book/2021/09/153b4ac4f7-3931-4f95-bc29-aa27619f058e.jpg","review":"因为自己的原因，竟然花了三个多月才看完这本书。作为哲学入门书籍，作者以时间线为基础走马观花的介绍了各种哲学派别，代表人物，虽不深入却也能给我等菜鸟一个观察哲学的角度。书中也有作者的巧思，用书中书的概念去解释一些并没那么好理解的哲学概念。哲学正是一个晦涩难懂的科目，我想也正如最后作者自己说的，这本书要多读几次才行。","month":10,"country":"中国"},{"title":"长夜难明","author":"紫金陈","start":"2019-10-05","finish":"2019-10-08","rating":8.5,"pages":"288","doubanLink":"https://book.douban.com/subject/26923390","cover":"https://neodb.social/m/book/2021/09/1509ab1503-e6d1-4dcb-8b0f-e9f24e69d82d.jpg","review":"国产推理几乎没看过，这本值得推荐，光能出版就值了。","month":10,"country":"中国"},{"title":"浮生六记","author":"（清）沈复","start":"2019-10-08","finish":"2019-10-10","rating":7,"pages":"80","doubanLink":"https://book.douban.com/subject/1088581/","cover":"https://neodb.social/m/book/2021/09/159f19504e-6c0c-43e6-a814-14c3ef5c0ff1.jpg","review":"走马观花，无甚感觉","month":10,"country":"中国"},{"title":"依存","author":"[日]西泽保彦","start":"2019-04-17","finish":"2019-10-22","rating":8,"pages":"455","doubanLink":"http://m.douban.com/book/subject/11504246/","cover":"https://neodb.social/m/item/book/2026/02/10/bcf5f451-63a2-45d4-bf7a-2931d4ada07f.jpg","review":"不知道这是看的第几本西泽保彦的书，也不知道是匠千晓系列的第几本，但应该是这一系列的最后一本吧？非常喜欢这一系列的各个人设，这一本也是保质保量的延续。对于一件事情的发生，作者总能给出各种不同角度，不同逻辑的解释方法，最后再来一给脑洞大开的结论。相对于系列前作，本书在新颖的点在于选择了其中一位故事人物作为叙述载体，人物感情情节有了较大的推进，揭秘了匠仔的身世，同时在推理的主题下面加上了很多心理学层面的思考。推荐。","month":10,"country":"日本"}];
 
     // ========== 数据注入结束 ==========
 
@@ -1084,6 +1072,3 @@ const template = `<!DOCTYPE html>
   </script>
 </body>
 </html>
-`;
-
-module.exports = template;
