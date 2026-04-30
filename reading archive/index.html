@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh" id="html">
+<html lang="zh" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="">
+  <script>window.onerror=function(m,s,l,c){return true;};</script>
+  <script>var _h=document.querySelector('html');_h&&(_h.setAttribute('data-theme',localStorage.getItem('theme_color')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')));</script>
   <title>阅读记录归档</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -35,7 +37,7 @@
       --shadow-hover: 0 2px 6px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
     }
 
-    .theme-dark {
+    [data-theme="dark"] {
       --bg: #121214;
       --bg-alt: #1c1c1f;
       --text: rgba(255,255,255,0.92);
@@ -251,54 +253,41 @@
   </div>
 
   <script>
-    // ===== 主题切换 =====
     (function() {
-      const STORAGE_KEY = 'darkMode';
       const toggleBtn = document.getElementById('theme-toggle');
       const icon = toggleBtn?.querySelector('.theme-icon');
-      const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 
-      // 读取用户手动设置（0=未设置，1=强制浅色，2=强制暗色）
-      let darkMode = localStorage.getItem(STORAGE_KEY)
-        ? parseInt(localStorage.getItem(STORAGE_KEY))
-        : 0;
+      function getPreferredTheme() {
+        const stored = localStorage.getItem('theme_color');
+        if (stored) return stored;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
 
-      // 检测系统暗色模式
-      const matchMedia = window.matchMedia
-        && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-      // 判断逻辑
-      function applyTheme() {
-        if ((!darkMode && matchMedia) || darkMode === 2) {
-          document.getElementById('html').className = 'theme-dark';
-          if (themeColorMeta) themeColorMeta.setAttribute('content', '#1f1f22');
-          if (icon) icon.textContent = '🌙';
-        } else {
-          document.getElementById('html').className = '';
-          if (themeColorMeta) themeColorMeta.setAttribute('content', '#ffffff');
-          if (icon) icon.textContent = '☀️';
+      function applyTheme(theme) {
+        document.querySelector('html').setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        if (icon) {
+          icon.textContent = theme === 'dark' ? '🌙' : '☀️';
         }
       }
 
       function toggleTheme() {
-        if (darkMode !== 1) {
-          darkMode = 1;
-        } else {
-          darkMode = 2;
-        }
-        localStorage.setItem(STORAGE_KEY, String(darkMode));
-        applyTheme();
+        const current = document.querySelector('html').getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
       }
-
-      applyTheme();
 
       if (toggleBtn) {
         toggleBtn.addEventListener('click', toggleTheme);
       }
 
+      // Initialize theme
+      applyTheme(getPreferredTheme());
+
+      // Listen for system theme changes
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (darkMode === 0) {
-          applyTheme();
+        if (!localStorage.getItem('theme')) {
+          applyTheme(e.matches ? 'dark' : 'light');
         }
       });
     })();

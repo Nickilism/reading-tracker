@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh" id="html">
+<html lang="zh" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="">
+  <script>window.onerror=function(m,s,l,c){return true;};</script>
+  <script>var _h=document.querySelector('html');_h&&(_h.setAttribute('data-theme',localStorage.getItem('theme_color')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')));</script>
   <title>2026 阅读记录</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -722,55 +724,39 @@
 
     // ===== 主题切换 =====
     (function() {
-      const STORAGE_KEY = 'darkMode';
+      const STORAGE_KEY = 'theme_color';
       const toggleBtn = document.getElementById('theme-toggle');
       const icon = toggleBtn?.querySelector('.theme-icon');
-      const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 
-      // 读取用户手动设置（0=未设置，1=强制浅色，2=强制暗色）
-      let darkMode = localStorage.getItem(STORAGE_KEY)
-        ? parseInt(localStorage.getItem(STORAGE_KEY))
-        : 0;
+      function getPreferredTheme() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) return stored;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
 
-      // 检测系统暗色模式
-      const matchMedia = window.matchMedia
-        && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-      // 判断逻辑
-      function applyTheme() {
-        if ((!darkMode && matchMedia) || darkMode === 2) {
-          document.getElementById('html').className = 'theme-dark';
-          if (themeColorMeta) themeColorMeta.setAttribute('content', '#1f1f22');
-          if (icon) icon.textContent = '🌙';
-        } else {
-          document.getElementById('html').className = '';
-          if (themeColorMeta) themeColorMeta.setAttribute('content', '#ffffff');
-          if (icon) icon.textContent = '☀️';
+      function applyTheme(theme) {
+        document.querySelector('html').setAttribute('data-theme', theme);
+        localStorage.setItem(STORAGE_KEY, theme);
+        if (icon) {
+          icon.textContent = theme === 'dark' ? '🌙' : '☀️';
         }
       }
 
       function toggleTheme() {
-        // 在未设置/系统偏好时点击：用户主动选择，记忆为浅色
-        // 如果当前是暗色，切换为浅色
-        if (darkMode !== 1) {
-          darkMode = 1;
-        } else {
-          // 如果当前是浅色，切换为暗色
-          darkMode = 2;
-        }
-        localStorage.setItem(STORAGE_KEY, String(darkMode));
-        applyTheme();
+        const current = document.querySelector('html').getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
       }
 
-      applyTheme();
+      applyTheme(getPreferredTheme());
 
       if (toggleBtn) {
         toggleBtn.addEventListener('click', toggleTheme);
       }
 
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (darkMode === 0) {
-          applyTheme();
+        if (!localStorage.getItem(STORAGE_KEY)) {
+          applyTheme(e.matches ? 'dark' : 'light');
         }
       });
     })();
@@ -1040,7 +1026,7 @@
 
     // ===== 图表 =====
     const maxMonthlyCount = Math.max(...actualMonths.map(m => monthCounts[m]));
-    const isDark = document.getElementById('html').classList.contains('theme-dark');
+    const isDark = document.querySelector('html').getAttribute('data-theme') === 'dark';
     const chartTextColor = isDark ? '#9e9a96' : '#615d59';
     const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
     new Chart(document.getElementById('monthChart'), {
