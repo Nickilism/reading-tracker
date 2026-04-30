@@ -43,6 +43,7 @@
       --text-muted: #6b6762;
       --border: rgba(255,255,255,0.1);
       --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
+      color-scheme: dark;
     }
 
     body {
@@ -264,6 +265,10 @@
       function applyTheme(theme) {
         document.getElementById('html').className = theme === 'dark' ? 'theme-dark' : '';
         localStorage.setItem('theme', theme);
+        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+        if (themeColorMeta) {
+          themeColorMeta.setAttribute('content', theme === 'dark' ? '#121214' : '#ffffff');
+        }
         if (icon) {
           icon.textContent = theme === 'dark' ? '🌙' : '☀️';
         }
@@ -278,9 +283,6 @@
       if (toggleBtn) {
         toggleBtn.addEventListener('click', toggleTheme);
       }
-
-      // Initialize theme
-      applyTheme(getPreferredTheme());
 
       // Listen for system theme changes
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
