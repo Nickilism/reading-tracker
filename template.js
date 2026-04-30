@@ -62,7 +62,6 @@ const template = `<!DOCTYPE html>
       --accent: #0075de;
       --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
       --star-empty: rgba(255,255,255,0.15);
-      color-scheme: dark;
     }
 
     /* ===== Base ===== */
@@ -735,41 +734,55 @@ const template = `<!DOCTYPE html>
 
     // ===== 主题切换 =====
     (function() {
-      const STORAGE_KEY = 'reading-tracker-theme';
+      const STORAGE_KEY = 'darkMode';
       const toggleBtn = document.getElementById('theme-toggle');
       const icon = toggleBtn?.querySelector('.theme-icon');
+      const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 
-      function getPreferredTheme() {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) return stored;
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      }
+      // 读取用户手动设置（0=未设置，1=强制浅色，2=强制暗色）
+      let darkMode = localStorage.getItem(STORAGE_KEY)
+        ? parseInt(localStorage.getItem(STORAGE_KEY))
+        : 0;
 
-      function applyTheme(theme) {
-        document.getElementById('html').className = theme === 'dark' ? 'theme-dark' : '';
-        localStorage.setItem(STORAGE_KEY, theme);
-        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-        if (themeColorMeta) {
-          themeColorMeta.setAttribute('content', theme === 'dark' ? '#121214' : '#ffffff');
-        }
-        if (icon) {
-          icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+      // 检测系统暗色模式
+      const matchMedia = window.matchMedia
+        && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+      // 判断逻辑
+      function applyTheme() {
+        if ((!darkMode && matchMedia) || darkMode === 2) {
+          document.getElementById('html').className = 'theme-dark';
+          if (themeColorMeta) themeColorMeta.setAttribute('content', '#1f1f22');
+          if (icon) icon.textContent = '🌙';
+        } else {
+          document.getElementById('html').className = '';
+          if (themeColorMeta) themeColorMeta.setAttribute('content', '#ffffff');
+          if (icon) icon.textContent = '☀️';
         }
       }
 
       function toggleTheme() {
-        const current = document.getElementById('html').classList.contains('theme-dark') ? 'dark' : 'light';
-        const next = current === 'dark' ? 'light' : 'dark';
-        applyTheme(next);
+        // 在未设置/系统偏好时点击：用户主动选择，记忆为浅色
+        // 如果当前是暗色，切换为浅色
+        if (darkMode !== 1) {
+          darkMode = 1;
+        } else {
+          // 如果当前是浅色，切换为暗色
+          darkMode = 2;
+        }
+        localStorage.setItem(STORAGE_KEY, String(darkMode));
+        applyTheme();
       }
+
+      applyTheme();
 
       if (toggleBtn) {
         toggleBtn.addEventListener('click', toggleTheme);
       }
 
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (!localStorage.getItem(STORAGE_KEY)) {
-          applyTheme(e.matches ? 'dark' : 'light');
+        if (darkMode === 0) {
+          applyTheme();
         }
       });
     })();
