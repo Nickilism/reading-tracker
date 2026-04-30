@@ -3,9 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
   <title>阅读记录归档</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #121214;
+        --bg-alt: #1c1c1f;
+        --text: rgba(255,255,255,0.92);
+        --text-secondary: #9e9a96;
+        --text-muted: #6b6762;
+        --border: rgba(255,255,255,0.1);
+        --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
+      }
+    }
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
