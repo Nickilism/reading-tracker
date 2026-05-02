@@ -19,9 +19,11 @@
       const isDark = darkMode === 2 || (darkMode === 0 && prefersDark);
       if (isDark) {
         root.classList.add('theme-dark');
+        root.classList.remove('theme-light');
         if (themeColor) themeColor.setAttribute('content', '#1f1f22');
       } else {
         root.classList.remove('theme-dark');
+        if (darkMode === 1) root.classList.add('theme-light');
         if (themeColor) themeColor.setAttribute('content', '#ffffff');
       }
     })();
@@ -29,18 +31,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <style>
     /* ===== Reset & Variables ===== */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #121214;
-        --bg-alt: #1c1c1f;
-        --text: rgba(255,255,255,0.92);
-        --text-secondary: #9e9a96;
-        --text-muted: #6b6762;
-        --border: rgba(255,255,255,0.1);
-        --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
-        --star-empty: rgba(255,255,255,0.15);
-      }
-    }
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
@@ -69,6 +59,20 @@
       --accent: #0075de;
       --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
       --star-empty: rgba(255,255,255,0.15);
+    }
+
+    /* System dark mode: follow iOS, but respect explicit light-mode choice */
+    @media (prefers-color-scheme: dark) {
+      :root:not(.theme-light) {
+        --bg: #121214;
+        --bg-alt: #1c1c1f;
+        --text: rgba(255,255,255,0.92);
+        --text-secondary: #9e9a96;
+        --text-muted: #6b6762;
+        --border: rgba(255,255,255,0.1);
+        --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
+        --star-empty: rgba(255,255,255,0.15);
+      }
     }
 
     /* ===== Base ===== */
@@ -758,7 +762,7 @@
           document.getElementById('html').className = 'theme-dark';
           if (themeColor) themeColor.setAttribute('content', '#1f1f22');
         } else {
-          document.getElementById('html').className = '';
+          document.getElementById('html').className = darkMode === 1 ? 'theme-light' : '';
           if (themeColor) themeColor.setAttribute('content', '#ffffff');
         }
         if (icon) {
