@@ -19,6 +19,25 @@ const template = `<!DOCTYPE html>
   <meta name="theme-color" content="">
   <title>{{YEAR}} 阅读记录</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      const root = document.getElementById('html');
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      let darkMode = 0;
+      try {
+        darkMode = parseInt(localStorage.getItem('darkMode'), 10) || 0;
+      } catch (_) {}
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = darkMode === 2 || (darkMode === 0 && prefersDark);
+      if (isDark) {
+        root.classList.add('theme-dark');
+        if (themeColor) themeColor.setAttribute('content', '#1f1f22');
+      } else {
+        root.classList.remove('theme-dark');
+        if (themeColor) themeColor.setAttribute('content', '#ffffff');
+      }
+    })();
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <style>
     /* ===== Reset & Variables ===== */
@@ -774,11 +793,19 @@ const template = `<!DOCTYPE html>
       }
 
       // 监听系统主题变化（仅在用户未手动选择时生效）
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-        if (darkMode === 0) {
-          applyTheme();
+      const colorSchemeMedia = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+      if (colorSchemeMedia) {
+        const handleChange = () => {
+          if (darkMode === 0) {
+            applyTheme();
+          }
+        };
+        if (typeof colorSchemeMedia.addEventListener === 'function') {
+          colorSchemeMedia.addEventListener('change', handleChange);
+        } else if (typeof colorSchemeMedia.addListener === 'function') {
+          colorSchemeMedia.addListener(handleChange);
         }
-      });
+      }
     })();
 
     // ===== 初始化 =====
