@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh" id="html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>Dark Mode Diagnostic</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #ffffff; --text: #000000; }
+    .theme-dark { --bg: #121214; --text: #ffffff; }
+    @media (prefers-color-scheme: dark) {
+      :root:not(.theme-light) { --bg: #121214; --text: #ffffff; }
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; padding: 2rem; }
+    .info { margin: 1rem 0; padding: 1rem; border: 1px solid var(--text); border-radius: 8px; }
+    .label { font-size: 12px; opacity: 0.6; }
+    .value { font-size: 18px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Dark Mode 诊断</h1>
+  <div class="info">
+    <div class="label">系统 prefers-color-scheme</div>
+    <div class="value" id="media-query">—</div>
+  </div>
+  <div class="info">
+    <div class="label">CSS 变量 --bg</div>
+    <div class="value" id="css-var">—</div>
+  </div>
+  <div class="info">
+    <div class="label">html class</div>
+    <div class="value" id="html-class">—</div>
+  </div>
+  <div class="info">
+    <div class="label">页面背景色</div>
+    <div class="value" id="body-bg">—</div>
+  </div>
+  <script>
+    function update() {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      document.getElementById('media-query').textContent = mq.matches ? 'dark' : 'light';
+      document.getElementById('css-var').textContent = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      document.getElementById('html-class').textContent = document.getElementById('html').className || '(空)';
+      document.getElementById('body-bg').textContent = getComputedStyle(document.body).backgroundColor;
+    }
+    update();
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', update);
+  </script>
+</body>
+</html>
