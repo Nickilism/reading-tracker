@@ -4,7 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <title>Dark Mode Diagnostic</title>
+  <meta name="theme-color" content="">
+  <title>Dark Mode Diagnostic v2</title>
+  <script>
+    (function () {
+      const root = document.getElementById('html');
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      let darkMode = 0;
+      try {
+        darkMode = parseInt(localStorage.getItem('darkMode'), 10) || 0;
+      } catch (_) {}
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = darkMode === 2 || (darkMode === 0 && prefersDark);
+      if (isDark) {
+        root.classList.add('theme-dark');
+        root.classList.remove('theme-light');
+        if (themeColor) themeColor.setAttribute('content', '#1f1f22');
+      } else {
+        root.classList.remove('theme-dark');
+        if (darkMode === 1) root.classList.add('theme-light');
+        if (themeColor) themeColor.setAttribute('content', '#ffffff');
+      }
+    })();
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg: #ffffff; --text: #000000; }
@@ -12,14 +35,15 @@
     @media (prefers-color-scheme: dark) {
       :root:not(.theme-light) { --bg: #121214; --text: #ffffff; }
     }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; padding: 2rem; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; padding: 2rem; transition: background 0.2s ease, color 0.2s ease; }
     .info { margin: 1rem 0; padding: 1rem; border: 1px solid var(--text); border-radius: 8px; }
     .label { font-size: 12px; opacity: 0.6; }
     .value { font-size: 18px; font-weight: 600; }
   </style>
 </head>
 <body>
-  <h1>Dark Mode 诊断</h1>
+  <h1>Dark Mode 诊断 v2</h1>
+  <p>（增加了早期脚本 + Chart.js + theme-color meta）</p>
   <div class="info">
     <div class="label">系统 prefers-color-scheme</div>
     <div class="value" id="media-query">—</div>
@@ -36,6 +60,10 @@
     <div class="label">页面背景色</div>
     <div class="value" id="body-bg">—</div>
   </div>
+  <div class="info">
+    <div class="label">localStorage darkMode</div>
+    <div class="value" id="ls-value">—</div>
+  </div>
   <script>
     function update() {
       const mq = window.matchMedia('(prefers-color-scheme: dark)');
@@ -43,6 +71,7 @@
       document.getElementById('css-var').textContent = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
       document.getElementById('html-class').textContent = document.getElementById('html').className || '(空)';
       document.getElementById('body-bg').textContent = getComputedStyle(document.body).backgroundColor;
+      document.getElementById('ls-value').textContent = localStorage.getItem('darkMode') || '(空/null)';
     }
     update();
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', update);
