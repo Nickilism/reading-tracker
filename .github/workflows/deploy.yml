@@ -1,7 +1,15 @@
 name: Deploy Reading Tracker
 
 on:
-  # 方式1: Airtable Automation 触发
+  # 方式1: push 核心文件时自动触发
+  push:
+    branches: [main]
+    paths:
+      - 'template.js'
+      - 'reading-tracker-github.js'
+      - 'reading-tracker-year-github.js'
+
+  # Airtable Automation 触发
   repository_dispatch:
     types: [airtable-update]
 
