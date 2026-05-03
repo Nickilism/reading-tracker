@@ -781,12 +781,19 @@ const template = `<!DOCTYPE html>
           const isDark = document.getElementById('html').classList.contains('theme-dark');
           icon.textContent = isDark ? '🌙' : '☀️';
         }
+        if (toggleBtn) {
+          toggleBtn.title = darkMode === 0 ? '跟随系统' : darkMode === 1 ? '强制亮色' : '强制暗色';
+        }
       }
 
       function toggleTheme() {
-        const isDark = document.getElementById('html').classList.contains('theme-dark');
-        darkMode = isDark ? 1 : 2;
-        localStorage.setItem(STORAGE_KEY, darkMode);
+        // Cycle: follow system (0) → force dark (2) → force light (1) → follow system (0)
+        darkMode = darkMode === 0 ? 2 : darkMode === 2 ? 1 : 0;
+        if (darkMode === 0) {
+          localStorage.removeItem(STORAGE_KEY);
+        } else {
+          localStorage.setItem(STORAGE_KEY, darkMode);
+        }
         applyTheme();
       }
 
