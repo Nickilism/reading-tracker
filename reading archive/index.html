@@ -4,30 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1f1f22">
   <title>阅读记录归档</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script>
-    (function () {
-      const root = document.getElementById('html');
-      const themeColor = document.querySelector('meta[name="theme-color"]');
-      let darkMode = 0;
-      try {
-        darkMode = parseInt(localStorage.getItem('darkMode'), 10) || 0;
-      } catch (_) {}
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const isDark = darkMode === 2 || (darkMode === 0 && prefersDark);
-      if (isDark) {
-        root.classList.add('theme-dark');
-        root.classList.remove('theme-light');
-        if (themeColor) themeColor.setAttribute('content', '#1f1f22');
-      } else {
-        root.classList.remove('theme-dark');
-        if (darkMode === 1) root.classList.add('theme-light');
-        if (themeColor) themeColor.setAttribute('content', '#ffffff');
-      }
-    })();
-  </script>
   <style>
     *, *::before, *::after {
       box-sizing: border-box;
@@ -46,19 +26,8 @@
       --shadow-hover: 0 2px 6px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
     }
 
-    .theme-dark {
-      --bg: #121214;
-      --bg-alt: #1c1c1f;
-      --text: rgba(255,255,255,0.92);
-      --text-secondary: #9e9a96;
-      --text-muted: #6b6762;
-      --border: rgba(255,255,255,0.1);
-      --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    /* System dark mode: follow iOS, but respect explicit light-mode choice */
     @media (prefers-color-scheme: dark) {
-      :root:not(.theme-light) {
+      :root {
         --bg: #121214;
         --bg-alt: #1c1c1f;
         --text: rgba(255,255,255,0.92);
@@ -88,9 +57,6 @@
       border-bottom: 1px solid var(--border);
       padding-bottom: 1.25rem;
       margin-bottom: 2rem;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
     }
 
     h1 {
@@ -108,27 +74,6 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       font-weight: 500;
-    }
-
-    .theme-toggle {
-      background: var(--bg-alt);
-      border: none;
-      border-radius: 8px;
-      padding: 8px 12px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .theme-toggle:hover {
-      background: var(--border);
-    }
-
-    .theme-toggle:active {
-      transform: scale(0.95);
     }
 
     .archive-list {
@@ -217,13 +162,8 @@
 <body>
   <div class="page">
     <header>
-      <div>
-        <h1>阅读记录归档</h1>
-        <p class="subtitle">Reading Tracker Archive</p>
-      </div>
-      <button class="theme-toggle" id="theme-toggle" aria-label="切换主题">
-        <span class="theme-icon">☀️</span>
-      </button>
+      <h1>阅读记录归档</h1>
+      <p class="subtitle">Reading Tracker Archive</p>
     </header>
 
     <div class="archive-list">
@@ -273,69 +213,5 @@
       </a>
     </footer>
   </div>
-
-  <script>
-    (function() {
-      const toggleBtn = document.getElementById('theme-toggle');
-      const icon = toggleBtn?.querySelector('.theme-icon');
-      const themeColor = document.querySelector('meta[name="theme-color"]');
-
-      // darkMode: 0=跟随系统, 1=强制亮色, 2=强制暗色
-      let darkMode = 0;
-      if (navigator.cookieEnabled) {
-        darkMode = parseInt(localStorage.getItem('darkMode')) || 0;
-      }
-
-      function applyTheme() {
-        const matchMedia = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if ((!darkMode && matchMedia) || darkMode === 2) {
-          document.getElementById('html').className = 'theme-dark';
-          if (themeColor) themeColor.setAttribute('content', '#1f1f22');
-        } else {
-          document.getElementById('html').className = darkMode === 1 ? 'theme-light' : '';
-          if (themeColor) themeColor.setAttribute('content', '#ffffff');
-        }
-        if (icon) {
-          const isDark = document.getElementById('html').classList.contains('theme-dark');
-          icon.textContent = isDark ? '🌙' : '☀️';
-        }
-        if (toggleBtn) {
-          toggleBtn.title = darkMode === 0 ? '跟随系统' : darkMode === 1 ? '强制亮色' : '强制暗色';
-        }
-      }
-
-      function toggleTheme() {
-        // Cycle: follow system (0) → force dark (2) → force light (1) → follow system (0)
-        darkMode = darkMode === 0 ? 2 : darkMode === 2 ? 1 : 0;
-        if (darkMode === 0) {
-          localStorage.removeItem('darkMode');
-        } else {
-          localStorage.setItem('darkMode', darkMode);
-        }
-        applyTheme();
-      }
-
-      if (toggleBtn) {
-        toggleBtn.addEventListener('click', toggleTheme);
-      }
-
-      applyTheme();
-
-      // 监听系统主题变化（仅在用户未手动选择时生效）
-      const colorSchemeMedia = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
-      if (colorSchemeMedia) {
-        const handleChange = () => {
-          if (darkMode === 0) {
-            applyTheme();
-          }
-        };
-        if (typeof colorSchemeMedia.addEventListener === 'function') {
-          colorSchemeMedia.addEventListener('change', handleChange);
-        } else if (typeof colorSchemeMedia.addListener === 'function') {
-          colorSchemeMedia.addListener(handleChange);
-        }
-      }
-    })();
-  </script>
 </body>
 </html>

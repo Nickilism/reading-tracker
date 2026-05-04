@@ -16,30 +16,10 @@ const template = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1f1f22">
   <title>{{YEAR}} 阅读记录</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script>
-    (function () {
-      const root = document.getElementById('html');
-      const themeColor = document.querySelector('meta[name="theme-color"]');
-      let darkMode = 0;
-      try {
-        darkMode = parseInt(localStorage.getItem('darkMode'), 10) || 0;
-      } catch (_) {}
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const isDark = darkMode === 2 || (darkMode === 0 && prefersDark);
-      if (isDark) {
-        root.classList.add('theme-dark');
-        root.classList.remove('theme-light');
-        if (themeColor) themeColor.setAttribute('content', '#1f1f22');
-      } else {
-        root.classList.remove('theme-dark');
-        if (darkMode === 1) root.classList.add('theme-light');
-        if (themeColor) themeColor.setAttribute('content', '#ffffff');
-      }
-    })();
-  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <style>
     /* ===== Reset & Variables ===== */
@@ -61,27 +41,15 @@ const template = `<!DOCTYPE html>
       --star-empty: rgba(0,0,0,0.15);
     }
 
-    .theme-dark {
-      --bg: #121214;
-      --bg-alt: #1c1c1f;
-      --text: rgba(255,255,255,0.92);
-      --text-secondary: #9e9a96;
-      --text-muted: #6b6762;
-      --border: rgba(255,255,255,0.1);
-      --accent: #0075de;
-      --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
-      --star-empty: rgba(255,255,255,0.15);
-    }
-
-    /* System dark mode: follow iOS, but respect explicit light-mode choice */
     @media (prefers-color-scheme: dark) {
-      :root:not(.theme-light) {
+      :root {
         --bg: #121214;
         --bg-alt: #1c1c1f;
         --text: rgba(255,255,255,0.92);
         --text-secondary: #9e9a96;
         --text-muted: #6b6762;
         --border: rgba(255,255,255,0.1);
+        --accent: #0075de;
         --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
         --star-empty: rgba(255,255,255,0.15);
       }
@@ -148,25 +116,6 @@ const template = `<!DOCTYPE html>
       display: flex;
       align-items: center;
       gap: 10px;
-    }
-
-    .theme-toggle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 9999px;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      padding: 0;
-      vertical-align: middle;
-    }
-
-    .theme-icon {
-      font-size: 13px;
-      line-height: 1;
     }
 
     @media (min-width: 768px) {
@@ -586,12 +535,7 @@ const template = `<!DOCTYPE html>
     <!-- ===== Header ===== -->
     <header>
       <div class="title-block">
-        <h1>
-          阅读记录
-          <button class="theme-toggle" id="theme-toggle" aria-label="切换主题">
-            <span class="theme-icon">☀️</span>
-          </button>
-        </h1>
+        <h1>阅读记录</h1>
         <p id="subtitle">{{MONTH_RANGE}} {{YEAR}}</p>
       </div>
       <div class="year-badge">{{YEAR}}</div>
@@ -754,70 +698,6 @@ const template = `<!DOCTYPE html>
     const books = {{BOOKS_JSON}};
 
     // ========== 数据注入结束 ==========
-
-    // ===== 主题切换 =====
-    (function() {
-      const STORAGE_KEY = 'darkMode';
-      const toggleBtn = document.getElementById('theme-toggle');
-      const icon = toggleBtn?.querySelector('.theme-icon');
-      const themeColor = document.querySelector('meta[name="theme-color"]');
-
-      // darkMode: 0=跟随系统, 1=强制亮色, 2=强制暗色
-      let darkMode = 0;
-      if (navigator.cookieEnabled) {
-        darkMode = parseInt(localStorage.getItem(STORAGE_KEY)) || 0;
-      }
-
-      function applyTheme() {
-        const matchMedia = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if ((!darkMode && matchMedia) || darkMode === 2) {
-          document.getElementById('html').className = 'theme-dark';
-          if (themeColor) themeColor.setAttribute('content', '#1f1f22');
-        } else {
-          document.getElementById('html').className = darkMode === 1 ? 'theme-light' : '';
-          if (themeColor) themeColor.setAttribute('content', '#ffffff');
-        }
-        if (icon) {
-          const isDark = document.getElementById('html').classList.contains('theme-dark');
-          icon.textContent = isDark ? '🌙' : '☀️';
-        }
-        if (toggleBtn) {
-          toggleBtn.title = darkMode === 0 ? '跟随系统' : darkMode === 1 ? '强制亮色' : '强制暗色';
-        }
-      }
-
-      function toggleTheme() {
-        // Cycle: follow system (0) → force dark (2) → force light (1) → follow system (0)
-        darkMode = darkMode === 0 ? 2 : darkMode === 2 ? 1 : 0;
-        if (darkMode === 0) {
-          localStorage.removeItem(STORAGE_KEY);
-        } else {
-          localStorage.setItem(STORAGE_KEY, darkMode);
-        }
-        applyTheme();
-      }
-
-      applyTheme();
-
-      if (toggleBtn) {
-        toggleBtn.addEventListener('click', toggleTheme);
-      }
-
-      // 监听系统主题变化（仅在用户未手动选择时生效）
-      const colorSchemeMedia = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
-      if (colorSchemeMedia) {
-        const handleChange = () => {
-          if (darkMode === 0) {
-            applyTheme();
-          }
-        };
-        if (typeof colorSchemeMedia.addEventListener === 'function') {
-          colorSchemeMedia.addEventListener('change', handleChange);
-        } else if (typeof colorSchemeMedia.addListener === 'function') {
-          colorSchemeMedia.addListener(handleChange);
-        }
-      }
-    })();
 
     // ===== 初始化 =====
     const actualMonths = [...new Set(books.map(b => b.month))].sort((a, b) => a - b);
@@ -1084,7 +964,7 @@ const template = `<!DOCTYPE html>
 
     // ===== 图表 =====
     const maxMonthlyCount = Math.max(...actualMonths.map(m => monthCounts[m]));
-    const isDark = document.getElementById('html').classList.contains('theme-dark');
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const chartTextColor = isDark ? '#9e9a96' : '#615d59';
     const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
     new Chart(document.getElementById('monthChart'), {
