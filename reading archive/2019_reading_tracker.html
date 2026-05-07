@@ -1,880 +1,1013 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh" id="html">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2019 阅读记录</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1f1f22">
+  <title>2019 阅读记录</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    /* ===== Reset & Variables ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  :root {
-    --bg: #ffffff;
-    --bg-alt: #f6f5f4;
-    --text: rgba(0,0,0,0.95);
-    --text-secondary: #615d59;
-    --text-muted: #a39e98;
-    --border: rgba(0,0,0,0.1);
-    --accent: #0075de;
-    --shadow-hover: 0 2px 6px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
-  }
+    :root {
+      --bg: #ffffff;
+      --bg-alt: #f6f5f4;
+      --text: rgba(0,0,0,0.95);
+      --text-secondary: #615d59;
+      --text-muted: #a39e98;
+      --border: rgba(0,0,0,0.1);
+      --accent: #0075de;
+      --shadow-hover: 0 2px 6px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
+      --star-empty: rgba(0,0,0,0.15);
+    }
 
-  body {
-    font-family: 'Inter', 'Noto Sans SC', -apple-system, system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 1rem;
-    line-height: 1.5;
-  }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #121214;
+        --bg-alt: #1c1c1f;
+        --text: rgba(255,255,255,0.92);
+        --text-secondary: #9e9a96;
+        --text-muted: #6b6762;
+        --border: rgba(255,255,255,0.1);
+        --accent: #0075de;
+        --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
+        --star-empty: rgba(255,255,255,0.15);
+      }
+    }
 
-  @media (min-width: 768px) { body { padding: 2rem; } }
+    /* ===== Base ===== */
+    body {
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1rem;
+      line-height: 1.5;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
 
-  .page { max-width: 1000px; margin: 0 auto; }
+    @media (min-width: 768px) {
+      body { padding: 2rem; }
+    }
 
-  header {
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 1.25rem;
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-  }
+    .page {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
 
-  .title-block h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    letter-spacing: -0.625px;
-    color: var(--text);
-    line-height: 1.1;
-  }
+    /* ===== Header ===== */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.25rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+    }
 
-  .title-block p {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 4px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-weight: 500;
-  }
+    .title-block h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.625px;
+      color: var(--text);
+      line-height: 1.1;
+    }
 
-  .year-badge {
-    font-size: 3rem;
-    font-weight: 700;
-    color: var(--bg-alt);
-    line-height: 1;
-    user-select: none;
-    letter-spacing: -1.5px;
-  }
+    .title-block p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
 
-  @media (min-width: 768px) {
-    .title-block h1 { font-size: 2.25rem; letter-spacing: -1px; }
-    .year-badge { font-size: 4rem; }
-  }
+    .year-badge {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--bg-alt);
+      line-height: 1;
+      user-select: none;
+      letter-spacing: -1.5px;
+    }
 
-  /* Stats Grid */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 1.5rem;
-  }
+    .title-block h1 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-  @media (max-width: 600px) { .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
-  @media (min-width: 600px) { .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; } }
-  @media (min-width: 900px) { .stats-grid { gap: 12px; } }
+    @media (min-width: 768px) {
+      .title-block h1 { font-size: 2.25rem; letter-spacing: -1px; }
+      .year-badge { font-size: 4rem; }
+    }
 
-  .stat {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-    transition: box-shadow 0.2s;
-  }
+    /* ===== Stats Grid ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
 
-  .stat:hover { box-shadow: var(--shadow-hover); }
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    }
 
-  .stat-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
+    @media (min-width: 600px) {
+      .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    }
 
-  .stat-value {
-    font-size: 1.75rem;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    color: var(--text);
-  }
+    @media (min-width: 900px) {
+      .stats-grid { gap: 12px; }
+    }
 
-  /* Country Stats */
-  .country-section {
-    background: var(--bg-alt);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem;
-    margin-bottom: 1.5rem;
-  }
+    .stat {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      transition: box-shadow 0.2s, background 0.2s ease, border-color 0.2s ease;
+    }
 
-  .section-title {
-    font-size: 11px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 600;
-    margin-bottom: 1rem;
-  }
+    .stat:hover {
+      box-shadow: var(--shadow-hover);
+    }
 
-  .country-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
 
-  .country-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 9999px;
-    padding: 6px 14px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-    transition: all 0.15s;
-    cursor: default;
-  }
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
 
-  .country-badge:hover { box-shadow: var(--shadow-hover); transform: translateY(-1px); }
-  .country-flag { font-size: 14px; }
-  .country-count { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+    /* ===== Country Stats ===== */
+    .country-section {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
 
-  /* Chart */
-  .chart-wrap {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem;
-    margin-bottom: 1.5rem;
-  }
+    .section-title {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
 
-  .chart-container { position: relative; height: 160px; }
+    .country-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-  /* Filters */
-  .filters {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 1.25rem;
-    flex-wrap: wrap;
-    align-items: center;
-  }
+    .country-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+      cursor: default;
+    }
 
-  .filter-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 600;
-    margin-right: 4px;
-  }
+    .country-badge:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-1px);
+    }
 
-  .filter-btn {
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    padding: 5px 14px;
-    border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
+    .country-flag { font-size: 14px; }
+    .country-count { font-size: 11px; color: var(--text-muted); font-weight: 600; }
 
-  .filter-btn:hover { border-color: var(--text); color: var(--text); }
-  .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    /* ===== Chart ===== */
+    .chart-wrap {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
 
-  /* Cover Wall */
-  .wall-section { margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem; }
+    .chart-container {
+      position: relative;
+      height: 160px;
+    }
 
-  .wall-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 1.25rem;
-  }
+    /* ===== Filters ===== */
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
 
-  .wall-header h2 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.25px; }
-  .wall-header span { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
+    .filter-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      margin-right: 4px;
+    }
 
-  #cover-wall {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-  }
-  @media (min-width: 600px) { #cover-wall { grid-template-columns: repeat(5, 1fr); gap: 12px; } }
-  @media (min-width: 900px) { #cover-wall { grid-template-columns: repeat(5, 1fr); gap: 14px; } }
+    .filter-btn {
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 5px 14px;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
 
-  .cover-link {
-    display: block;
-    border-radius: 8px;
-    overflow: hidden;
-    background: var(--bg-alt);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
+    .filter-btn:hover {
+      border-color: var(--text);
+      color: var(--text);
+    }
 
-  .cover-link:hover { transform: scale(1.03); box-shadow: var(--shadow-hover); }
-  .cover-img-wrap { position: relative; }
-  .cover-img-wrap img { display: block; width: 100%; height: auto; }
+    .filter-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
 
-  .cover-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.85) 30%, transparent 70%);
-    opacity: 0;
-    transition: opacity 0.25s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 10px 9px;
-  }
+    /* ===== Cover Wall ===== */
+    .wall-section {
+      margin-top: 2rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+    }
 
-  .cover-link:hover .cover-overlay { opacity: 1; }
-  .cover-title { font-size: 11px; font-weight: 600; color: #fff; line-height: 1.3; margin-bottom: 2px; }
-  .cover-author { font-size: 9px; color: rgba(255,255,255,0.7); margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .cover-rating { font-size: 11px; color: #f5a623; }
+    .wall-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
 
-  /* Collapsible Book List */
-  .booklist-section {
-    margin-top: 1.5rem;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
+    .wall-header h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.25px;
+    }
 
-  .booklist-toggle {
-    width: 100%;
-    background: var(--bg-alt);
-    border: none;
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    transition: background 0.15s;
-  }
+    .wall-header span {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
 
-  .booklist-toggle:hover { background: #eeebe7; }
+    #cover-wall {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
 
-  .sort-bar {
-    display: flex;
-    gap: 6px;
-    padding: 10px 18px;
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
+    @media (min-width: 600px) {
+      #cover-wall { grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    }
 
-  .sort-btn {
-    font-family: inherit;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
+    @media (min-width: 900px) {
+      #cover-wall { grid-template-columns: repeat(5, 1fr); gap: 14px; }
+    }
 
-  .sort-btn:hover { border-color: var(--text); color: var(--text); }
-  .sort-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .cover-link {
+      display: block;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--bg-alt);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
 
-  .booklist-toggle .arrow {
-    font-size: 10px;
-    transition: transform 0.2s;
-  }
+    .cover-link:hover {
+      transform: scale(1.03);
+      box-shadow: var(--shadow-hover);
+    }
 
-  .booklist-toggle.open .arrow { transform: rotate(180deg); }
+    .cover-img-wrap { position: relative; }
+    .cover-img-wrap img { display: block; width: 100%; height: auto; }
 
-  .booklist-content {
-    display: none;
-    padding: 0;
-  }
+    .cover-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 30%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 10px 9px;
+    }
 
-  .booklist-content.open { display: block; }
+    .cover-link:hover .cover-overlay { opacity: 1; }
+    .cover-title { font-size: 11px; font-weight: 600; color: #fff; line-height: 1.3; margin-bottom: 2px; }
+    .cover-author { font-size: 9px; color: rgba(255,255,255,0.7); margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cover-rating { font-size: 11px; color: #f5a623; }
 
-  .book-row {
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    padding: 14px 18px;
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-  }
+    /* ===== Collapsible Book List ===== */
+    .booklist-section {
+      margin-top: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+    }
 
-  .book-row:first-child { border-top: none; }
+    .booklist-toggle {
+      width: 100%;
+      background: var(--bg-alt);
+      border: none;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: background 0.15s;
+    }
 
-  .book-info { flex: 1; min-width: 0; }
+    .booklist-toggle:hover { background: var(--bg-alt); filter: brightness(0.95); }
 
-  .book-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 3px;
-    line-height: 1.4;
-  }
+    .sort-bar {
+      display: flex;
+      gap: 6px;
+      padding: 10px 18px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
 
-  .book-author { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
+    .sort-btn {
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
 
-  .book-review {
-    font-size: 12px;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin-top: 8px;
-    word-break: break-word;
-    overflow-wrap: break-word;
-  }
+    .sort-btn:hover { border-color: var(--text); color: var(--text); }
+    .sort-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-  .review-more-btn {
-    background: none;
-    border: none;
-    padding: 4px 0;
-    font-family: inherit;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--accent);
-    cursor: pointer;
-    margin-top: 4px;
-    transition: color 0.15s;
-  }
+    .booklist-toggle .arrow {
+      font-size: 10px;
+      transition: transform 0.2s;
+    }
 
-  .review-more-btn:hover { color: var(--accent-hover); }
+    .booklist-toggle.open .arrow { transform: rotate(180deg); }
 
-  .book-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .booklist-content { display: none; padding: 0; }
+    .booklist-content.open { display: block; }
 
-  .month-tag {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 9999px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-  }
+    .book-row {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 14px 18px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
 
-  .star-rating { font-size: 11px; letter-spacing: 1px; }
-  .star-filled {
-    background: linear-gradient(to right, #f5a623 100%, #f5a623 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .star-half {
-    background: linear-gradient(to right, #f5a623 0%, #f5a623 50%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.15) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .star-empty {
-    color: rgba(0,0,0,0.15);
-  }
-  .rating-num { font-size: 10px; color: var(--text-muted); font-weight: 600; }
-  .pages-tag { font-size: 10px; color: var(--text-muted); }
+    .book-row:first-child { border-top: none; }
 
-  .book-dates {
-    text-align: right;
-    font-size: 10px;
-    color: var(--text-muted);
-    line-height: 1.7;
-    white-space: nowrap;
-    font-weight: 500;
-  }
+    .book-info { flex: 1; min-width: 0; }
 
-  footer {
-    margin-top: 2.5rem;
-    border-top: 1px solid var(--border);
-    padding-top: 1rem;
-    font-size: 11px;
-    color: var(--text-muted);
-    text-align: center;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-weight: 500;
-  }
+    .book-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+      line-height: 1.4;
+    }
 
-  @media (max-width: 480px) {
-    .book-row { flex-direction: column; gap: 8px; }
-    .book-dates { text-align: left; }
-    .stat-value { font-size: 1.5rem; }
-    .stats-grid { gap: 8px; }
-  }
-</style>
+    .book-author {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .book-review {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-top: 8px;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .review-more-btn {
+      background: none;
+      border: none;
+      padding: 4px 0;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      margin-top: 4px;
+      transition: color 0.15s;
+    }
+
+    .review-more-btn:hover { color: var(--accent-hover); }
+
+    .book-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .month-tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .star-rating { font-size: 11px; letter-spacing: 1px; }
+
+    .star-filled {
+      background: linear-gradient(to right, #f5a623 100%, #f5a623 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .star-half {
+      background: linear-gradient(to right, #f5a623 0%, #f5a623 50%, var(--star-empty) 50%, var(--star-empty) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .star-empty { color: var(--star-empty); }
+    .rating-num { font-size: 10px; color: var(--text-muted); font-weight: 600; }
+    .pages-tag { font-size: 10px; color: var(--text-muted); }
+
+    .book-dates {
+      text-align: right;
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      margin-top: 2.5rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 480px) {
+      .book-row { flex-direction: column; gap: 8px; }
+      .book-dates { text-align: left; }
+      .stat-value { font-size: 1.5rem; }
+      .stats-grid { gap: 8px; }
+    }
+  </style>
 </head>
 <body>
-<div class="page">
+  <div class="page">
 
-  <header>
-    <div class="title-block">
-      <h1>阅读记录</h1>
-      <p id="subtitle">{{MONTH_RANGE}} 2019</p>
-    </div>
-    <div class="year-badge">2019</div>
-  </header>
-
-  <div class="stats-grid">
-    <div class="stat"><div class="stat-label">已读书目</div><div class="stat-value" id="total-books">—</div></div>
-    <div class="stat"><div class="stat-label">平均评分</div><div class="stat-value" id="avg-rating">—</div></div>
-    <div class="stat"><div class="stat-label">总页数</div><div class="stat-value" id="total-pages">—</div></div>
-    <div class="stat"><div class="stat-label">阅读天数中位数</div><div class="stat-value" id="avg-reading-time">—</div></div>
-  </div>
-
-  <div class="country-section">
-    <div class="section-title">国家分布</div>
-    <div class="country-grid" id="country-grid"></div>
-  </div>
-
-  <div class="chart-wrap">
-    <div class="section-title">每月阅读量</div>
-    <div class="chart-container">
-      <canvas id="monthChart" role="img"></canvas>
-    </div>
-  </div>
-
-  <div class="filters" id="filters"><span class="filter-label">筛选</span></div>
-
-  <div class="wall-section">
-    <div class="wall-header">
-      <h2>书影留存</h2>
-      <span id="wall-count">— 本</span>
-    </div>
-    <div id="cover-wall"></div>
-  </div>
-
-  <div class="booklist-section">
-    <button class="booklist-toggle" id="booklist-toggle" onclick="toggleBooklist()">
-      <span>书籍清单</span>
-      <span class="arrow">▼</span>
-    </button>
-    <div class="sort-bar" id="sort-bar">
-      <button class="sort-btn active" data-sort="finish">时间 ↓</button>
-      <button class="sort-btn" data-sort="rating">评分 ↓</button>
-      <button class="sort-btn" data-sort="pages">页数 ↓</button>
-    </div>
-    <div class="booklist-content" id="booklist-content"></div>
-  </div>
-
-  <footer id="footer">数据来源 Airtable · Books · 导出于 2026-04-28</footer>
-</div>
-
-<script>
-// ========== 数据注入开始 ==========
-// 以下变量由生成脚本注入
-
-const YEAR = 2019;
-const GENERATED_DATE = "2026-04-28";
-
-// 12个月颜色配置
-const MONTH_COLORS = [
-  { bg: '#b5d4f4', color: '#0c447c', label: '1月' },
-  { bg: '#9fe1cb', color: '#085041', label: '2月' },
-  { bg: '#fac775', color: '#633806', label: '3月' },
-  { bg: '#f5c4b3', color: '#712b13', label: '4月' },
-  { bg: '#d4c4f4', color: '#4c147c', label: '5月' },
-  { bg: '#f4d4b5', color: '#7c4414', label: '6月' },
-  { bg: '#b5f4d4', color: '#147c54', label: '7月' },
-  { bg: '#f4b5d4', color: '#7c1454', label: '8月' },
-  { bg: '#d4f4b5', color: '#547c14', label: '9月' },
-  { bg: '#b5d4f4', color: '#147c8c', label: '10月' },
-  { bg: '#f4b5b5', color: '#7c1414', label: '11月' },
-  { bg: '#b5f4f4', color: '#147c7c', label: '12月' },
-];
-
-// 国家前缀映射（支持多种括号格式）
-const COUNTRY_PREFIX_MAP = {
-  // 方括号
-  '[日]': '日本', '[美]': '美国', '[德]': '德国', '[英]': '英国',
-  '[法]': '法国', '[塞尔维亚]': '塞尔维亚', '[韩]': '韩国', '[俄]': '俄罗斯',
-  '[以色列]': '以色列', '[爱尔兰]': '爱尔兰', '[英美]': '英美', '[荷]': '荷兰',
-  '[意大利]': '意大利', '[奥]': '奥地利', '[奥地利]': '奥地利', '[阿根廷]': '阿根廷',
-  '[波兰]': '波兰', '[葡萄牙]': '葡萄牙', '[古希腊]': '古希腊',
-  '[瑞典]': '瑞典', '[加拿大]': '加拿大', '[澳]': '澳大利亚',
-  '[英国]': '英国', '[加]': '加拿大', '[意]': '意大利', '[波]': '波兰',
-  '[阿]': '阿根廷', '[荷]': '荷兰',  // 常见缩写
-  // 圆括号
-  '(日)': '日本', '(美)': '美国', '(德)': '德国', '(英)': '英国',
-  '(法)': '法国', '(韩)': '韩国', '(俄)': '俄罗斯', '(荷)': '荷兰',
-  '(意)': '意大利', '(奥)': '奥地利', '(葡萄牙)': '葡萄牙',
-  '(古希腊)': '古希腊', '(俄罗斯)': '俄罗斯',
-  '（日）': '日本', '（美）': '美国', '（德）': '德国', '（英）': '英国',
-  '（法）': '法国', '（韩）': '韩国', '（俄）': '俄罗斯',
-  '（意）': '意大利', '（葡萄牙）': '葡萄牙',
-  // 中文方括号 〔 〕
-  '〔美〕': '美国', '〔英〕': '英国', '〔日〕': '日本', '〔德〕': '德国',
-  '〔法〕': '法国', '〔俄〕': '俄罗斯', '〔意〕': '意大利', '〔波〕': '波兰',
-};
-
-// 国家旗帜
-const COUNTRY_FLAGS = {
-  '中国': '🇨🇳', '日本': '🇯🇵', '美国': '🇺🇸', '德国': '🇩🇪',
-  '英国': '🇬🇧', '法国': '🇫🇷', '塞尔维亚': '🇷🇸', '韩国': '🇰🇷',
-  '俄罗斯': '🇷🇺', '以色列': '🇮🇱', '爱尔兰': '🇮🇪', '英美': '🇺🇸',
-  '荷兰': '🇳🇱', '意大利': '🇮🇹', '奥地利': '🇦🇹', '阿根廷': '🇦🇷',
-  '波兰': '🇵🇱', '葡萄牙': '🇵🇹', '古希腊': '🇬🇷', '瑞典': '🇸🇪',
-  '加拿大': '🇨🇦', '澳大利亚': '🇦🇺', '西班牙': '🇪🇸', '捷克': '🇨🇿',
-};
-
-// 检测字符串是否包含中文字符
-function hasChineseChars(str) {
-  return /[\u4e00-\u9fa5]/.test(str);
-}
-
-// 标准化作者名字符串，去除各种括号及其内容
-function stripCountryPrefixes(author) {
-  return author
-    .replace(/\[([^\]]+)\]/g, '')   // [xxx]
-    .replace(/\(([^\)]+)\)/g, '')     // (xxx)
-    .replace(/（([^）]+)）/g, '')      // （xxx）
-    .replace(/《([^》]+)》/g, '')     // 《xxx》
-    .replace(/【([^】]+)】/g, '')     // 【xxx】
-    .trim();
-}
-
-// 国家推断
-function deriveCountry(author) {
-  // 1. 先匹配前缀映射表
-  for (const [prefix, country] of Object.entries(COUNTRY_PREFIX_MAP)) {
-    if (author.includes(prefix)) return country;
-  }
-  // 2. 无前缀时，根据姓名文字判断
-  const nameOnly = stripCountryPrefixes(author);
-  if (hasChineseChars(nameOnly)) {
-    return '中国';
-  }
-  // 3. 纯英文名默认为美国
-  return '美国';
-}
-
-// 书籍数据（由生成脚本注入）
-const books = [{"title":"刀锋","author":"[英] 毛姆","start":"2018-12-22","finish":"2019-01-28","rating":8.5,"pages":"464","doubanLink":"https://book.douban.com/subject/26896878/","cover":"https://neodb.social/m/book/2021/09/155a94b23f-6133-4cfd-9157-9e0d00c345ec.jpg","review":"读的第二本毛姆的小说，微信阅读，耗时9个多小时","month":1,"country":"英国"},{"title":"流浪地球","author":"刘慈欣","start":"2019-02-10","finish":"2019-02-12","rating":7.8,"pages":"293","doubanLink":"https://book.douban.com/subject/3266609/","cover":"https://neodb.social/m/book/2021/09/15b58fb37b-0313-46ac-b2d9-e52db5d97ca0.jpg","review":"","month":2,"country":"中国"},{"title":"局外人","author":"[法] 阿尔贝·加缪","start":"2019-01-30","finish":"2019-02-13","rating":8,"pages":"128","doubanLink":"https://book.douban.com/subject/4908885/","cover":"https://neodb.social/m/item/book/2026/02/11/b72ae794-7277-4244-a303-01b04580c004.jpeg","review":"","month":2,"country":"法国"},{"title":"献给虚无的供物","author":"（日）中井英夫","start":"2019-02-14","finish":"2019-03-09","rating":8.3,"pages":"484","doubanLink":"https://book.douban.com/subject/10515231/","cover":"https://neodb.social/m/book/2021/09/16f44650ed-a0fc-4682-9a4d-559b8aa84c43.jpg","review":"","month":3,"country":"日本"},{"title":"正面管教","author":"[美]简·尼尔森","start":"2019-05-06","finish":"2019-06-14","rating":8.3,"pages":"276","doubanLink":"https://book.douban.com/subject/3420606","cover":"https://neodb.social/m/book/2021/10/125fbc1caa-e7a7-41d3-bb37-2e5fd913dc5c.jpg","review":"","month":6,"country":"美国"},{"title":"空椅子","author":"（美）杰夫里·迪弗","start":"2019-06-29","finish":"2019-07-10","rating":8,"pages":"487","doubanLink":"https://book.douban.com/subject/3130849/","cover":"https://neodb.social/m/book/2021/09/174d98f2a2-a32f-48d9-af77-f72f0bdf0b93.jpg","review":"","month":7,"country":"美国"},{"title":"肠子","author":"[美] 恰克·帕拉尼克","start":"2019-07-13","finish":"2019-08-05","rating":7,"pages":"408","doubanLink":"https://book.douban.com/subject/5920385","cover":"https://neodb.social/m/book/2021/09/156007b797-851a-426c-bb39-c5d92aca9f69.jpg","review":"","month":8,"country":"美国"},{"title":"苏菲的世界","author":"[挪] 乔斯坦·贾德","start":"2019-06-10","finish":"2019-10-05","rating":8.8,"pages":"528","doubanLink":"https://book.douban.com/subject/2284311/","cover":"https://neodb.social/m/book/2021/09/153b4ac4f7-3931-4f95-bc29-aa27619f058e.jpg","review":"因为自己的原因，竟然花了三个多月才看完这本书。作为哲学入门书籍，作者以时间线为基础走马观花的介绍了各种哲学派别，代表人物，虽不深入却也能给我等菜鸟一个观察哲学的角度。书中也有作者的巧思，用书中书的概念去解释一些并没那么好理解的哲学概念。哲学正是一个晦涩难懂的科目，我想也正如最后作者自己说的，这本书要多读几次才行。","month":10,"country":"挪威"},{"title":"长夜难明","author":"紫金陈","start":"2019-10-05","finish":"2019-10-08","rating":8.5,"pages":"288","doubanLink":"https://book.douban.com/subject/26923390","cover":"https://neodb.social/m/book/2021/09/1509ab1503-e6d1-4dcb-8b0f-e9f24e69d82d.jpg","review":"国产推理几乎没看过，这本值得推荐，光能出版就值了。","month":10,"country":"中国"},{"title":"浮生六记","author":"（清）沈复","start":"2019-10-08","finish":"2019-10-10","rating":7,"pages":"80","doubanLink":"https://book.douban.com/subject/1088581/","cover":"https://neodb.social/m/book/2021/09/159f19504e-6c0c-43e6-a814-14c3ef5c0ff1.jpg","review":"走马观花，无甚感觉","month":10,"country":"中国"},{"title":"依存","author":"[日]西泽保彦","start":"2019-04-17","finish":"2019-10-22","rating":8,"pages":"455","doubanLink":"http://m.douban.com/book/subject/11504246/","cover":"https://neodb.social/m/item/book/2026/02/10/bcf5f451-63a2-45d4-bf7a-2931d4ada07f.jpg","review":"不知道这是看的第几本西泽保彦的书，也不知道是匠千晓系列的第几本，但应该是这一系列的最后一本吧？非常喜欢这一系列的各个人设，这一本也是保质保量的延续。对于一件事情的发生，作者总能给出各种不同角度，不同逻辑的解释方法，最后再来一给脑洞大开的结论。相对于系列前作，本书在新颖的点在于选择了其中一位故事人物作为叙述载体，人物感情情节有了较大的推进，揭秘了匠仔的身世，同时在推理的主题下面加上了很多心理学层面的思考。推荐。","month":10,"country":"日本"}];
-
-// ========== 数据注入结束 ==========
-
-// 月份元数据（根据实际月份动态生成）
-const actualMonths = [...new Set(books.map(b => b.month))].sort((a, b) => a - b);
-const monthMeta = {};
-actualMonths.forEach(m => { monthMeta[m] = MONTH_COLORS[m - 1]; });
-
-// 月份范围标签
-const monthLabels = actualMonths.map(m => `${m}月`);
-const MONTH_RANGE = `${Math.min(...actualMonths)}月 – ${Math.max(...actualMonths)}月`;
-document.getElementById('subtitle').textContent = 'Nickilism';
-
-// 统计
-const totalBooks = books.length;
-const avgRating = (books.reduce((sum, b) => sum + b.rating, 0) / totalBooks).toFixed(1);
-const totalPages = books.reduce((sum, b) => sum + (parseInt(b.pages) || 0), 0);
-
-// 国家统计（只统计非空国家）
-const countryCount = {};
-books.forEach(b => {
-  if (b.country) {
-    countryCount[b.country] = (countryCount[b.country] || 0) + 1;
-  }
-});
-
-// 每月统计
-const monthCounts = {};
-actualMonths.forEach(m => { monthCounts[m] = 0; });
-books.forEach(b => { if (monthCounts[b.month] !== undefined) monthCounts[b.month]++; });
-
-// 更新统计
-document.getElementById('total-books').textContent = totalBooks;
-document.getElementById('avg-rating').textContent = avgRating;
-document.getElementById('total-pages').textContent = totalPages;
-
-// 计算阅读天数中位数
-const readingDays = books.map(b => {
-  const start = new Date(b.start);
-  const finish = new Date(b.finish);
-  return (finish - start) / (1000 * 60 * 60 * 24);
-}).sort((a, b) => a - b);
-const medianReadingDays = readingDays.length % 2 === 0
-  ? (readingDays[readingDays.length/2 - 1] + readingDays[readingDays.length/2]) / 2
-  : readingDays[Math.floor(readingDays.length/2)];
-document.getElementById('avg-reading-time').textContent = medianReadingDays.toFixed(1);
-
-// 渲染国家分布
-const countryGrid = document.getElementById('country-grid');
-Object.entries(countryCount).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
-  const badge = document.createElement('div');
-  badge.className = 'country-badge';
-  badge.innerHTML = `<span class="country-flag">${COUNTRY_FLAGS[country] || ''}</span>${country}<span class="country-count">×${count}</span>`;
-  countryGrid.appendChild(badge);
-});
-
-// 星星计算
-function stars(rating) {
-  let full, half;
-  if (rating >= 9) { full = 5; half = 0; }
-  else if (rating >= 8.5) { full = 4; half = 1; }
-  else if (rating >= 8.0) { full = 4; half = 0; }
-  else if (rating >= 7.5) { full = 3; half = 1; }
-  else if (rating >= 7.0) { full = 3; half = 0; }
-  else { full = 2; half = 0; }
-  const empty = 5 - full - half;
-  return '<span class="star-filled">★</span>'.repeat(full) +
-         (half ? '<span class="star-half">★</span>' : '') +
-         '<span class="star-empty">☆</span>'.repeat(empty);
-}
-
-// 筛选器
-const filterMap = {
-  all: () => true,
-  high: b => b.rating >= 8.3,
-  normal: b => b.rating > 7.9 && b.rating < 8.3,
-  low: b => b.rating <= 7.9,
-};
-
-const highCount = books.filter(b => b.rating >= 8.3).length;
-const normalCount = books.filter(b => b.rating > 7.9 && b.rating < 8.3).length;
-const lowCount = books.filter(b => b.rating <= 7.9).length;
-
-const filterBtns = [
-  { key: 'all', label: `全部 (${totalBooks})` },
-  { key: 'high', label: `🟢 高分作品 (${highCount})` },
-  { key: 'normal', label: `🟡 普通作品 (${normalCount})` },
-  { key: 'low', label: `🔴 低分作品 (${lowCount})` },
-];
-
-// 添加国家筛选按钮
-Object.entries(countryCount).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
-  filterBtns.push({
-    key: `country-${country}`,
-    label: `${COUNTRY_FLAGS[country] || ''} ${country} (${count})`
-  });
-  filterMap[`country-${country}`] = b => b.country === country;
-});
-
-// 添加月份筛选按钮
-actualMonths.forEach(m => {
-  const count = books.filter(b => b.month === m).length;
-  filterBtns.push({
-    key: `month-${m}`,
-    label: `${m}月`
-  });
-  filterMap[`month-${m}`] = b => b.month === m;
-});
-
-let currentFilter = 'all';
-let currentSortField = 'finish';
-let currentSortDir = 'desc';
-let booklistOpen = true;
-
-const filtersEl = document.getElementById('filters');
-filterBtns.forEach(fb => {
-  const btn = document.createElement('button');
-  btn.className = 'filter-btn' + (fb.key === 'all' ? ' active' : '');
-  btn.textContent = fb.label;
-  btn.onclick = () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentFilter = fb.key;
-    const filtered = books.filter(filterMap[fb.key]);
-    renderWall(filtered);
-    renderBooklist(getSortedList(filtered));
-    if (booklistOpen) {
-      document.getElementById('booklist-content').classList.add('open');
-      document.getElementById('booklist-toggle').classList.add('open');
-    }
-  };
-  filtersEl.appendChild(btn);
-});
-
-// 渲染封面墙
-function renderWall(list) {
-  document.getElementById('wall-count').textContent = `${list.length} 本`;
-  const wallEl = document.getElementById('cover-wall');
-  wallEl.innerHTML = '';
-  // 按 finish 时间升序排列
-  const sorted = getSortedList(list);
-  sorted.forEach(b => {
-    const item = document.createElement('div');
-    item.className = 'cover-item';
-    item.innerHTML = `
-      <div class="cover-link" onclick="window.open('${b.doubanLink}', '_blank')" title="${b.title}">
-        <div class="cover-img-wrap">
-          <img src="${b.cover}" alt="${b.title}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 150%22><rect fill=%22%23f6f5f4%22 width=%22100%22 height=%22150%22/><text x=%2250%22 y=%2280%22 text-anchor=%22middle%22 fill=%22%23a39e98%22 font-size=%2210%22>${b.title}</text></svg>'">
-          <div class="cover-overlay">
-            <div class="cover-title">${b.title}</div>
-            <div class="cover-author">${b.author}</div>
-            <div class="cover-rating">${stars(b.rating)} ${b.rating}</div>
-          </div>
-        </div>
-      </div>`;
-    wallEl.appendChild(item);
-  });
-}
-
-// 渲染书单列表
-function renderBooklist(list) {
-  const content = document.getElementById('booklist-content');
-  content.innerHTML = list.map((b, idx) => {
-    const m = monthMeta[b.month];
-    let reviewSection = '';
-    if (b.review) {
-      const needsTruncation = b.review.length > 60;
-      const truncatedText = needsTruncation ? b.review.substring(0, 60) + '...' : b.review;
-      reviewSection = `
-        <div class="book-review" id="review-${idx}" data-full="${encodeURIComponent(b.review)}" data-truncated="${needsTruncation}">
-          ${truncatedText.replace(/\n/g, '<br>')}
-        </div>
-        ${needsTruncation ? `<button class="review-more-btn" onclick="toggleReview(${idx}, this)">展开</button>` : ''}
-      `;
-    }
-    return `<div class="book-row">
-      <div class="book-info">
-        <div class="book-title"><a href="${b.doubanLink}" target="_blank" style="color:inherit;text-decoration:none;">${b.title}</a></div>
-        <div class="book-author">${b.author}</div>
-        <div class="book-meta">
-          <span class="month-tag" style="background:${m.bg};color:${m.color}">${m.label}</span>
-          <span class="star-rating">${stars(b.rating)}</span>
-          <span class="rating-num">${b.rating}</span>
-          ${b.pages ? `<span class="pages-tag">${b.pages}页</span>` : ''}
-        </div>
-        ${reviewSection}
+    <!-- ===== Header ===== -->
+    <header>
+      <div class="title-block">
+        <h1>阅读记录</h1>
+        <p id="subtitle">{{MONTH_RANGE}} 2019</p>
       </div>
-      <div class="book-dates">${b.start}<br>${b.finish}</div>
-    </div>`;
-  }).join('');
-}
+      <div class="year-badge">2019</div>
+    </header>
 
-function toggleReview(idx, btn) {
-  const review = document.getElementById(`review-${idx}`);
-  const isCollapsed = btn.textContent === '展开';
-  const fullText = decodeURIComponent(review.dataset.full);
+    <!-- ===== Stats Grid ===== -->
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-label">已读书目</div>
+        <div class="stat-value" id="total-books">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">平均评分</div>
+        <div class="stat-value" id="avg-rating">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">总页数</div>
+        <div class="stat-value" id="total-pages">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">阅读天数中位数</div>
+        <div class="stat-value" id="avg-reading-time">—</div>
+      </div>
+    </div>
 
-  if (isCollapsed) {
-    review.innerHTML = fullText.replace(/\n/g, '<br>');
-    btn.textContent = '收起';
-  } else {
-    review.innerHTML = fullText.substring(0, 60) + '...';
-    btn.textContent = '展开';
-  }
-}
+    <!-- ===== Country Stats ===== -->
+    <div class="country-section">
+      <div class="section-title">国家分布</div>
+      <div class="country-grid" id="country-grid"></div>
+    </div>
 
-// 展开/收起书单
-function toggleBooklist() {
-  const toggle = document.getElementById('booklist-toggle');
-  const content = document.getElementById('booklist-content');
-  booklistOpen = !booklistOpen;
-  toggle.classList.toggle('open', booklistOpen);
-  content.classList.toggle('open', booklistOpen);
-}
+    <!-- ===== Chart ===== -->
+    <div class="chart-wrap">
+      <div class="section-title">每月阅读量</div>
+      <div class="chart-container">
+        <canvas id="monthChart" role="img"></canvas>
+      </div>
+    </div>
 
-// 排序函数
-function getSortedList(list) {
-  const sorted = [...list];
-  const dir = currentSortDir === 'desc' ? -1 : 1;
-  switch (currentSortField) {
-    case 'finish': return sorted.sort((a, b) => a.finish.localeCompare(b.finish) * dir);
-    case 'rating': return sorted.sort((a, b) => (a.rating - b.rating) * dir);
-    case 'pages': return sorted.sort((a, b) => ((parseInt(a.pages) || 0) - (parseInt(b.pages) || 0)) * dir);
-    default: return sorted;
-  }
-}
+    <!-- ===== Filters ===== -->
+    <div class="filters" id="filters">
+      <span class="filter-label">筛选</span>
+    </div>
 
-// 排序按钮事件
-document.querySelectorAll('.sort-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const field = btn.dataset.sort;
-    if (currentSortField === field) {
-      // 同字段点击 → 切换方向
-      currentSortDir = currentSortDir === 'desc' ? 'asc' : 'desc';
-    } else {
-      // 不同字段 → 切换到该字段，默认降序
-      currentSortField = field;
-      currentSortDir = 'desc';
+    <!-- ===== Cover Wall ===== -->
+    <div class="wall-section">
+      <div class="wall-header">
+        <h2>书影留存</h2>
+        <span id="wall-count">— 本</span>
+      </div>
+      <div id="cover-wall"></div>
+    </div>
+
+    <!-- ===== Book List ===== -->
+    <div class="booklist-section">
+      <button class="booklist-toggle" id="booklist-toggle" onclick="toggleBooklist()">
+        <span>书籍清单</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="sort-bar" id="sort-bar">
+        <button class="sort-btn active" data-sort="finish">时间 ↓</button>
+        <button class="sort-btn" data-sort="rating">评分 ↓</button>
+        <button class="sort-btn" data-sort="pages">页数 ↓</button>
+      </div>
+      <div class="booklist-content" id="booklist-content"></div>
+    </div>
+
+    <!-- ===== Footer ===== -->
+<footer id="footer" style="display: flex; align-items: center; justify-content: center; gap: 0;">导出于 2026-05-07 · <a href="https://github.com/Nickilism/reading-tracker" target="_blank" style="color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; margin-left: 0.25em; line-height: 1; margin-bottom: 2px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="display: block;"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a></footer>
+  <script>
+    // ========== 数据注入开始 ==========
+    // 以下变量由生成脚本注入
+
+    const YEAR = 2019;
+    const GENERATED_DATE = "2026-05-07";
+
+    // 12个月颜色配置
+    const MONTH_COLORS = [
+      { bg: '#b5d4f4', color: '#0c447c', label: '1月' },
+      { bg: '#9fe1cb', color: '#085041', label: '2月' },
+      { bg: '#fac775', color: '#633806', label: '3月' },
+      { bg: '#f5c4b3', color: '#712b13', label: '4月' },
+      { bg: '#d4c4f4', color: '#4c147c', label: '5月' },
+      { bg: '#f4d4b5', color: '#7c4414', label: '6月' },
+      { bg: '#b5f4d4', color: '#147c54', label: '7月' },
+      { bg: '#f4b5d4', color: '#7c1454', label: '8月' },
+      { bg: '#d4f4b5', color: '#547c14', label: '9月' },
+      { bg: '#b5d4f4', color: '#147c8c', label: '10月' },
+      { bg: '#f4b5b5', color: '#7c1414', label: '11月' },
+      { bg: '#b5f4f4', color: '#147c7c', label: '12月' },
+    ];
+
+    // 国家前缀映射（支持多种括号格式）
+    const COUNTRY_PREFIX_MAP = {
+      // 方括号
+      '[日]': '日本', '[美]': '美国', '[德]': '德国', '[英]': '英国',
+      '[法]': '法国', '[塞尔维亚]': '塞尔维亚', '[韩]': '韩国', '[俄]': '俄罗斯',
+      '[以色列]': '以色列', '[爱尔兰]': '爱尔兰', '[英美]': '英美', '[荷]': '荷兰',
+      '[意大利]': '意大利', '[奥]': '奥地利', '[奥地利]': '奥地利', '[阿根廷]': '阿根廷',
+      '[波兰]': '波兰', '[葡萄牙]': '葡萄牙', '[古希腊]': '古希腊',
+      '[瑞典]': '瑞典', '[加拿大]': '加拿大', '[澳]': '澳大利亚',
+      '[英国]': '英国', '[加]': '加拿大', '[意]': '意大利', '[波]': '波兰',
+      '[阿]': '阿根廷', '[荷]': '荷兰',
+      // 圆括号
+      '(日)': '日本', '(美)': '美国', '(德)': '德国', '(英)': '英国',
+      '(法)': '法国', '(韩)': '韩国', '(俄)': '俄罗斯', '(荷)': '荷兰',
+      '(意)': '意大利', '(奥)': '奥地利', '(葡萄牙)': '葡萄牙',
+      '(古希腊)': '古希腊', '(俄罗斯)': '俄罗斯',
+      // 中文圆括号
+      '（日）': '日本', '（美）': '美国', '（德）': '德国', '（英）': '英国',
+      '（法）': '法国', '（韩）': '韩国', '（俄）': '俄罗斯',
+      '（意）': '意大利', '（葡萄牙）': '葡萄牙',
+      // 中文方括号 〔 〕
+      '〔美〕': '美国', '〔英〕': '英国', '〔日〕': '日本', '〔德〕': '德国',
+      '〔法〕': '法国', '〔俄〕': '俄罗斯', '〔意〕': '意大利', '〔波〕': '波兰',
+    };
+
+    // 国家旗帜
+    const COUNTRY_FLAGS = {
+      '中国': '🇨🇳', '日本': '🇯🇵', '美国': '🇺🇸', '德国': '🇩🇪',
+      '英国': '🇬🇧', '法国': '🇫🇷', '塞尔维亚': '🇷🇸', '韩国': '🇰🇷',
+      '俄罗斯': '🇷🇺', '以色列': '🇮🇱', '爱尔兰': '🇮🇪', '英美': '🇺🇸',
+      '荷兰': '🇳🇱', '意大利': '🇮🇹', '奥地利': '🇦🇹', '阿根廷': '🇦🇷',
+      '波兰': '🇵🇱', '葡萄牙': '🇵🇹', '古希腊': '🇬🇷', '瑞典': '🇸🇪',
+      '加拿大': '🇨🇦', '澳大利亚': '🇦🇺', '西班牙': '🇪🇸', '捷克': '🇨🇿',
+    };
+
+    // 检测字符串是否包含中文字符
+    function hasChineseChars(str) {
+      return /[\u4e00-\u9fa5]/.test(str);
     }
-    // 更新按钮文字
-    const fieldLabels = { finish: '时间', rating: '评分', pages: '页数' };
-    document.querySelectorAll('.sort-btn').forEach(b => {
-      const f = b.dataset.sort;
-      const a = (currentSortField === f) ? currentSortDir : 'desc';
-      b.textContent = fieldLabels[f] + (a === 'desc' ? ' ↓' : ' ↑');
-      b.classList.toggle('active', currentSortField === f);
+
+    // 标准化作者名字符串，去除各种括号及其内容
+    function stripCountryPrefixes(author) {
+      return author
+        .replace(/\[([^\]]+)\]/g, '')   // [xxx]
+        .replace(/\(([^\)]+)\)/g, '')     // (xxx)
+        .replace(/（([^）]+)）/g, '')      // （xxx）
+        .replace(/《([^》]+)》/g, '')     // 《xxx》
+        .replace(/【([^】]+)】/g, '')     // 【xxx】
+        .trim();
+    }
+
+    // 国家推断
+    function deriveCountry(author) {
+      // 1. 先匹配前缀映射表
+      for (const [prefix, country] of Object.entries(COUNTRY_PREFIX_MAP)) {
+        if (author.includes(prefix)) return country;
+      }
+      // 2. 无前缀时，根据姓名文字判断
+      const nameOnly = stripCountryPrefixes(author);
+      if (hasChineseChars(nameOnly)) {
+        return '中国';
+      }
+      // 3. 纯英文名默认为美国
+      return '美国';
+    }
+
+    // 书籍数据（由生成脚本注入）
+    const books = [{"title":"刀锋","author":"[英] 毛姆","start":"2018-12-22","finish":"2019-01-28","rating":8.5,"pages":"464","doubanLink":"https://book.douban.com/subject/26896878/","cover":"https://neodb.social/m/book/2021/09/155a94b23f-6133-4cfd-9157-9e0d00c345ec.jpg","review":"读的第二本毛姆的小说，微信阅读，耗时9个多小时","month":1,"country":"英国"},{"title":"流浪地球","author":"刘慈欣","start":"2019-02-10","finish":"2019-02-12","rating":7.8,"pages":"293","doubanLink":"https://book.douban.com/subject/3266609/","cover":"https://neodb.social/m/book/2021/09/15b58fb37b-0313-46ac-b2d9-e52db5d97ca0.jpg","review":"","month":2,"country":"中国"},{"title":"局外人","author":"[法] 阿尔贝·加缪","start":"2019-01-30","finish":"2019-02-13","rating":8,"pages":"128","doubanLink":"https://book.douban.com/subject/4908885/","cover":"https://neodb.social/m/item/book/2026/02/11/b72ae794-7277-4244-a303-01b04580c004.jpeg","review":"","month":2,"country":"法国"},{"title":"献给虚无的供物","author":"（日）中井英夫","start":"2019-02-14","finish":"2019-03-09","rating":8.3,"pages":"484","doubanLink":"https://book.douban.com/subject/10515231/","cover":"https://neodb.social/m/book/2021/09/16f44650ed-a0fc-4682-9a4d-559b8aa84c43.jpg","review":"","month":3,"country":"日本"},{"title":"正面管教","author":"[美]简·尼尔森","start":"2019-05-06","finish":"2019-06-14","rating":8.3,"pages":"276","doubanLink":"https://book.douban.com/subject/3420606","cover":"https://neodb.social/m/book/2021/10/125fbc1caa-e7a7-41d3-bb37-2e5fd913dc5c.jpg","review":"","month":6,"country":"美国"},{"title":"空椅子","author":"（美）杰夫里·迪弗","start":"2019-06-29","finish":"2019-07-10","rating":8,"pages":"487","doubanLink":"https://book.douban.com/subject/3130849/","cover":"https://neodb.social/m/book/2021/09/174d98f2a2-a32f-48d9-af77-f72f0bdf0b93.jpg","review":"","month":7,"country":"美国"},{"title":"肠子","author":"[美] 恰克·帕拉尼克","start":"2019-07-13","finish":"2019-08-05","rating":7,"pages":"408","doubanLink":"https://book.douban.com/subject/5920385","cover":"https://neodb.social/m/book/2021/09/156007b797-851a-426c-bb39-c5d92aca9f69.jpg","review":"","month":8,"country":"美国"},{"title":"苏菲的世界","author":"[挪] 乔斯坦·贾德","start":"2019-06-10","finish":"2019-10-05","rating":8.8,"pages":"528","doubanLink":"https://book.douban.com/subject/2284311/","cover":"https://neodb.social/m/book/2021/09/153b4ac4f7-3931-4f95-bc29-aa27619f058e.jpg","review":"因为自己的原因，竟然花了三个多月才看完这本书。作为哲学入门书籍，作者以时间线为基础走马观花的介绍了各种哲学派别，代表人物，虽不深入却也能给我等菜鸟一个观察哲学的角度。书中也有作者的巧思，用书中书的概念去解释一些并没那么好理解的哲学概念。哲学正是一个晦涩难懂的科目，我想也正如最后作者自己说的，这本书要多读几次才行。","month":10,"country":"中国"},{"title":"长夜难明","author":"紫金陈","start":"2019-10-05","finish":"2019-10-08","rating":8.5,"pages":"288","doubanLink":"https://book.douban.com/subject/26923390","cover":"https://neodb.social/m/book/2021/09/1509ab1503-e6d1-4dcb-8b0f-e9f24e69d82d.jpg","review":"国产推理几乎没看过，这本值得推荐，光能出版就值了。","month":10,"country":"中国"},{"title":"浮生六记","author":"（清）沈复","start":"2019-10-08","finish":"2019-10-10","rating":7,"pages":"80","doubanLink":"https://book.douban.com/subject/1088581/","cover":"https://neodb.social/m/book/2021/09/159f19504e-6c0c-43e6-a814-14c3ef5c0ff1.jpg","review":"走马观花，无甚感觉","month":10,"country":"中国"},{"title":"依存","author":"[日]西泽保彦","start":"2019-04-17","finish":"2019-10-22","rating":8,"pages":"455","doubanLink":"http://m.douban.com/book/subject/11504246/","cover":"https://neodb.social/m/item/book/2026/02/10/bcf5f451-63a2-45d4-bf7a-2931d4ada07f.jpg","review":"不知道这是看的第几本西泽保彦的书，也不知道是匠千晓系列的第几本，但应该是这一系列的最后一本吧？非常喜欢这一系列的各个人设，这一本也是保质保量的延续。对于一件事情的发生，作者总能给出各种不同角度，不同逻辑的解释方法，最后再来一给脑洞大开的结论。相对于系列前作，本书在新颖的点在于选择了其中一位故事人物作为叙述载体，人物感情情节有了较大的推进，揭秘了匠仔的身世，同时在推理的主题下面加上了很多心理学层面的思考。推荐。","month":10,"country":"日本"}];
+
+    // ========== 数据注入结束 ==========
+
+    // ===== 初始化 =====
+    const actualMonths = [...new Set(books.map(b => b.month))].sort((a, b) => a - b);
+    const monthMeta = {};
+    actualMonths.forEach(m => { monthMeta[m] = MONTH_COLORS[m - 1]; });
+
+    const monthLabels = actualMonths.map(m => `${m}月`);
+    const MONTH_RANGE = `${Math.min(...actualMonths)}月 – ${Math.max(...actualMonths)}月`;
+    document.getElementById('subtitle').textContent = 'Nickilism';
+
+    // ===== 统计计算 =====
+    const totalBooks = books.length;
+    const avgRating = (books.reduce((sum, b) => sum + b.rating, 0) / totalBooks).toFixed(1);
+    const totalPages = books.reduce((sum, b) => sum + (parseInt(b.pages) || 0), 0);
+
+    // 国家统计（只统计非空国家）
+    const countryCount = {};
+    books.forEach(b => {
+      if (b.country) {
+        countryCount[b.country] = (countryCount[b.country] || 0) + 1;
+      }
     });
-    const filtered = books.filter(filterMap[currentFilter]);
-    renderWall(filtered);
-    renderBooklist(getSortedList(filtered));
-    if (booklistOpen) {
-      document.getElementById('booklist-content').classList.add('open');
-      document.getElementById('booklist-toggle').classList.add('open');
-    }
-  });
-});
 
-renderWall(books);
-renderBooklist(getSortedList(books));
-// 默认展开清单
-if (booklistOpen) {
-  document.getElementById('booklist-content').classList.add('open');
-  document.getElementById('booklist-toggle').classList.add('open');
-}
+    // 每月统计
+    const monthCounts = {};
+    actualMonths.forEach(m => { monthCounts[m] = 0; });
+    books.forEach(b => { if (monthCounts[b.month] !== undefined) monthCounts[b.month]++; });
 
-// 图表
-const maxMonthlyCount = Math.max(...actualMonths.map(m => monthCounts[m]));
-new Chart(document.getElementById('monthChart'), {
-  type: 'bar',
-  data: {
-    labels: monthLabels,
-    datasets: [{
-      label: '本数',
-      data: actualMonths.map(m => monthCounts[m]),
-      backgroundColor: actualMonths.map(m => MONTH_COLORS[m - 1].bg),
-      borderColor: actualMonths.map(m => MONTH_COLORS[m - 1].color),
-      borderWidth: 1,
-      borderRadius: 6,
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-    },
-    scales: {
-      y: { beginAtZero: true, max: Math.max(maxMonthlyCount + 1, 4), ticks: { stepSize: 1, font: { family: 'Inter', size: 11 }, color: '#a39e98' }, grid: { color: 'rgba(0,0,0,0.05)' }, border: { display: false } },
-      x: { ticks: { font: { family: 'Inter', size: 12 }, color: '#615d59' }, grid: { display: false }, border: { display: false } }
+    // ===== 更新 DOM =====
+    document.getElementById('total-books').textContent = totalBooks;
+    document.getElementById('avg-rating').textContent = avgRating;
+    document.getElementById('total-pages').textContent = totalPages;
+
+    // 计算阅读天数中位数
+    const readingDays = books.map(b => {
+      const start = new Date(b.start);
+      const finish = new Date(b.finish);
+      return (finish - start) / (1000 * 60 * 60 * 24);
+    }).sort((a, b) => a - b);
+
+    const medianReadingDays = readingDays.length % 2 === 0
+      ? (readingDays[readingDays.length/2 - 1] + readingDays[readingDays.length/2]) / 2
+      : readingDays[Math.floor(readingDays.length/2)];
+    document.getElementById('avg-reading-time').textContent = medianReadingDays.toFixed(1);
+
+    // 渲染国家分布
+    const countryGrid = document.getElementById('country-grid');
+    Object.entries(countryCount).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
+      const badge = document.createElement('div');
+      badge.className = 'country-badge';
+      badge.innerHTML = `<span class="country-flag">${COUNTRY_FLAGS[country] || ''}</span>${country}<span class="country-count">×${count}</span>`;
+      countryGrid.appendChild(badge);
+    });
+
+    // ===== 星星计算 =====
+    function stars(rating) {
+      let full, half;
+      if (rating >= 9) { full = 5; half = 0; }
+      else if (rating >= 8.5) { full = 4; half = 1; }
+      else if (rating >= 8.0) { full = 4; half = 0; }
+      else if (rating >= 7.5) { full = 3; half = 1; }
+      else if (rating >= 7.0) { full = 3; half = 0; }
+      else { full = 2; half = 0; }
+      const empty = 5 - full - half;
+      return '<span class="star-filled">★</span>'.repeat(full) +
+             (half ? '<span class="star-half">★</span>' : '') +
+             '<span class="star-empty">☆</span>'.repeat(empty);
     }
-  },
-  plugins: [{
-    id: 'monthDataLabels',
-    afterDatasetsDraw(chart) {
-      const { ctx, data, scales } = chart;
-      ctx.save();
-      ctx.font = '600 11px Inter';
-      ctx.fillStyle = '#615d59';
-      ctx.textAlign = 'center';
-      data.datasets[0].data.forEach((value, index) => {
-        if (value > 0) {
-          const x = scales.x.getPixelForValue(index);
-          const y = scales.y.getPixelForValue(value) - 6;
-          ctx.fillText(value, x, y);
+
+    // ===== 筛选器 =====
+    const filterMap = {
+      all: () => true,
+      high: b => b.rating >= 8.3,
+      normal: b => b.rating > 7.9 && b.rating < 8.3,
+      low: b => b.rating <= 7.9,
+    };
+
+    const highCount = books.filter(b => b.rating >= 8.3).length;
+    const normalCount = books.filter(b => b.rating > 7.9 && b.rating < 8.3).length;
+    const lowCount = books.filter(b => b.rating <= 7.9).length;
+
+    const filterBtns = [
+      { key: 'all', label: `全部 (${totalBooks})` },
+      { key: 'high', label: `🟢 高分作品 (${highCount})` },
+      { key: 'normal', label: `🟡 普通作品 (${normalCount})` },
+      { key: 'low', label: `🔴 低分作品 (${lowCount})` },
+    ];
+
+    // 添加国家筛选按钮
+    Object.entries(countryCount).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
+      filterBtns.push({
+        key: `country-${country}`,
+        label: `${COUNTRY_FLAGS[country] || ''} ${country} (${count})`
+      });
+      filterMap[`country-${country}`] = b => b.country === country;
+    });
+
+    // 添加月份筛选按钮
+    actualMonths.forEach(m => {
+      const count = books.filter(b => b.month === m).length;
+      filterBtns.push({
+        key: `month-${m}`,
+        label: `${m}月`
+      });
+      filterMap[`month-${m}`] = b => b.month === m;
+    });
+
+    let currentFilter = 'all';
+    let currentSortField = 'finish';
+    let currentSortDir = 'desc';
+    let booklistOpen = true;
+
+    const filtersEl = document.getElementById('filters');
+    filterBtns.forEach(fb => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn' + (fb.key === 'all' ? ' active' : '');
+      btn.textContent = fb.label;
+      btn.onclick = () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = fb.key;
+        const filtered = books.filter(filterMap[fb.key]);
+        renderWall(filtered);
+        renderBooklist(getSortedList(filtered));
+        if (booklistOpen) {
+          document.getElementById('booklist-content').classList.add('open');
+          document.getElementById('booklist-toggle').classList.add('open');
+        }
+      };
+      filtersEl.appendChild(btn);
+    });
+
+    // ===== 渲染封面墙 =====
+    function renderWall(list) {
+      document.getElementById('wall-count').textContent = `${list.length} 本`;
+      const wallEl = document.getElementById('cover-wall');
+      wallEl.innerHTML = '';
+      // 按 finish 时间升序排列
+      const sorted = getSortedList(list);
+      sorted.forEach(b => {
+        const item = document.createElement('div');
+        item.className = 'cover-item';
+        item.innerHTML = `
+          <div class="cover-link" onclick="window.open('${b.doubanLink}', '_blank')" title="${b.title}">
+            <div class="cover-img-wrap">
+              <img src="${b.cover}" alt="${b.title}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 150%22><rect fill=%22%23f6f5f4%22 width=%22100%22 height=%22150%22/><text x=%2250%22 y=%2280%22 text-anchor=%22middle%22 fill=%22%23a39e98%22 font-size=%2210%22>${b.title}</text></svg>'">
+              <div class="cover-overlay">
+                <div class="cover-title">${b.title}</div>
+                <div class="cover-author">${b.author}</div>
+                <div class="cover-rating">${stars(b.rating)} ${b.rating}</div>
+              </div>
+            </div>
+          </div>`;
+        wallEl.appendChild(item);
+      });
+    }
+
+    // ===== 渲染书单列表 =====
+    function renderBooklist(list) {
+      const content = document.getElementById('booklist-content');
+      content.innerHTML = list.map((b, idx) => {
+        const m = monthMeta[b.month];
+        let reviewSection = '';
+        if (b.review) {
+          const needsTruncation = b.review.length > 60;
+          const truncatedText = needsTruncation ? b.review.substring(0, 60) + '...' : b.review;
+          reviewSection = `
+            <div class="book-review" id="review-${idx}" data-full="${encodeURIComponent(b.review)}" data-truncated="${needsTruncation}">
+              ${truncatedText.replace(/\n/g, '<br>')}
+            </div>
+            ${needsTruncation ? `<button class="review-more-btn" onclick="toggleReview(${idx}, this)">展开</button>` : ''}
+          `;
+        }
+        return `<div class="book-row">
+          <div class="book-info">
+            <div class="book-title"><a href="${b.doubanLink}" target="_blank" style="color:inherit;text-decoration:none;">${b.title}</a></div>
+            <div class="book-author">${b.author}</div>
+            <div class="book-meta">
+              <span class="month-tag" style="background:${m.bg};color:${m.color}">${m.label}</span>
+              <span class="star-rating">${stars(b.rating)}</span>
+              <span class="rating-num">${b.rating}</span>
+              ${b.pages ? `<span class="pages-tag">${b.pages}页</span>` : ''}
+            </div>
+            ${reviewSection}
+          </div>
+          <div class="book-dates">${b.start}<br>${b.finish}</div>
+        </div>`;
+      }).join('');
+    }
+
+    function toggleReview(idx, btn) {
+      const review = document.getElementById(`review-${idx}`);
+      const isCollapsed = btn.textContent === '展开';
+      const fullText = decodeURIComponent(review.dataset.full);
+
+      if (isCollapsed) {
+        review.innerHTML = fullText.replace(/\n/g, '<br>');
+        btn.textContent = '收起';
+      } else {
+        review.innerHTML = fullText.substring(0, 60) + '...';
+        btn.textContent = '展开';
+      }
+    }
+
+    // ===== 展开/收起书单 =====
+    function toggleBooklist() {
+      const toggle = document.getElementById('booklist-toggle');
+      const content = document.getElementById('booklist-content');
+      booklistOpen = !booklistOpen;
+      toggle.classList.toggle('open', booklistOpen);
+      content.classList.toggle('open', booklistOpen);
+    }
+
+    // ===== 排序函数 =====
+    function getSortedList(list) {
+      const sorted = [...list];
+      const dir = currentSortDir === 'desc' ? -1 : 1;
+      switch (currentSortField) {
+        case 'finish': return sorted.sort((a, b) => a.finish.localeCompare(b.finish) * dir);
+        case 'rating': return sorted.sort((a, b) => (a.rating - b.rating) * dir);
+        case 'pages': return sorted.sort((a, b) => ((parseInt(a.pages) || 0) - (parseInt(b.pages) || 0)) * dir);
+        default: return sorted;
+      }
+    }
+
+    // ===== 排序按钮事件 =====
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const field = btn.dataset.sort;
+        if (currentSortField === field) {
+          // 同字段点击 → 切换方向
+          currentSortDir = currentSortDir === 'desc' ? 'asc' : 'desc';
+        } else {
+          // 不同字段 → 切换到该字段，默认降序
+          currentSortField = field;
+          currentSortDir = 'desc';
+        }
+        // 更新按钮文字
+        const fieldLabels = { finish: '时间', rating: '评分', pages: '页数' };
+        document.querySelectorAll('.sort-btn').forEach(b => {
+          const f = b.dataset.sort;
+          const a = (currentSortField === f) ? currentSortDir : 'desc';
+          b.textContent = fieldLabels[f] + (a === 'desc' ? ' ↓' : ' ↑');
+          b.classList.toggle('active', currentSortField === f);
+        });
+        const filtered = books.filter(filterMap[currentFilter]);
+        renderWall(filtered);
+        renderBooklist(getSortedList(filtered));
+        if (booklistOpen) {
+          document.getElementById('booklist-content').classList.add('open');
+          document.getElementById('booklist-toggle').classList.add('open');
         }
       });
-      ctx.restore();
+    });
+
+    // ===== 初始渲染 =====
+    renderWall(books);
+    renderBooklist(getSortedList(books));
+    // 默认展开清单
+    if (booklistOpen) {
+      document.getElementById('booklist-content').classList.add('open');
+      document.getElementById('booklist-toggle').classList.add('open');
     }
-  }]
-});
-</script>
+
+    // ===== 图表 =====
+    const maxMonthlyCount = Math.max(...actualMonths.map(m => monthCounts[m]));
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const chartTextColor = isDark ? '#9e9a96' : '#615d59';
+    const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
+    new Chart(document.getElementById('monthChart'), {
+      type: 'bar',
+      data: {
+        labels: monthLabels,
+        datasets: [{
+          label: '本数',
+          data: actualMonths.map(m => monthCounts[m]),
+          backgroundColor: actualMonths.map(m => MONTH_COLORS[m - 1].bg),
+          borderColor: actualMonths.map(m => MONTH_COLORS[m - 1].color),
+          borderWidth: 1,
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: Math.max(maxMonthlyCount + 1, 4),
+            ticks: { stepSize: 1, font: { family: 'Inter', size: 11 }, color: chartTextColor },
+            grid: { color: chartGridColor },
+            border: { display: false }
+          },
+          x: {
+            ticks: { font: { family: 'Inter', size: 12 }, color: chartTextColor },
+            grid: { display: false },
+            border: { display: false }
+          }
+        }
+      },
+      plugins: [{
+        id: 'monthDataLabels',
+        afterDatasetsDraw(chart) {
+          const { ctx, data, scales } = chart;
+          ctx.save();
+          ctx.font = '600 11px Inter';
+          ctx.fillStyle = chartTextColor;
+          ctx.textAlign = 'center';
+          data.datasets[0].data.forEach((value, index) => {
+            if (value > 0) {
+              const x = scales.x.getPixelForValue(index);
+              const y = scales.y.getPixelForValue(value) - 6;
+              ctx.fillText(value, x, y);
+            }
+          });
+          ctx.restore();
+        }
+      }]
+    });
+  </script>
 </body>
 </html>

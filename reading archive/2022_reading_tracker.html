@@ -1,880 +1,1013 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh" id="html">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2022 阅读记录</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1f1f22">
+  <title>2022 阅读记录</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    /* ===== Reset & Variables ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  :root {
-    --bg: #ffffff;
-    --bg-alt: #f6f5f4;
-    --text: rgba(0,0,0,0.95);
-    --text-secondary: #615d59;
-    --text-muted: #a39e98;
-    --border: rgba(0,0,0,0.1);
-    --accent: #0075de;
-    --shadow-hover: 0 2px 6px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
-  }
+    :root {
+      --bg: #ffffff;
+      --bg-alt: #f6f5f4;
+      --text: rgba(0,0,0,0.95);
+      --text-secondary: #615d59;
+      --text-muted: #a39e98;
+      --border: rgba(0,0,0,0.1);
+      --accent: #0075de;
+      --shadow-hover: 0 2px 6px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
+      --star-empty: rgba(0,0,0,0.15);
+    }
 
-  body {
-    font-family: 'Inter', 'Noto Sans SC', -apple-system, system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 1rem;
-    line-height: 1.5;
-  }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #121214;
+        --bg-alt: #1c1c1f;
+        --text: rgba(255,255,255,0.92);
+        --text-secondary: #9e9a96;
+        --text-muted: #6b6762;
+        --border: rgba(255,255,255,0.1);
+        --accent: #0075de;
+        --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
+        --star-empty: rgba(255,255,255,0.15);
+      }
+    }
 
-  @media (min-width: 768px) { body { padding: 2rem; } }
+    /* ===== Base ===== */
+    body {
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1rem;
+      line-height: 1.5;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
 
-  .page { max-width: 1000px; margin: 0 auto; }
+    @media (min-width: 768px) {
+      body { padding: 2rem; }
+    }
 
-  header {
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 1.25rem;
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-  }
+    .page {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
 
-  .title-block h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    letter-spacing: -0.625px;
-    color: var(--text);
-    line-height: 1.1;
-  }
+    /* ===== Header ===== */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.25rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+    }
 
-  .title-block p {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 4px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-weight: 500;
-  }
+    .title-block h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.625px;
+      color: var(--text);
+      line-height: 1.1;
+    }
 
-  .year-badge {
-    font-size: 3rem;
-    font-weight: 700;
-    color: var(--bg-alt);
-    line-height: 1;
-    user-select: none;
-    letter-spacing: -1.5px;
-  }
+    .title-block p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
 
-  @media (min-width: 768px) {
-    .title-block h1 { font-size: 2.25rem; letter-spacing: -1px; }
-    .year-badge { font-size: 4rem; }
-  }
+    .year-badge {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--bg-alt);
+      line-height: 1;
+      user-select: none;
+      letter-spacing: -1.5px;
+    }
 
-  /* Stats Grid */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 1.5rem;
-  }
+    .title-block h1 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-  @media (max-width: 600px) { .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
-  @media (min-width: 600px) { .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; } }
-  @media (min-width: 900px) { .stats-grid { gap: 12px; } }
+    @media (min-width: 768px) {
+      .title-block h1 { font-size: 2.25rem; letter-spacing: -1px; }
+      .year-badge { font-size: 4rem; }
+    }
 
-  .stat {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-    transition: box-shadow 0.2s;
-  }
+    /* ===== Stats Grid ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
 
-  .stat:hover { box-shadow: var(--shadow-hover); }
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    }
 
-  .stat-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
+    @media (min-width: 600px) {
+      .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    }
 
-  .stat-value {
-    font-size: 1.75rem;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    color: var(--text);
-  }
+    @media (min-width: 900px) {
+      .stats-grid { gap: 12px; }
+    }
 
-  /* Country Stats */
-  .country-section {
-    background: var(--bg-alt);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem;
-    margin-bottom: 1.5rem;
-  }
+    .stat {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      transition: box-shadow 0.2s, background 0.2s ease, border-color 0.2s ease;
+    }
 
-  .section-title {
-    font-size: 11px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 600;
-    margin-bottom: 1rem;
-  }
+    .stat:hover {
+      box-shadow: var(--shadow-hover);
+    }
 
-  .country-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
 
-  .country-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 9999px;
-    padding: 6px 14px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-    transition: all 0.15s;
-    cursor: default;
-  }
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
 
-  .country-badge:hover { box-shadow: var(--shadow-hover); transform: translateY(-1px); }
-  .country-flag { font-size: 14px; }
-  .country-count { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+    /* ===== Country Stats ===== */
+    .country-section {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
 
-  /* Chart */
-  .chart-wrap {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem;
-    margin-bottom: 1.5rem;
-  }
+    .section-title {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
 
-  .chart-container { position: relative; height: 160px; }
+    .country-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-  /* Filters */
-  .filters {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 1.25rem;
-    flex-wrap: wrap;
-    align-items: center;
-  }
+    .country-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+      cursor: default;
+    }
 
-  .filter-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 600;
-    margin-right: 4px;
-  }
+    .country-badge:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-1px);
+    }
 
-  .filter-btn {
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    padding: 5px 14px;
-    border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
+    .country-flag { font-size: 14px; }
+    .country-count { font-size: 11px; color: var(--text-muted); font-weight: 600; }
 
-  .filter-btn:hover { border-color: var(--text); color: var(--text); }
-  .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    /* ===== Chart ===== */
+    .chart-wrap {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
 
-  /* Cover Wall */
-  .wall-section { margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem; }
+    .chart-container {
+      position: relative;
+      height: 160px;
+    }
 
-  .wall-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 1.25rem;
-  }
+    /* ===== Filters ===== */
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
 
-  .wall-header h2 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.25px; }
-  .wall-header span { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
+    .filter-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      margin-right: 4px;
+    }
 
-  #cover-wall {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-  }
-  @media (min-width: 600px) { #cover-wall { grid-template-columns: repeat(5, 1fr); gap: 12px; } }
-  @media (min-width: 900px) { #cover-wall { grid-template-columns: repeat(5, 1fr); gap: 14px; } }
+    .filter-btn {
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 5px 14px;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
 
-  .cover-link {
-    display: block;
-    border-radius: 8px;
-    overflow: hidden;
-    background: var(--bg-alt);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
+    .filter-btn:hover {
+      border-color: var(--text);
+      color: var(--text);
+    }
 
-  .cover-link:hover { transform: scale(1.03); box-shadow: var(--shadow-hover); }
-  .cover-img-wrap { position: relative; }
-  .cover-img-wrap img { display: block; width: 100%; height: auto; }
+    .filter-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
 
-  .cover-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.85) 30%, transparent 70%);
-    opacity: 0;
-    transition: opacity 0.25s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 10px 9px;
-  }
+    /* ===== Cover Wall ===== */
+    .wall-section {
+      margin-top: 2rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+    }
 
-  .cover-link:hover .cover-overlay { opacity: 1; }
-  .cover-title { font-size: 11px; font-weight: 600; color: #fff; line-height: 1.3; margin-bottom: 2px; }
-  .cover-author { font-size: 9px; color: rgba(255,255,255,0.7); margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .cover-rating { font-size: 11px; color: #f5a623; }
+    .wall-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
 
-  /* Collapsible Book List */
-  .booklist-section {
-    margin-top: 1.5rem;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
+    .wall-header h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.25px;
+    }
 
-  .booklist-toggle {
-    width: 100%;
-    background: var(--bg-alt);
-    border: none;
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    transition: background 0.15s;
-  }
+    .wall-header span {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
 
-  .booklist-toggle:hover { background: #eeebe7; }
+    #cover-wall {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
 
-  .sort-bar {
-    display: flex;
-    gap: 6px;
-    padding: 10px 18px;
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
+    @media (min-width: 600px) {
+      #cover-wall { grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    }
 
-  .sort-btn {
-    font-family: inherit;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
+    @media (min-width: 900px) {
+      #cover-wall { grid-template-columns: repeat(5, 1fr); gap: 14px; }
+    }
 
-  .sort-btn:hover { border-color: var(--text); color: var(--text); }
-  .sort-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .cover-link {
+      display: block;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--bg-alt);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
 
-  .booklist-toggle .arrow {
-    font-size: 10px;
-    transition: transform 0.2s;
-  }
+    .cover-link:hover {
+      transform: scale(1.03);
+      box-shadow: var(--shadow-hover);
+    }
 
-  .booklist-toggle.open .arrow { transform: rotate(180deg); }
+    .cover-img-wrap { position: relative; }
+    .cover-img-wrap img { display: block; width: 100%; height: auto; }
 
-  .booklist-content {
-    display: none;
-    padding: 0;
-  }
+    .cover-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 30%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 10px 9px;
+    }
 
-  .booklist-content.open { display: block; }
+    .cover-link:hover .cover-overlay { opacity: 1; }
+    .cover-title { font-size: 11px; font-weight: 600; color: #fff; line-height: 1.3; margin-bottom: 2px; }
+    .cover-author { font-size: 9px; color: rgba(255,255,255,0.7); margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cover-rating { font-size: 11px; color: #f5a623; }
 
-  .book-row {
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    padding: 14px 18px;
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-  }
+    /* ===== Collapsible Book List ===== */
+    .booklist-section {
+      margin-top: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+    }
 
-  .book-row:first-child { border-top: none; }
+    .booklist-toggle {
+      width: 100%;
+      background: var(--bg-alt);
+      border: none;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: background 0.15s;
+    }
 
-  .book-info { flex: 1; min-width: 0; }
+    .booklist-toggle:hover { background: var(--bg-alt); filter: brightness(0.95); }
 
-  .book-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 3px;
-    line-height: 1.4;
-  }
+    .sort-bar {
+      display: flex;
+      gap: 6px;
+      padding: 10px 18px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
 
-  .book-author { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
+    .sort-btn {
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
 
-  .book-review {
-    font-size: 12px;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin-top: 8px;
-    word-break: break-word;
-    overflow-wrap: break-word;
-  }
+    .sort-btn:hover { border-color: var(--text); color: var(--text); }
+    .sort-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-  .review-more-btn {
-    background: none;
-    border: none;
-    padding: 4px 0;
-    font-family: inherit;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--accent);
-    cursor: pointer;
-    margin-top: 4px;
-    transition: color 0.15s;
-  }
+    .booklist-toggle .arrow {
+      font-size: 10px;
+      transition: transform 0.2s;
+    }
 
-  .review-more-btn:hover { color: var(--accent-hover); }
+    .booklist-toggle.open .arrow { transform: rotate(180deg); }
 
-  .book-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .booklist-content { display: none; padding: 0; }
+    .booklist-content.open { display: block; }
 
-  .month-tag {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 9999px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-  }
+    .book-row {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 14px 18px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
 
-  .star-rating { font-size: 11px; letter-spacing: 1px; }
-  .star-filled {
-    background: linear-gradient(to right, #f5a623 100%, #f5a623 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .star-half {
-    background: linear-gradient(to right, #f5a623 0%, #f5a623 50%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.15) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .star-empty {
-    color: rgba(0,0,0,0.15);
-  }
-  .rating-num { font-size: 10px; color: var(--text-muted); font-weight: 600; }
-  .pages-tag { font-size: 10px; color: var(--text-muted); }
+    .book-row:first-child { border-top: none; }
 
-  .book-dates {
-    text-align: right;
-    font-size: 10px;
-    color: var(--text-muted);
-    line-height: 1.7;
-    white-space: nowrap;
-    font-weight: 500;
-  }
+    .book-info { flex: 1; min-width: 0; }
 
-  footer {
-    margin-top: 2.5rem;
-    border-top: 1px solid var(--border);
-    padding-top: 1rem;
-    font-size: 11px;
-    color: var(--text-muted);
-    text-align: center;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-weight: 500;
-  }
+    .book-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+      line-height: 1.4;
+    }
 
-  @media (max-width: 480px) {
-    .book-row { flex-direction: column; gap: 8px; }
-    .book-dates { text-align: left; }
-    .stat-value { font-size: 1.5rem; }
-    .stats-grid { gap: 8px; }
-  }
-</style>
+    .book-author {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .book-review {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-top: 8px;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .review-more-btn {
+      background: none;
+      border: none;
+      padding: 4px 0;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      margin-top: 4px;
+      transition: color 0.15s;
+    }
+
+    .review-more-btn:hover { color: var(--accent-hover); }
+
+    .book-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .month-tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .star-rating { font-size: 11px; letter-spacing: 1px; }
+
+    .star-filled {
+      background: linear-gradient(to right, #f5a623 100%, #f5a623 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .star-half {
+      background: linear-gradient(to right, #f5a623 0%, #f5a623 50%, var(--star-empty) 50%, var(--star-empty) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .star-empty { color: var(--star-empty); }
+    .rating-num { font-size: 10px; color: var(--text-muted); font-weight: 600; }
+    .pages-tag { font-size: 10px; color: var(--text-muted); }
+
+    .book-dates {
+      text-align: right;
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      margin-top: 2.5rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 480px) {
+      .book-row { flex-direction: column; gap: 8px; }
+      .book-dates { text-align: left; }
+      .stat-value { font-size: 1.5rem; }
+      .stats-grid { gap: 8px; }
+    }
+  </style>
 </head>
 <body>
-<div class="page">
+  <div class="page">
 
-  <header>
-    <div class="title-block">
-      <h1>阅读记录</h1>
-      <p id="subtitle">{{MONTH_RANGE}} 2022</p>
-    </div>
-    <div class="year-badge">2022</div>
-  </header>
-
-  <div class="stats-grid">
-    <div class="stat"><div class="stat-label">已读书目</div><div class="stat-value" id="total-books">—</div></div>
-    <div class="stat"><div class="stat-label">平均评分</div><div class="stat-value" id="avg-rating">—</div></div>
-    <div class="stat"><div class="stat-label">总页数</div><div class="stat-value" id="total-pages">—</div></div>
-    <div class="stat"><div class="stat-label">阅读天数中位数</div><div class="stat-value" id="avg-reading-time">—</div></div>
-  </div>
-
-  <div class="country-section">
-    <div class="section-title">国家分布</div>
-    <div class="country-grid" id="country-grid"></div>
-  </div>
-
-  <div class="chart-wrap">
-    <div class="section-title">每月阅读量</div>
-    <div class="chart-container">
-      <canvas id="monthChart" role="img"></canvas>
-    </div>
-  </div>
-
-  <div class="filters" id="filters"><span class="filter-label">筛选</span></div>
-
-  <div class="wall-section">
-    <div class="wall-header">
-      <h2>书影留存</h2>
-      <span id="wall-count">— 本</span>
-    </div>
-    <div id="cover-wall"></div>
-  </div>
-
-  <div class="booklist-section">
-    <button class="booklist-toggle" id="booklist-toggle" onclick="toggleBooklist()">
-      <span>书籍清单</span>
-      <span class="arrow">▼</span>
-    </button>
-    <div class="sort-bar" id="sort-bar">
-      <button class="sort-btn active" data-sort="finish">时间 ↓</button>
-      <button class="sort-btn" data-sort="rating">评分 ↓</button>
-      <button class="sort-btn" data-sort="pages">页数 ↓</button>
-    </div>
-    <div class="booklist-content" id="booklist-content"></div>
-  </div>
-
-  <footer id="footer">数据来源 Airtable · Books · 导出于 2026-04-28</footer>
-</div>
-
-<script>
-// ========== 数据注入开始 ==========
-// 以下变量由生成脚本注入
-
-const YEAR = 2022;
-const GENERATED_DATE = "2026-04-28";
-
-// 12个月颜色配置
-const MONTH_COLORS = [
-  { bg: '#b5d4f4', color: '#0c447c', label: '1月' },
-  { bg: '#9fe1cb', color: '#085041', label: '2月' },
-  { bg: '#fac775', color: '#633806', label: '3月' },
-  { bg: '#f5c4b3', color: '#712b13', label: '4月' },
-  { bg: '#d4c4f4', color: '#4c147c', label: '5月' },
-  { bg: '#f4d4b5', color: '#7c4414', label: '6月' },
-  { bg: '#b5f4d4', color: '#147c54', label: '7月' },
-  { bg: '#f4b5d4', color: '#7c1454', label: '8月' },
-  { bg: '#d4f4b5', color: '#547c14', label: '9月' },
-  { bg: '#b5d4f4', color: '#147c8c', label: '10月' },
-  { bg: '#f4b5b5', color: '#7c1414', label: '11月' },
-  { bg: '#b5f4f4', color: '#147c7c', label: '12月' },
-];
-
-// 国家前缀映射（支持多种括号格式）
-const COUNTRY_PREFIX_MAP = {
-  // 方括号
-  '[日]': '日本', '[美]': '美国', '[德]': '德国', '[英]': '英国',
-  '[法]': '法国', '[塞尔维亚]': '塞尔维亚', '[韩]': '韩国', '[俄]': '俄罗斯',
-  '[以色列]': '以色列', '[爱尔兰]': '爱尔兰', '[英美]': '英美', '[荷]': '荷兰',
-  '[意大利]': '意大利', '[奥]': '奥地利', '[奥地利]': '奥地利', '[阿根廷]': '阿根廷',
-  '[波兰]': '波兰', '[葡萄牙]': '葡萄牙', '[古希腊]': '古希腊',
-  '[瑞典]': '瑞典', '[加拿大]': '加拿大', '[澳]': '澳大利亚',
-  '[英国]': '英国', '[加]': '加拿大', '[意]': '意大利', '[波]': '波兰',
-  '[阿]': '阿根廷', '[荷]': '荷兰',  // 常见缩写
-  // 圆括号
-  '(日)': '日本', '(美)': '美国', '(德)': '德国', '(英)': '英国',
-  '(法)': '法国', '(韩)': '韩国', '(俄)': '俄罗斯', '(荷)': '荷兰',
-  '(意)': '意大利', '(奥)': '奥地利', '(葡萄牙)': '葡萄牙',
-  '(古希腊)': '古希腊', '(俄罗斯)': '俄罗斯',
-  '（日）': '日本', '（美）': '美国', '（德）': '德国', '（英）': '英国',
-  '（法）': '法国', '（韩）': '韩国', '（俄）': '俄罗斯',
-  '（意）': '意大利', '（葡萄牙）': '葡萄牙',
-  // 中文方括号 〔 〕
-  '〔美〕': '美国', '〔英〕': '英国', '〔日〕': '日本', '〔德〕': '德国',
-  '〔法〕': '法国', '〔俄〕': '俄罗斯', '〔意〕': '意大利', '〔波〕': '波兰',
-};
-
-// 国家旗帜
-const COUNTRY_FLAGS = {
-  '中国': '🇨🇳', '日本': '🇯🇵', '美国': '🇺🇸', '德国': '🇩🇪',
-  '英国': '🇬🇧', '法国': '🇫🇷', '塞尔维亚': '🇷🇸', '韩国': '🇰🇷',
-  '俄罗斯': '🇷🇺', '以色列': '🇮🇱', '爱尔兰': '🇮🇪', '英美': '🇺🇸',
-  '荷兰': '🇳🇱', '意大利': '🇮🇹', '奥地利': '🇦🇹', '阿根廷': '🇦🇷',
-  '波兰': '🇵🇱', '葡萄牙': '🇵🇹', '古希腊': '🇬🇷', '瑞典': '🇸🇪',
-  '加拿大': '🇨🇦', '澳大利亚': '🇦🇺', '西班牙': '🇪🇸', '捷克': '🇨🇿',
-};
-
-// 检测字符串是否包含中文字符
-function hasChineseChars(str) {
-  return /[\u4e00-\u9fa5]/.test(str);
-}
-
-// 标准化作者名字符串，去除各种括号及其内容
-function stripCountryPrefixes(author) {
-  return author
-    .replace(/\[([^\]]+)\]/g, '')   // [xxx]
-    .replace(/\(([^\)]+)\)/g, '')     // (xxx)
-    .replace(/（([^）]+)）/g, '')      // （xxx）
-    .replace(/《([^》]+)》/g, '')     // 《xxx》
-    .replace(/【([^】]+)】/g, '')     // 【xxx】
-    .trim();
-}
-
-// 国家推断
-function deriveCountry(author) {
-  // 1. 先匹配前缀映射表
-  for (const [prefix, country] of Object.entries(COUNTRY_PREFIX_MAP)) {
-    if (author.includes(prefix)) return country;
-  }
-  // 2. 无前缀时，根据姓名文字判断
-  const nameOnly = stripCountryPrefixes(author);
-  if (hasChineseChars(nameOnly)) {
-    return '中国';
-  }
-  // 3. 纯英文名默认为美国
-  return '美国';
-}
-
-// 书籍数据（由生成脚本注入）
-const books = [{"title":"哥德尔、艾舍尔、巴赫","author":"[美] 侯世达","start":"2021-11-14","finish":"2022-01-05","rating":8.4,"pages":"1053","doubanLink":"https://book.douban.com/subject/1291204/","cover":"https://neodb.social/m/book/2021/09/15057272e8-cae8-4920-b8b1-2dcaba1c4dcb.jpg","review":"断断续续看了接近俩月，脑袋里印象最深的两个词是同构和自指，前半本书还能勉强跟上，后半本就力不从心了，佩服作者天马行空式的想象力。","month":1,"country":"美国"},{"title":"奥古斯都","author":"[美] 约翰·威廉斯","start":"2022-01-06","finish":"2022-01-14","rating":8.5,"pages":"374","doubanLink":"https://book.douban.com/subject/27180479/","cover":"https://neodb.social/m/book/2021/09/15cb797418-ef40-40c7-93f4-2c02e0aa8472.jpg","review":"上一次看书信体还是《傅雷家书》，当然没法与《奥古斯都》相提并论。这本书帮我补充了一段古罗马的历史知识，尽管作者说其中不乏故事，但这种文风令人煞是喜爱。以我目前之贫瘠语言，还无法在书评中言说一二，但此书绝对值得再次阅读，其中不乏一些桥段在一开始读时便令人摩挲品味。","month":1,"country":"美国"},{"title":"苏格拉底的申辩","author":"[古希腊] 柏拉图","start":"2022-01-18","finish":"2022-01-24","rating":8.6,"pages":"232","doubanLink":"https://book.douban.com/subject/26934202/","cover":"https://neodb.social/m/book/2021/09/161f2c4a1d-62b5-4870-9b4b-abd73505d03d.jpg","review":"第一次读柏拉图，也是第一次读注疏本。以我一个门外汉的观点看，本书在注疏上做的非常详尽扎实，对比，评价了各个名家注疏的优缺点并辅以作者自己的见解。尽管本人对于历史考究不求甚解，仍然读的津津有味。\n\n在这套申辩与之后的译者解读中，完全被苏格拉底式的生活态度所折服，其「无知之知」的求知之路，打开了我认识知识的另一扇门。他的这种否定性的求知方法，在他否定的地方，并不是简单的否定。在他说「不是」的时候，也蕴含了他「是」什么。「未经省察的生活是不值得过的生活」其审视的对象不仅是自身，亦可使他人。也许对苏格拉底而言，哲学的起点与终点都是「认识自己」，而人不可能有真正的智慧，但却一定存在真正的智慧，所以死亡到底好不好，只有神知道。\n\n##无知之知\n\n苏格拉底的好朋友凯瑞丰在德尔斐神庙求签问还有谁比苏格拉底更智慧，神谕说没有人更比他智慧。苏格拉底难以置信自己会是最智慧的人，因为他认为自己很无知，所以为了理解神谕的意思，他去拜访那些公认的智慧之人，企图在与他们的对话中能明白神谕到底是什么意思（根据注疏，苏格拉底不会怀疑神，而是试图明白神谕是否还有其它解释）。然而在与那些「智慧」之人的对话中，他发现，其实他们并无智慧。不仅如此，他们甚至不知道自己没有智慧，两相比较，大家都不智慧，然而苏格拉底有此自知之明，而他们强不知以为知，那么自然他们便更无知，苏格拉底便更智慧。也因此，他被人们忌恨。他的对话对象中有政治家、诗人、匠人，政治家被人们以为有智慧，却压根不知道自己的智慧为何，诗人们凭借灵感能写出看似有智慧的诗歌，却自己也无法理解，而匠人们，在其从事的工作中的确有一点智慧，但却因此以为自己在其他任何事情上也有智慧，而没有对灵魂和心灵真正的智慧，三种类型的人在苏格拉底式的诘问下都会恼羞成怒，这也是苏格拉底最后会被送上法庭的直接原因。\n\n然而即便如此，在法庭上申辩的决心，对良好生活和正义的追求，让苏格拉底没有因为害怕死亡而做出任何妥协。他在申辩时让法官们不要叫喊，听他用他的方式进行抗辩。甚至明知只要他提出一个相对这种的惩罚方式，比如流放便能免除一死，但他提出的却是法官们让他在市政大厅用膳。这种戏谑的方式，一方面说明苏格拉底对其正义，「好」的追求决心，一方面也是他对死亡的一种不同见解的注脚。死过的人都不会说话，没死过的人都没体验过死亡，自然按照苏格拉底的「无知之知」，死亡到底「好」还是「不好」都是未知的。\n\n「未经省察的生活是不值得过的生活」，苏格拉底不仅省察自己，还省察他人，在这种省察中他践行者他的无知之知，体现着他的爱知，因为一个智慧之人，首先要「认识自己」。","month":1,"country":"古希腊"},{"title":"动物园","author":"[日] 乙一","start":"2022-01-25","finish":"2022-01-27","rating":7.9,"pages":"368","doubanLink":"https://book.douban.com/subject/26723423/","cover":"https://neodb.social/m/book/2021/09/158c45ce1a-61bd-4746-bed7-418f3b603176.jpg","review":"没有背景了解，奔着推理来看的，推理性较强的两篇是衣橱和小白屋，七个房间前段都比较好，但结尾过于直白简单了，个人比较喜欢神的咒语。总体而言，感觉一般吧。","month":1,"country":"日本"},{"title":"大问题","author":"[美] 罗伯特·所罗门, [美] 凯思林·希金斯","start":"2022-01-10","finish":"2022-02-04","rating":8.4,"pages":"462","doubanLink":"https://book.douban.com/subject/30176572/","cover":"https://neodb.social/m/book/2021/11/28ea99c2de-160e-4688-9c68-a944545353ee.jpg","review":"以问题为导向介入哲学，比之之前看的西方哲学史，《大问题》无疑更适合入门，至少在引起兴趣方面要强出不少。但也正因此，它缺少那些以时间线索编排的哲学史书本所能提供的关于哲学的发展和各位哲学大家思想汇总的清晰脉络。","month":2,"country":"美国"},{"title":"地下室手记","author":"(俄罗斯) 陀思妥耶夫斯基","start":"2022-02-07","finish":"2022-02-15","rating":8.4,"pages":"216","doubanLink":"https://book.douban.com/subject/34990839/","cover":"https://neodb.social/m/book/2021/09/1511b305e8-ac4c-43e7-8634-c5b29cff0d9d.jpg","review":"即使是距离本书创作一个半世纪还多的当代，书中主人公「地下室人」的内心世界与我们仍有很多重叠。这种徒劳的企图在我们不在意，甚至是看不起、厌恶的人群中寻找身份认同矛盾行为，深刻的揭示人作为社会性动物的不可理喻性。","month":2,"country":"俄罗斯"},{"title":"到灯塔去","author":"[英] 弗吉尼亚·伍尔夫","start":"2022-02-10","finish":"2022-02-17","rating":7.5,"pages":"312","doubanLink":"https://book.douban.com/subject/35152219/","cover":"https://neodb.social/m/item/book/2023/12/10/5be1a06c-c2de-40c7-822b-e6d8c42062af.png","review":"看到那么多好评，我想应该不是书本的问题，但我自认自己应该也不会有太大的问题，然而这本书我实在读不下去，不管它是意识流还是象征的表现手法，始终无法与作者产生共鸣，这种频率的不对位也许就是无缘吧。","month":2,"country":"英国"},{"title":"Atomic Habits","author":"James Clear","start":"2022-01-28","finish":"2022-02-21","rating":8.3,"pages":"320","doubanLink":"https://book.douban.com/subject/30355759/","cover":"https://neodb.social/m/book/2021/09/16b54ff245-74bb-4307-be52-1eba93c7af23.jpg","review":"读的是英文原版，作者的语言平实易懂，为了能有更好的阅读效果，在每一章读毕我都对章节内容做了总结，尽管作者也贴心的给了每一章的 Chapter Summary，但我想自己动手写一写印象会更深刻。\n\n本书讲的是习惯养成，一个非常老生常谈的日常生活问题。作者的厉害之处在于能将这样一个问题讲透，并结合自己的经历，各种颇具说服力的例子，提出具备操作性的习惯养成办法。他用了四法则、习惯得分卡、指差确认、习惯堆叠、两分钟准则、金发女郎准则等概念化的术语，形成一套习惯养成的逻辑，将枯燥无味的重复性行动拆解成可以按部就班的体系化操作指南，值得借鉴学习。\n\n下面的章节终结只是我对作者内容的邯郸学步，摘录了我认为的核心内容，相较而言，作者的写作方式是在每一章先用例子来引入，再分析解释核心观点，在代入感上会强很多。\n\n## Chapter 1 主要讲一些耳熟能详的关于习惯益处的知识点\n\n- 要关注微小的改善，长此以往必将积累成客观的变化，习惯如同复利。\n- 设定目标固然能提供方向，但没有系统性的方法驱动，最终难免跑偏，因此与其将关注点放在目标的设定，不如做好系统性方法的建设，因为成功与失败的人他们都有相同的目标，却区别在方法的使用。\n\n## Chapter 2 主要讲对习惯的重新认识\n\n通常人们决定要养成某个习惯是出于想要获得某种结果，如体重减轻，肌肉增长，知识变多。但作者提出，关键点并不在于结果，过分关注结果产出反而会影响习惯培养的积极性。更有效的方式是你将改变的重点放在自我的身份认知(identity)上。简单来说两步走，一先设定一个你想成为的人，二用阶段式的小成功来证明自己。想要成为一个健康的人，你自然不会去吃垃圾食品，想要成为一个学者，你自然会去读书。用这套论述，养成习惯变等于成为一个新自己，习惯在这里的作用不是给你带来一个好的结果，而是它们会改变你对自我认知信念，我每天读书学习，我自然会认为我是一个有识之士，我每天健走不吃垃圾食品，我自然是一个健康之人。\n\n基于身份认知的习惯会形成一个反馈循环，认知->习惯->认知，当然，如果是坏习惯，那将是一个恶性循环。\n\n## Chapter 3 介绍如何养成好习惯以及戒掉坏习惯\n\n习惯被养成是因为同一种行为被重复了多次。为何这一行为会被重复执行，在于它能解决我们的问题。因此，习惯养成的目的是出于解决问题。不仅如此，在习惯养成前，我们解决问题时通常需要耗费更多的精力投入，但一旦养成习惯，这一行为就会变成「自动的」，多次重复的行为会让我们的身体建立这种自动化的程序，从而让其能将更多精力聚焦在其他新的更重要的问题上。书中一句概括的话说得好：Habits are mental shortcuts learned from experience. （习惯是从经历中学会的思维捷径）\n\n习惯的养成过程可以被分成四个步骤：提示(cue)、渴望(craving)、回应(response)、奖赏(reward)。所以，要养成一个好习惯就是要让提示变得明显、渴望变得有吸引力、回应变得简单、奖赏变得让人满足，而要戒掉坏习惯则从上面四个方面的反向进行努力。作者称之为行为变化四法则。\n\n## Chapter 4-7 关于行为变化四法则第一条：让cue变得明显\n\n- 通过足够的训练，习惯会让人们的大脑会形成从线索提示到预测结果的自然连接，而无需有意识的介入。在开始改变行为之前，人们应对自己的习惯先有一个明确的认识，作者介绍了两种方法 Habits Scorecard 和 Pointibg-and-Calling，前者帮助我们认识自己的行为习惯，后者可以强化我们想要养成的行为习惯。\n- 「实施决心」和「习惯堆叠」两个办法可以让cue 变得明显。前者要求在制定计划时明确说出在何时何地干何事，在我看来类似心理暗示，相比「激情」式的行为变化，即那些看完某视频或例子后以为自己觉悟而作的无具体时间地点的行为变化，「实施决心」通过更具体的要求来给自己暗示，好比给自己承诺。后者则是在已有习惯的基础上将新的计划安排在其(reward)后，类似饭前洗手、饭后刷牙这类习惯，关键是要找准被堆叠的母习惯。\n- 人是视觉化为主的动物，习惯又由cue激发，因此，通过在环境中的显眼位置设置cue，能有效的改变我们的生活习惯。而随着时间积累，这种cue会从单一物品变成整个场景。引导我们行为的不是场景中的物品，而是我们与它们之间的关系。所以，面对场景时，我们应该思考的是我们与之包含物品之间的关系而非它包含了什么物品。在卧室看到床时，我们要思考关系是它是用来睡觉的，而不是躺着玩手机的，不同的物品和场景有不同的功能，通过将场景、物品分区分类分功能，能帮助我们建立与之对应的习惯。同样的如果要戒掉坏习惯，可以考虑从更换场景、物件上入手。有一点要注意的是不要轻易将不同习惯的场景混在一起，因为那样容易让我们滑下那些更简单更喜欢的习惯中去，如不要在拉屎的时候玩手机…\n- 要戒掉坏习惯，自我控制只是短期办法。给吸烟患者看黑肺的照片，给肥胖之人看体重都只能增加其焦虑，反而继续坏习惯。同过让cue变得不明显，看不见，才是戒断习惯的长期有效办法。比起拒绝诱惑，选择避开它，让自己看不见它才是更有效的办法。\n\n## Chapter 8-10 关于行为变化四法则第二条：让行动变得有吸引力\n\n- 人类与动物一样在进化过程中，大脑都预置了一些设定来指导我们的行为，进化是一个缓慢的过程，而大脑的进化显然并为跟上我们这个物质以变得极大丰富的时代的发展。所以现代社会，各行各业可以利用各种这类预置来施加影响以图谋得利。食品工业通过各种盐、糖、卡路里们的组合来制造让我们垂涎欲滴的食物，尽管肥胖症严重却无法控制自己的饮食习惯。互联网社交网络通过算法、界面设计、数据分析来穷尽对我们思维习惯的考察，吞噬我们的所有可用时间，即使明知不对还能让人就犯。它们采取的方法都利用到了四法则中的第二条，让这些行为变得有吸引力。科学家们发现习惯是由多巴胺驱动的一个反馈循环，当我们越是期望某一行为时，多巴胺分泌便越增多，从而更想要去行动，在这一循环中，是对某一奖赏的期望，而不是得到，使得我们去行动。书中用到的多巴胺激凸图很好的解释了这点。一个有效的让某一行为变得有吸引力的办法是「诱惑捆绑」，将这一行为和能让我们期待的另一行为捆绑在一起进行，在我看剧后，我会做一百个俯卧撑，类似上面提到的「习惯堆叠」\n- 人是群体性的动物，我们的习性会在群体生活中被塑造。哪种行为对我们有吸引力在一定程度上被我们的文化所影响。我们会不知觉的模仿身边的亲友、所处的族群以及自己的仰慕对象。利用这一点，我们可以根据自己想要培养的习惯加入到已将之视为平常的群体中，同时他们与我们有一定的共同点，如此来自然的培养习惯。此外，族群对我们的可能还有负面影响，以至于在把我们带偏，在本能做对的事情上做了符合大家的错误的决定。\n- 我们的行为在表面上看是渴望做某事，更深层的是对某种动机的满足（习惯发朋友圈：期望得到社交认同，习惯用搜索引擎：减少不确定性）这些渴望满足的动机，古来有之。找到这些动机，分析我们行为的目的，通过使坏习惯的戒断的好处变得明显来帮助戒断。通过在我们感觉良好的事情前植入想要获得的习惯让它变得有吸引力。习惯的成因是行为之前的预测，这些预测导致上面所说的情感动机。如发朋友圈，我预测会有人点赞留言，从而满足社交认同心理。当行为与预测匹配时，会反复的重复行为获得情感动机的满足，最终形成习惯。\n\n## Chapter 11-14 关于行为变化四法则第三条：让行动变简单\n\n- 习惯养成前我们应该更多的投入到行动中而不是计划中（摄影案例），能让行为成为习惯的关键因素不是时间而是它被重复的频率(联想到 spaced repetition)。当一个行为重复的足够多次后，它会变得「自行其是」，从而成为习惯。\n- 人天生是趋懒避累的生物，我们的行为自然会滑向那些所需努力最小的事物上，从某种意义上说每一个习惯都是你获得你想要的事物的绊脚石。因此，为了养成好的习惯，我们应准备好周身的环境，让其能减少我们行为的阻力，反之，为了戒断某个习惯，我们应采取反向措施，阻挠、降低我们行为的便捷性。\n- 日常生活中我们的行为有接近一半是出于习惯，习惯只是我们每天众多瞬间时刻的入口，却影响着接下去的时间。值得注意的是，习惯也经常会影响那些决定我们人生道路的决定性选择。选择犹如岔路口，一些会提高人生质量，一些让人堕入黑暗。因此习惯非常重要。作者介绍了一个「两分钟规则」，说的是当你要开始一个新习惯的时候，你应该少于两分钟来完成它。两分钟干的事情要尽量仪式化，其目的是让习惯尽可能的有一个简单轻松的开始。它的意义不在于做两分钟本身，而是掌握开始做事情这个习惯，再逐渐加强优化获得更深入的提高。\n- 第三条法则的反面是让行为改变变得艰难，用于戒断习惯。承诺机制的运用可以再当下做出好意的决定以期在未来得到好的行为，而这么做的最终目的是形成行为的习惯。作者举了雨果写书，朋友断网的例子。有些单次的决定还能带来长效的好处，如更换好的床垫、遮光窗帘等。我们还能利用技术手段来帮助我们断开坏行为，当然现在的社交平台、互联网大公司也正在做着相反的事情，用技术使人沉迷，攫取用户注意力。\n\n## Chapter 15-17 关于行为变化四法则第四条：让行动变的满足\n\n- 前面三条法则是关于当下的行为，即让当下的行为变得易于进行从而养成习惯；而第四条法则是关于让这一行为在下一次也能被我们乐于执行的方法。人类大脑的演化使得我们更容易倾向即刻的满足而不去想延迟的满足。坏习惯之所以能被养成，一个重要原因就是它们提供了即刻的满足感，无论是吸烟、甜食、性，它们在当下就能满足人们的感官刺激，然而长远来看，它们带来的问题却是灾难性的。而好的习惯，往往在此刻却是带来不舒服的，只有大时间尺度下才会体现它的益处。因此行为改变的准则是：即刻得到奖赏的被不断重复，即刻得到惩罚的则被避免。为了让我们能适应延迟满足，作者提出了一个技巧，它不违逆我们的天然人性，而是善加利用。即让每一次有益习惯行为的结尾插入一点「奖励」，让我们获得即刻的满足感。作者举了几个例子，其中一个是设立一个旅游账户，那么每次避免点外卖、吃甜食时就在往账户里存一笔小钱，获得即刻满足感。这样的满足感会对提升下次进行这一行为的概率，长此以往能重新建立你对自己的身份认同，最终得到好习惯的真正奖励。\n- 可视化的行为衡量方法有助于加强我们习惯的建立，一方面它加强行为本身，二方面也能提供一点满足感。这里作者引入了习惯跟踪器，它可以是你手写本子也可以用现代化的手法自动记录，习惯记录器的好处是1.它带来了视觉提示让你行动起来；2.激励你取得进步和不断掉记录继续保持行动；3.每一笔记录都是一种小奖赏让你得到满足。我们难免有例外的时候，但是无论如何始终坚持不要连续两次破坏一个习惯，那将变成一个新的习惯。还有需注意的是，习惯记录器本身也有缺点，一是它没那么好坚持，需要在习惯上叠加习惯，二是它可能会让我们偏离目标，作者引用了古德哈特定律，「当一个指标变成目标，它将不再是一个好的指标」，类似的还有坎贝尔定律。\n- 第四法则的反面运用，可以有效戒断坏习惯——通过让行为的结果得到即刻的惩罚，当然惩罚的力度要比坏习惯给的安慰强。除此之外，作者还介绍了「习惯合约」来帮助达成行为的坚持。通过与我们身边的熟人进行沟通，可以是口头约定，最好是书面承诺，并设置违背行为后的惩罚来督促我们坚持自己的习惯。\n\n## Chapter 18 关于天赋\n\n这章是关于如何开发和利用自己的天赋（基因），有点成功学意味。从事自己擅长的事情时习惯总是好培养的，或者反过来，因为你喜欢做这件事，自然就培养出了习惯，从而使之变成你擅长的。作者谈论的主要方法其实很直白：在开发你既得天赋的同时，去探索那些你可能擅长的领域，用谷歌的例子作者推荐将开发和探索的时间花费比例大概定在 80-90% : 10-20%。每个人都会有自己的一些特点，关键是找到并利用它们，并将它们组合运用，培养成习惯，使自己在某一领域得到发展。我们的基因现在已无法改变，但要让基因起作用，离不开努力工作，坚持习惯，并且没有这些 hardworking 你也不知道自己是否具备那样的基因。\n\n## Chapter 19 Goldilocks准则\n\n这个准则的名字来源于一个叫做「三只熊」的儿童故事，故事中一个叫 Goldilocks 的小女孩品尝了三碗不同的燕麦粥并说喜欢既不烫也不冷，温度刚刚好的那一碗。「刚刚好」这一概念很容易理解并且在各种领域学科得到应用。作者这里引入这一准则用来说明对于我们的做事动力而言，难度低了我们会觉得无聊，难度高了则备受打击，需要找到那个「刚刚好」可以应对的难度值，那么会让我们保持最佳的动力。当我们运用第三法则中的「两分钟规则」时，习惯若已建立，我们若不改变加深难度，那种轻易的感觉会很快让我们觉得无聊，从而让习惯又被放弃。科学家们发现要想在工作中达致心流状态，这项工作的难度值差不多要比你的能力高出4%左右。成功最大的敌人不是失败而是无聊。也许这也是视频游戏、小黄片、垃圾食品等等持续提供新鲜感的习惯被轻易保持下来的原因。这种「不确定性奖励」它不会令我们产生新的渴望（craving），却能放大渴望本身。\n\n## Chapter 20 好习惯的缺点\n\n习惯一旦养成，它的好处是能自动化的行动，让我们能有更多精力去掌握其他细节。但习惯还只是通向精通的必要要条件，而不是充分条件。要精通某项技能，除了习惯，还要关注任何值得改进的细节。而一项静止的习惯，往往会成为通向精通的阻力。因为它被自动化后，很难让人主动再对习惯精雕细琢，这一舒适圈刚好形成在我们的行为开始变得自动化的那一刻，也即我们开始感觉自己要精通某项技能的那一刻。对于任何习惯，反思与审查是长期优化的有效办法，可以让我们对自己的表现保持警觉。在习惯的养成中，我们会逐渐的建立自身的身份认同，当外部环境要求我们变化时，越深入的身份认同，越难超越和改变。我们可以做的是提取身份认同中的特质属性，通过这些搭配这些不同的特质属性来演变新的身份认同。\n","month":2,"country":"美国"},{"title":"斐多","author":"(古希腊) 柏拉图","start":"2022-02-21","finish":"2022-02-25","rating":8.4,"pages":"122","doubanLink":"https://book.douban.com/subject/26259073/","cover":"https://neodb.social/m/book/2021/11/02c4d5b6d0-8192-4120-88ff-a14339a22ade.jpg","review":"柏拉图的斐多篇，记述的是斐多回忆述说苏格拉底被雅典法律处死当天服药自尽时与好友们的对话。柏拉图通过苏格拉底之口阐述了著名的回忆说、理念论等哲学思辨。带着两千多年的人类科学发展、知识储备回看这一文本，苏格拉底的一些观点难免让我无法认同，但他对知识的谦卑、对哲学的追求并不妨碍我的崇拜，即使是两年多年后的现在我们仍然无法看清楚意识、灵魂。几年前我在微信签名上写下「皮囊易逝 灵魂不朽」，很惊喜的在书中看到了对应。","month":2,"country":"古希腊"},{"title":"说理","author":"陈嘉映","start":"2022-03-02","finish":"2022-03-15","rating":8.2,"pages":"428","doubanLink":"https://book.douban.com/subject/34996424/","cover":"https://neodb.social/m/book/2021/12/11b3187bdf-515c-4df0-a28d-e7e30f9482c4.jpg","review":"如果不是分成颗粒度较小的小节形式，这本书我要读完可能会更不容易。阅读过程中时常会神游书外，但也有一些章节看的会深有体会。如果把真本书的知识内容比喻成一张网络，那么我看到的点亮的只有零星的一些。还是缺少沉下心来的态度，而总想着完成自定的阅读进度。","month":3,"country":"中国"},{"title":"科学革命","author":"[美] 劳伦斯·普林西比","start":"2022-03-16","finish":"2022-03-19","rating":8.5,"pages":"288","doubanLink":"https://book.douban.com/subject/25777854/","cover":"https://neodb.social/m/book/2021/09/18501b9178-8490-4c92-b648-ee61776b4dd3.jpg","review":"这本书与牛津通识读本《科学哲学》以及库恩的《科学革命的结构》我认为可以作为中学生的必读书目。我们当下的生活是如此依赖于科学技术，「科学」甚至经常作为一个褒义词出现，科学主义无处不在，因此了解科学出处、反思科学、解构科学应是学习科学者的必经之路。本书通过言简意赅的文字表述，代表性的例子选取告诉我们科学是如何从自然哲学中脱胎而来，其中也不乏一些我们对科学史的错误常识辟谣。行文流畅，阅读感受轻松，可作为三本书中的第一本阅读。","month":3,"country":"美国"},{"title":"告白","author":"[日]凑佳苗","start":"2022-03-21","finish":"2022-03-24","rating":8.5,"pages":"256","doubanLink":"https://book.douban.com/subject/34809715/","cover":"https://neodb.social/m/book/2021/11/01139367ed-2952-4a42-9bb0-b53c4f1a839f.jpg","review":"「可见对于同一件事，因角度不同， 看法天差地别的情况在这世上比比皆是。\n」小说篇首的这句话便是整本小说的主题，电影《罗生门》抑或小说《竹林中》都早已出现，并不鲜见。但作者能以青少年犯罪为载体，通过案件当事人和相关人的角度对案件发生的始末和动机进行了解释，让每一次反转都发生在人性的拐角处，使得整本小说的可读性极高，同时在家庭教育、校园伦理、法律等方面做了实例化的探讨让小说的社会意义也上了层次。尤其值得推荐的是，作者并没有俗套的制造出一个皆大欢喜的结尾，来弘扬人性光辉。","month":3,"country":"日本"},{"title":"包法利夫人","author":"[法] 福楼拜","start":"2022-03-25","finish":"2022-04-02","rating":8.5,"pages":"302","doubanLink":"https://book.douban.com/subject/25897678/","cover":"https://neodb.social/m/book/2021/09/15735152cf-46f6-4171-a023-943cb460b301.jpg","review":"福楼拜以文字考究精确著称，我无缘读得懂原文，但即使是中译本，也能间接的感受一二。尤其是书中几个经典桥段，通过视角切换、通过对话主题对比将人物刻画的淋漓尽致，足见大师手笔。作为名著，尽管大致剧情早已被各种渠道剧透过。但读至结尾，内心仍能泛起波澜。\n\n这次读的是实体书，但同时我会打开微信读书对应的电子版，一来方便做笔记照抄，二来也想看看他人的阅读心得。令我诧异的是，在众多文字评论中，竟然有不少是在同情心疼爱玛的，甚至居然还有认为查理卑微下贱的。\n道德批判按下不表，我在阅读此书时对爱情倒有了点新认识。\n\n书中爱玛一开始追求的便不是浪漫的爱情，她要的只是浪漫本身，罗道尔夫也好，赖昂也好，都是满足她浪漫感觉的媒介，她从未真正爱过谁，所以也谈不上有真的爱情。\n\n理型对象只存在于她自己的心中，任何现实载体都只是对其理型对象的模本，再精确的模本也只能提供一时的惊艳，时间荡涤后，剩下的只有裂纹和细节上的误差。而这种误差便如同癌细胞般会肆意扩散，达至晚期时，任何当初的山盟海誓都已烟消云散，眼里只有这些误差，且揪着它们去攻击这个模本。人们抱着浪漫之情企图寻找自己的爱情，在一个惊艳对象上以为自己找到了，其实找到的就是这样的爱情模本。真正的爱情应当从那个人出发，归于那个人，而不要为了浪漫，为了契合，为了匹配。我又想起了康德的道德律令，爱情也一样，爱情的目的应该是其爱的对象本身，应以人为目的，而非拿人当工具。","month":4,"country":"法国"},{"title":"凶年（全2册）","author":"[美]大卫·西蒙（David Simon）","start":"2022-02-22","finish":"2022-04-06","rating":8.3,"pages":"790","doubanLink":"https://book.douban.com/subject/35352576/","cover":"https://neodb.social/m/book/2021/09/1571038444-4c21-45d8-a973-aa349892a73d.jpg","review":"在看过五季《火线》和两本《凶年》后，巴尔的摩已成为我的美国故乡。","month":4,"country":"美国"},{"title":"人间椅子","author":"（日）江户川乱步","start":"2022-04-03","finish":"2022-04-14","rating":8.3,"pages":"288","doubanLink":"https://book.douban.com/subject/6558046/","cover":"https://neodb.social/m/book/2021/09/1516e96306-ce27-4701-be21-4d4114639975.jpg","review":"寥寥数笔就能描写出离奇的氛围、荒诞的情节、细腻的心里，这便是大师的短篇。","month":4,"country":"日本"},{"title":"ルックバツク","author":"[日] 藤本 タツキ","start":"2022-04-18","finish":"2022-04-19","rating":8.2,"pages":"144","doubanLink":"https://book.douban.com/subject/35533868/","cover":"https://neodb.social/m/item/bangumi/2024/12/23/79c238ee-7d4f-4ec5-a460-77d8469d3a03.jpg","review":"成年后没看过漫画，这一部的观看契机是播客《迟早更新》以及Oasis的那首歌。很简短的一个故事，从文学意义上讲，我感觉并不值这么高的评分，当然，这本就是漫画，不是文学，所以我只能以一个门外汉的角度进行评价。","month":4,"country":"日本"},{"title":"中国历代政治得失","author":"錢穆","start":"2022-04-10","finish":"2022-04-27","rating":8.5,"pages":"178","doubanLink":"https://book.douban.com/subject/6803721/","cover":"https://neodb.social/m/book/2021/11/01c340ef17-a01a-4fdb-a179-1f4860343a63.jpg","review":"第一次读竖排繁体书，获益良多。从小接受的国内义务教育，对中国古代的政治、历史的所有观点皆来自教科书，填鸭式的教育让我忘了反思。而钱穆老先生这本书，让我重新认识了一遍中国古代政治。虽是一本不厚的小书，但内容覆盖范围极广，历代的皇帝与政府的关系、政府的组织架构、科举制度、赋税制度、兵役制度等拓宽了我的历史视野。钱老提出的历史意见与时代意见，制度与法术，封建社会的探讨也另我印象深刻，但也因为书小，有些观点看起来有些武断而缺乏论证。某种程度上本书让我联想到了费孝通白乡土中国，这也是本值得复读的好书。","month":4,"country":"中国"},{"title":"城堡","author":"[捷克] 卡夫卡","start":"2022-04-19","finish":"2022-04-29","rating":8,"pages":"287","doubanLink":"https://book.douban.com/subject/26986881/","cover":"https://neodb.social/m/book/2021/11/2714b973c2-2586-4628-8649-54524073568e.jpg","review":"读完包法利夫人接着读这荒诞的城堡，反差有点大，说实话，我感觉并不那么容易读下去。也许应该先尝试尝试卡夫卡的短篇。","month":4,"country":"捷克"},{"title":"The Almanack of Naval Ravikant","author":"Naval Ravikant, Eric Jorgenson","start":"2022-05-05","finish":"2022-05-12","rating":8.2,"pages":"242","doubanLink":"https://book.douban.com/subject/35219712/","cover":"https://neodb.social/m/book/2021/09/1601ff050a-256e-4c62-9e39-2217040ab7d0.jpg","review":"\n前言\n这本书的内容是关于过去十年 Naval Ravikant 的推特、播客和散文中的金句整理汇编。Naval Ravikant 于1974年生于印度新德里，9岁时随母亲还有兄弟一起搬到了美国纽约。他现在是知名的美国企业家与投资者，他是 AngelList 的联合创始人，董事长兼前首席执行官。他在早期投资了200多家公司，包括 Uber，FourSquare，Twitter 等。他在事业上取得相当大的成就，并在 Twitter 上分享自己的成功之道和人生思考，这本书就是这些内容的汇编。\n\n总体来讲，这本书在豆瓣以及 Goodreads 上的评价都相当高，但就内容而言，我觉得还是有点偏鸡汤的。当然，我并不反对鸡汤，能间或的喝上几口对于身体思想也不无裨益。我一直以来都觉得与其阅读成功者关于自己成功的秘诀，并不如观察失败者分享自己失败的原因有价值，因为成功往往会有偶然性，而失败往往蕴含更多的必然性，然而市面上少见有关于失败者分享自己失败经验的。大概，失败者并不那么容易开口分享。\n\n以下是我在阅读这本书时作的一些记录，因为读的是英文原版，所以这些记录大致上是翻译了作者的原话。当然，作者书中的内容会更具体，而我只是摘抄了我认为有启发性的东西。内容遗��是不可避免的，甚至观点传递上也难免有所疏漏，权当自己的记录，若你对书本感兴趣，还是得自己亲身阅读。就语言风格而言，Naval 的用词朴实易懂，就我的英文水平而言几乎没有阅读障碍，将文本当作英文语感训练也是不错的。\n记录\n1. 财富和金钱不同，金钱的获得来自于出卖自己的时间或者劳动力，而财富则是你在睡觉时也能给你金钱积累的东西。要获得财务自由，要将经历时间投入到财富的积累上，而不是金钱的积累。\n2. 现代社会到处都是能获利的杠杆 (leverage)，将经历投入到自己感兴趣的事业上，将要做的事情成为目的 (for their own sake)，而不是手段，往往能将事情做的更好而获得更高的回报。 注：杠杆* (leverage) 就像一个放大器，它能放大你的回报，过去的社会通过出卖劳动力来拿回报，工作几个小时就只有固定的几个小时的薪资，而现在不同，通过资本运作、公司、技术、生产力，能让一项工作成倍的得到回报。代码工程师是一个非常好的说明例子.*\n3. 如果社会能通过训练你完成一项工作，那么同样也可通过训练他人来替代你的工作。\n4. 忘记财富与贫穷的对立、忘记白领与蓝领的对立，现在的对立是有杠杆和无杠杆之间的对立。有三大类的杠杆：1、劳动力杠杆——其他为你工作的人，2、金钱杠杆，上个世纪主要的杠杆形式，3、一个全新的杠杆——没有复制成本的产品，包括书本、媒体、代码。其中代码可能是最强大的无需许可的杠杆。\n5. 一周40小时工作制是工业时代的残余。知识工作者的工作更像运动员——训练和冲刺，然后休整和评估。\n6. 销售 (sell) 与创建 (build) 是成为伟大技术公司一员的条件，这两个概念都有宽泛的定义，如果两者你都不会，那么开始学习。\n7. Accountability（不知道如何翻译，暂且称为责任等级）随着所处工作层级升高而升高，责任等级越高则能拥有更高的杠杆，如底层的房屋装修工是没有责任等级的，他的责任等级属于他的包工头，扩大自己的责任等级，是增加杠杆的有利途径。\n8. 对从事的事情要拥有所有权和股权，所有权能让你主动的去做事情，而股权则是你获利的杠杆，让你能有被动 (passive) 的收入。\n9. 要以你的判断获得报酬，而不是时间。一个被验证过有判断力的人，辅之以高责任等级和良好清晰的记录，是积累财富的关键。例子：巴菲特。\n10. 将时间计入你的每个决定中，量化你的时薪，从而判断做一项事情是否值得。这个量化要超过你自己当前的预期，直到让你觉得荒谬的地步。\n11. 财富积累是近代社会演化出来的正和游戏，而社会地位则是一个零和游戏，那些攻击创造财富的人，经常只是为了寻求社会地位。\n12. 在哪个城市、和谁在一起、做什么工作，是值得我们好好思量的事情，人们往往轻易决定这几项事情而将生命中的大部分时间居住在某个城市，和某个人在一起，做某一项工作。\n13. 退休就是当你不用为了想象的明天而牺牲今天的时光。当今天已让你自足，你也就退休了。\n14. 遇见好运的四种方式：1、希望好运降临 2、忙碌的准备，跌跌撞撞进好运 3、练就识别好运来临的眼光并抓住它 4、成为某方面独一无二的能手，好运自会来找你。\n15. 你不会因为花时间去省钱而变得富有，但你可以省时间去赚钱而变得富有。\n16. 当代经济社会，努力工作是一项被高估的能力，而判断力则是被低估的能力。你前进的方向比你前进的速度更重要，尤其是在加上杠杆的时候。\n17. 清晰的思考者是比聪明更好的恭维词汇。一个清晰的思考者能串联最基础的知识，用最简单易懂的语言讲述复杂的概念。只知道概念者，只是在记忆，而不是真的学会。\n18. 紧张源于你认为你所是，松弛源于你所是。——佛家谚语\n19. 不要被身份、标签所累，要重估最底层的原则，如果你的行为想法能非常切合某一主义思想，那么你要开始高度怀疑自我了。（与原子习惯里的培养习惯方法相违背）\n20. 当你想要批判一个人的时候，不要去批判那个具体的人，而要去批判他的这类行为和行事的方法；当你想要赞美一个人，找到最能符合你要赞美品质的那一个人，然后去赞美他。如此，人们的自我和身份认知就不会与你对着干，而是来帮你的忙。\n21. 在决策阶段，大脑就像一个记忆预测机器，会根据过往的经验来预测当前的情况。但是这一预测最好是有一些原则和心智模型的支撑，否则只要环境改变则预测就失效。建立心智模型的最有效方法就是读书，每天都一小时科学、数学或哲学书，可能让你在七年内成为人类成功的上层梯队中的一员。\n22. 大脑的空间是有限的，神经元也是有限的，但我们可以通过各种形式的记录，把它们当成指针、地址或助记符来记录有潜在经验支持的根深蒂固的原则。\n23. 了解一点复杂理论，会让我们知道人们是多么的无知，是多么的不善于预测。\n24. 多了解一些微观经济学、博弈论、委托人-代理人问题，有助于创办公司。\n25. 如果你拿不定主意，答案就是不，例如是否嫁给某个人、是否接受某个工作、是否搬去某个城市，因为现代社会总是充满选择，通过互联网人们是高度连接的。\n26. 如果你在做一个难分伯仲的艰难选择，选择那个会带给你短期痛苦的。因为大脑会因为短期的痛苦而给另外一个选择加分，要有长期的眼光，利用复利的概念去看待问题。（short-term pain, long-term gain）\n27. 读你所喜欢的，直到你喜欢读。（一个值得思考的教孩子的观点）\n28. 先建立读书习惯，喜欢读书的想法。读书的时候跳读、选择性阅读、把握内容主旨，专注于那些能带来预测能力的新概念。不要畏惧难懂的书，因为有阅读压力，才表明你在阅读中有所收获。\n29. 一本书不一定要从头读到尾，可以从你喜欢的地方开始，不要有心里负担。\n30. 学好逻辑与数学，一旦你掌握好这两门技艺，那么没有书会再难倒你。\n31. 阅读时要有牢固的知识基础，因此要读经典，读知识流派的开创者。\n32. 任何经历两千多年还能流传至今的书，都是经过无数智者过滤后的选择，这些书中的一般原则大概率都是对的。\n33. 一个平和的心态、一副健康的身体、一个充满爱的家庭，这些东西是买不到的，它们只能靠挣取。\n34. 生命中最重要的三大件是财富、健康和幸福。我们以这样顺序去追求它们，但就重要性而言却是倒过来的。\n35. 也许幸福不是通过遗传或者选择而得，而是一个高度个人化的技巧，它可以被学习，就如健身，就如事业上的成功。\n36. 幸福来自于对外部世界的接纳，以一种中立的视角达致的一种平和安宁的心态。\n37. 安宁市休息时的幸福，幸福是运动中的安宁，你可以随时将安宁与幸福进行转换。\n38. 几个能让自己变得幸福快乐的小技巧，需要虔诚的练习：\n1. 冥想，带着目的去冥想，思考理解自己的心智是如何工作的。\n2. 知晓自己的每时每刻，如果想批判某人，停下来想一想这么做的积极意义是什么？\n3. 更多的接受阳光，向上看，保持微笑。\n4. 每当发现自己渴望某事物时，问问自己是否没有这个事物我就将变得不幸福？你会发现多数时候并不是的。\n5. 不摄入咖啡因让我更幸福，让我情绪更稳定。\n6. 每天锻炼让我更幸福。\n7. 批判的越多，你就越与自己分离。有那么一瞬你会觉得快乐，因为你觉得自己比别人好，但随后，你会觉得孤独，随之产生负面情绪。世界只是反映了你自己的感受。\n8. 告诉你的朋友们你是幸福的，然后你会被迫遵守它。你的朋友也会期望你是一个幸福的人。\n9. 通过最大限度地减少对这三个智能手机应用程序的使用来恢复时间和快乐：电话、日历和闹钟。\n10. 你的秘密越多，你将越不快乐。\n11. 没有例外——所有屏幕活动都与较少的幸福相关，所有非屏幕活动与更多幸福相关\n12. 政治、学术、社会地位都是零和游戏。正和游戏创造积极的人。\n39. 如何学会接受不可改变之事？从根本上说，只用一招：拥抱死亡。没什么可留下的。我们都会离开。我们的孩子将会离开。我们的作品将是尘埃。我们的文明将是尘埃。我们的星球将是尘埃。我们的太阳系将是尘埃。在宏伟的事物计划中，宇宙已经存在了一百亿年。它将再存在一百亿年。而我们只不过是其中的一瞬。\n40. 医生不会让你健康。营养学家不会让你苗条。老师不会让你变得聪明。导师不会让你平静。导师不会让你变得富有。运动鞋不会让你健康。最终，你必须承担责任。拯救自己。\n41. 没有人能比你更能做你自己，倾听和学习，但是不要模彷，每个人都是独特的存在，每个人都有自己特定的知识、能力和渴望，世界上没有其他人能做到。\n42. 你认为什么习惯对你的生活影响最大？日常的晨练。\n43. 过多的糖分导致身体的肥胖，过多的分心导致心灵的肿胀。\n44. 自然用数学说话，数学是我们对自然语言的逆向工程。\n45. 生命是否有意义？我有三种可能的答案：1、意义是个人的，你要自己去找意义；2、生命没有意义，一切事物都将灰飞烟灭，宇宙归于热寂；3、时间之矢源于熵增，熵增不可逆，宇宙终将归于热寂，而我们所有行事的意义便是加速熵增，加速热寂的到来，让能量分散，让我们成为同一。\n46. 什么是你的核心价值观？1、诚实，对自己诚实，不要看人行事，离开任何我无法诚实以待的人；2、我不相信短期的想法或交易。所有生命中的好处都来自复利，不管是金钱、关系、爱、健康或者习惯。我只想与我认为会余生相伴的人在一起，我只做能在长期上有回报的工作；3、与人相处，我相信同伴关系，我不认可等级关系；4、不要生气，也不要与易生气的人在一起。\n47. 越老的问题，需要越老的答案。\n\n","month":5,"country":"美国"},{"title":"学术与政治","author":"[德] 马克斯·韦伯","start":"2022-05-04","finish":"2022-05-16","rating":8.3,"pages":"264","doubanLink":"https://book.douban.com/subject/35489050/","cover":"https://neodb.social/m/book/2021/12/066af7522c-70fd-49a2-b217-122c9339ea80.jpg","review":"虽说是给大学生的演讲稿，但我读起来还是颇为艰涩，以《以学术为天职》倒还好，还能看的津津有味，尤其是韦伯谈到世界的祛魅，心有戚戚焉。但后面《以政治为天职》和关于《客观性》的这两篇以我目前的能力还着实无法看进去，留待以后有机会再学习吧。","month":5,"country":"德国"},{"title":"希腊棺材之谜","author":"[美] 埃勒里·奎因","start":"2022-05-16","finish":"2022-05-26","rating":8.3,"pages":"383","doubanLink":"https://book.douban.com/subject/3112726/","cover":"https://neodb.social/m/book/2021/09/16eb2010e6-e781-42c3-8455-3c77a02837a1.jpg","review":"一波四折，案中有案，结尾的反转着实没有想到。奎因动不动就拉丁文法文的引用我觉得也是此书的一处妙招。","month":5,"country":"美国"},{"title":"洞穴奇案","author":"[美] 彼得·萨伯, Peter Suber","start":"2022-06-01","finish":"2022-06-10","rating":8.7,"pages":"208","doubanLink":"https://book.douban.com/subject/35183164/","cover":"https://neodb.social/m/book/2021/09/16fbf23335-9031-4309-92eb-2c88e9a70cd9.jpg","review":"一开始被书名吸引，一位这是一本推理小说，直到翻开看了前言，才发现这是一本虚构案件读法官陈词。读完虚构案件难免会联想到此前看过的哈佛大学公开课_Justice_里探讨过的类似内容，一个是电车难题，另一个是英女王诉杜德利与斯蒂芬案的真实案件。无论是哪一种情景设计，最终是让按钮决定的人，让法官限于法律与道德的两难之间。\n\n此书由富勒首版于1949年，他虚拟了5位法官的精彩陈词，50年后由萨伯再次接续虚拟了另外9位法官的不同陈词。就我个人感觉而言，富勒的5位法官陈词位认为更加短小精悍，在法理道理的探讨上更为聚焦，而萨伯的9位法官也许因为可供分析的角度越来越少的缘故，在内容铺陈上略显松散，观点十二甚至有凑数之嫌，观点十三则过于激进。\n\n总体而言，阅读这本书就是一场思辨盛宴。在这里我们将读到一个关于区分实定法和自然法、法律语言和法律目的、司法职能和行政职能、司法性立法和立法机构立法、公义常识与立法精神、立法司法与道德关系、紧急避难抗辩与「故意」词义、法官的自由裁量权等的学术性专题讨论。\n\n作为一个非法学专业的普通人，遇到这样一个巧妙设计的案件，以法官角色代入，自己该如何做出判决呢？这本身就是一件有意思的事情，它需要我们援引法条说服自己的同时还要说服众人。然而不同的人对同一件事就是会有不同的观点，像前言所述，这个案例并不是富勒的结论，而是他的提问。\n\n在此，我也不自量力想提一点微小的看法，是关于紧急避难抗辩的。尽管在陈词中，有的法官支持杀人者的紧急避难抗辩，有的反对，但我的一个反对意见，没有出现在法官陈词中：我们首先假设杀人者即幸存者们的紧急抗辩成立。根据霍姆斯法官提出的，如果杀人对于船上的人的存活是必要的，那在法律上就是正当的。也就是说杀人者吃被杀者威特莫尔的肉而幸存是必要。现在，假设在杀人者行凶的当下，威特莫尔有一股突如其来的求生欲望，在被杀人者围攻的某一时刻，突然暴起将其中一位反杀，那么威特莫尔这一行为是否也属于紧急避难？根据霍姆斯法官的观点，显然威特莫尔的杀人对他的存活是必要的，在法律上是正当的，也是紧急避难。于是，在一场杀人事件上，正反双方都具备了紧急避难条件，这显然是可笑的，这样的杀人事件无论结局如何都没有错的一方，杀人不问对象，只要有结果就成了正义。\n\n","month":6,"country":"美国"},{"title":"禅与摩托车维修艺术","author":"[美]罗伯特·M.波西格","start":"2022-05-21","finish":"2022-06-11","rating":8.2,"pages":"494","doubanLink":"https://book.douban.com/subject/30208077/","cover":"https://neodb.social/m/book/2021/09/18b3d10c71-5e6c-49a2-a851-92b1123a2db5.jpg","review":"书本叙述时穿插着两条世界线，一条是作者与儿子的骑行之旅，另一条是在前者的肖陶扩中回忆那个曾经的他「斐德洛」在精神分裂前的思想之旅。书本探讨的精神主题多元，包括教育、科技、艺术、宗教、哲学、修辞学等，倒是与书名中的禅相关的内容寥寥无几，最核心则是关于「良质」的阐释。为了调和古典理性与浪漫主义，主体与客体，斐德洛提出了良质，尽管良质难以或者根本无法定义，他仍试图以各种方式去解释描述，甚至还在老子的《道德经》、佛陀、印度教等中找到了对应。斐德洛有强大的勇气去挑战柏拉图与亚里士多德的哲学观，但我并没有在书中看到与之匹配的思想解释。全书给我留下最深印象的是关于庞加莱的那一段文本：按作者的意思，庞加莱的约定主义——事实是基于理性美学而预先选择的。数学发明者的真实作用在于选择这些组合，以便减少无用者，或者设法避免制造它们的麻烦。以欧几里德几何公设举例，选择不同的第五公设可以以推出形式完备的其他几何，如罗式几何、黎曼几何。这一看法并没有回答真理何以可能的问题，因为按照约定主义，真理只是加以喜好的选择，而无真实的客观性，科学现实的源头不过是一种主观的、反复无常的和谐。而斐德洛的良质能在此扮演调和的角色，作者认为事实的预先选择并非基于主观的、反复无常的“任何你喜欢的东西”，而是基于良质，即现实自身。良质是一个二元的、主观-客观的形而上学系统中的第三个形而上学实体。 ","month":6,"country":"美国"},{"title":"阿莱夫","author":"[阿根廷] 豪·路·博尔赫斯","start":"2022-06-07","finish":"2022-06-19","rating":8.3,"pages":"203","doubanLink":"https://book.douban.com/subject/25796122/","cover":"https://neodb.social/m/item/book/2023/11/17/c7b20e8a-cb42-4b22-b300-e4e51475cf18.jpg","review":"博尔赫斯玩转的时空如迷宫一般难解。","month":6,"country":"阿根廷"},{"title":"How to Take Smart Notes","author":"Sönke Ahrens","start":"2022-06-13","finish":"2022-06-22","rating":8.5,"pages":"176","doubanLink":"https://book.douban.com/subject/30216624/","cover":"https://neodb.social/m/book/2021/09/15bbb95fa9-c023-47d6-98ee-e8a2ee5539c7.jpg","review":"本书的主线是论证卢曼笔记法何以优秀，但之所以不能将其看成是一部如何做笔记的手册，是因为作者还提供了践行这种笔记法的 How and Why，因此有不少读者批评作者有凑字数之嫌，我并不认同。作者在论证过程中也充满其他具有颠覆性的知识，如幸存者偏差、蔡格尼格效应，记忆技巧、意志力研究，学习原理等等，他们都被合适的编排在与卢曼笔记法制作相关的背景之下。尤其是作者在书中多处驳斥了传统教育对学生以主题指导方法写作的弊病，指出头脑风暴的问题令人印象深刻。毫无疑问作者也在践行卢曼笔记法，我们有理由期待假以时日作者也会有更多优秀作品诞生。\n\n不同与以往的根据主题发散，通过头脑风暴，再去阅读进行写作的自上而下的过程，卢曼的方法是反向的自下而上的过程。在阅读中进行积累——卡片制作。通过闪念卡片、文献卡片、永久卡片，逐渐累积知识，再通过让卡片之间建立连接，通过索引标志方便的找寻卡片，从而让某个写作主题自然浮现，因此当要就有关主题进行写作时，只需要去参考自己积累的卡片就能水到渠成。\n\n这种方法大大减少了就一张空白纸开始写作时那种抓耳挠腮的困难，将重要的工作放在了平时的阅读积累、笔记制作上。人的心力和精力都是有限的，我们能同时处理的多任务研究表明最多只有7件事情左右。而且多任务处理会使我们分心，减短持续注意力的时间。尽管很多人以为自己在这种多任务方式下工作会更有效率，但有控制对照组的实验表明，长期实践多任务的人不仅在任务质量上会变差，同时还会损害他们回到顺序任务时的效率。卢曼笔记法的工作流可以避免多任务处理问题，帮助我们更好的集中注意力。它可以将写作时的不同任务分层，提供一个清晰的可分离的任务结构。因此通过工作流的建立，利用卢曼卡片能将任务结构外化，分解成一个个子项，一个时间只做一件事情，将头脑从用于短期记忆的压力中释放出来，更多的去做思考上的事情。不仅如此，这种方法相比主题发散的方法，在阅读内容越多，笔记越多的时候，会更有优势。因为它不仅不会让主题下面的内容过多而显得凌乱，却能增加不同知识之间的连接。\n\n每个人都天生带有认知偏见，我们会喜欢与自己认同的人在一起，也会欢迎那些让我们认同的观点。自上而下的笔记方法，即先确定主题再进行阅读写作的方法，更容易让我们带上固有的认知偏见去做研究，在阅读中我们会更倾向于去挖掘那些符合我们既有观点的文章。而自下而上的方法，即卢曼笔记法，能有效的避免这种认知偏见。我们没有带着某个主题和目的去阅读，做笔记尽管有所取舍，但标准并不是支持与反对，而是相关与不相关。然后发散，连接以往笔记内容，当需要写文章时，在笔记卡片盒里找出那些做好的永久笔记，稍微修改一番就能使用。\n\n一般认为人们学习新[知识](https://www.notion.so/p-27a0d7cdfd404f4a81e7b983cac9219e) 的能力随着年纪的增长的确是衰退的，毕竟任何人的脑容量都是限定的。但是随着年岁的增长，我们已经内化的知识之间的练习却是越来越紧密的。如果将新知识看成是孤立的知识，的确，比起年轻的自己，我们接受新东西的能力会差一些。如果将新知识与我们已有知识建立连接，让其对接在我们已经内化的知识之上，成为我们思想网络中的一个节点，相比孤立知识，毫无疑问我们能更快的学习它。而卢曼笔记法的关键作用就是在于建立这种连接。我相信没有哪个知识是“孤立无援”的，如果有，它就不是知识，而只是信息。只要有知识背景，我们总能找到新知识与其的连接之处。而这种连接开始构建后，会形成正反馈，随着知识的增多，他的扩大不是线性的，而是指数级的。\n\n制作卢曼笔记的时候，一个关键点是不能原封不动的摘抄文本内容，而是要用自己的语言进行精简重写，因为只有动笔重写的时候你才能将注意力从文本内容转向文本的框架、模式和类别上来。因此通常我们学生被教育的阅读方法，在阅读的时候划线，更多的只是带给我们一种在阅读的假象，当下次碰到类似的内容时，曝光效应会让学生们觉得那些熟悉的知识就是已经理解的知识，实际上，他们根本没有将这些知识内化。这让我想到我们当下的“为你读书”类的播客节目。这类[知识](https://www.notion.so/p-27a0d7cdfd404f4a81e7b983cac9219e) 播客以为你快速读书，掌握书中知识为卖点宣传，界面上甚至会显示你用了XX小时、听了XX本书，一看就是满满的学富五车感。这种知识虚荣感不仅只会让听者失去了真正阅读书籍的机会，而且还会让他产生一点关于某类知识的模糊而不坚实的印象而导致认知偏见。真正的知识掌握，不仅要方法，也要下功夫，这是毫无疑问的。好比为了获得好的身材，去健身房却只是请一个教练在你面前演示怎么锻炼是没用的，一定要自己上场，出汗。因此研究得最多、最成功的学习方法是“详细阐释”(elaboration)。\n\n想写出一篇好文章，你只需要有一篇好的草稿，想要有一篇好的草稿，你只需要将做好的笔记转成连贯的文字，而这一系列的笔记就是你用卢曼笔记法做笔记时存放在 Slip-box里的。你真正需要做的是拿起笔，去阅读。卢曼笔记法让记笔记的学者不在成为学术研究的中心，他更像一只勤劳的蜘蛛在编织他自己的知识之网，而学术的主体、成果、论文便是被这张网捕获的猎物。\n\n阅读完这本书，我不敢说自己能完全明白卢曼笔记法的准确步骤和流程，但是作者在论述 How and Why 的时候还是给我提供了很多意想不到的洞见和采取行动的鼓励。在具体的工具选择上，我纠结于 Obsidian 和 Notion，前者能提供更加方便优美的双链形式，而后者在电脑端和移动端的体验更加一致，而我又是免费的 Team Plan 用户。因为一直在 Notion 做读书笔记，最终还是选择继续在 Notion 上开展新的笔记方法，根据我的粗浅理解以及条件限制，我暂定的笔记工作流如下：\n1. 先带着输入设备（电脑、手机）阅读文本、划线->\n2. 为了不影响阅读，收集完一天的划线后，重写关键内容进行摘记->\n3. 摘记时用关键字插入[[]]的 link to page，这些关键字全部集合在一个 slip-box 的 page 里，因为 notion 支持双链，所以能在关键字的 page 页面下看到所有 backlink->\n4. 根据不同文本的摘记积累，对关键词page内容做更新扩充，形成主题->\n5. 不同关键词 page 之间也会根据类似主题进行 link（因为即使不同主题，也会有重叠的知识内容）\n最终效果是文本的摘记之间会互联，由摘记产生的关键字主题之间会互联。这是我阅读这本书时开始尝试的笔记方法，从直觉上来讲，比我之前囫囵吞枣般的划线归档会好，最终效果如何，还是要用时间来印证。","month":6,"country":"美国"},{"title":"杜撰集","author":"[阿根廷] 豪·路·博尔赫斯","start":"2022-06-21","finish":"2022-06-24","rating":8.3,"pages":"92","doubanLink":"https://book.douban.com/subject/25796061/","cover":"https://neodb.social/m/item/book/2023/11/17/8fdf217d-445f-4240-8d9c-a7fde42989e3.jpg","review":"对我而言，比阿莱夫好看些，我喜欢其中的三个故事，第一个和最后一个以及中间的死亡与指南针。","month":6,"country":"阿根廷"},{"title":"六论自发性","author":"[美] 詹姆斯·C. 斯科特","start":"2022-06-19","finish":"2022-06-28","rating":8.5,"pages":"230","doubanLink":"https://book.douban.com/subject/30441554/","cover":"https://neodb.social/m/book/2021/09/154a0c61e5-40e8-41de-9762-cee12b93f8d3.jpg","review":"# 六论自发性\n\n## 前言\n\n本书原著首发于2012年，作者是人类学家詹姆斯·C·斯科特。全书内容可以概括为表达一个[无政府主义](https://www.notion.so/p-d9727011fff94dd6bf2fb0bcc51ee1e2) 思想者关于国家、关于革命、关于平等的想法。\n\n作者从无政府主义的角度观察当今的国家政治、教育、公共讨论、景观设计等议题。无政府主义的最大特点是互惠性，是不经等级制度和国家制度达成的合作。19、20世纪间，科学的极大发展导致“世界的祛魅”，使得无政府主义者以为科学将解决一切问题，取代政治，由专家来治理世界。但由于市场经济的发展，导致不存在纯粹的民主制，其制度内的机构都掌握在买主手中，导致在现存制度内解决问题的希望渺茫。而大规模的反抗和运动会演变成政治权威与法西斯主义。国家摧毁了自愿合作所产生的自然的积极精神和责任意识。导致我们失去了互助的习性。\n\n同时作者认为当下的社会科学自满于精英主义者的视角，而忽视无产者、农民等的目的、价值和实践，只拿他们填充社会经济数据中的数值。在书中对此作了重点批判。\n\n全书提出了许多现今社会的问题，尽管没有提及多少解决方案，但无政府主义者视角对我而言颇为新颖，彻底改变了我对这个政治词汇的认识，是一次非常有收获的阅读，以下是我做的各章摘抄换穿插的一点微不足道的想法。\n\n## 第一章\n在前文所述背景下，本书第一章作者定义了一种“日常形式的抵抗”，它极少进入历史记载，却暗中对政权、国家和军队产生了巨大的、常常是决定性的影响。贫民，农民等下层阶级匿名、沉默，且往往是共谋的方式行使这种违法的抵抗，偏爱这种小“小打小闹”似的日常操练，能减少公开抵抗带来的风险。“政治特技”具有榜样效应的传染性，它来自于少数抵抗者起初的观察和默会协同，在没有遇到极大的体制惩罚时，它能形成病毒式扩散传播，那便使得无政府主义操演有了后续的可能。反观三个世纪来的所有解放运动，都是从最初的几个勇敢灵魂挑战既定的法律框架开始。而这种挑战往往来自于自发的行为，如果有机构代理，仍处于制度框架内，则这种抵抗容易被消解。本章最后作者还探讨了权力与倾听的关系，Charisma式领导在得到权力的过程中需要 Call and Response，他的领导魅力风格是被他的选民所塑造和选择的，而极权主义国家的决策者，很可能处于一个臆想的世界，因为他们不需要倾听。\n\n## 第二章\n本章是关于民间秩序与官方秩序。作者认为民间秩序的消亡源于无政府主义的宿敌——民族国家的崛起。偏离常规的民间实践被国家制度处理，国家级别的同质化工程（如统一方言）也进一步促成民间实践的消失，除此之外国际组织的标准化制定也将民间实践排除。官方实践是一种流水线工厂似得实践，它能实现权力中心对物质和工作流的极大控制，如福特T型车工厂、麦当劳汉堡制作。子随父姓也是一种以监管规训为目的随国家发展而普及的官方实践。命名、景观、建筑和工作流程的特定规划，显示出了秩序、理性、抽象性和系统简洁性，这使它们为等级制度中的权力所用即官方实践。然而很多时候，这种强制性本身是一种折中的妥协方案，无法适应个异性场景，作者举了几个科学种植的林学为例子。归根结底，失败的原因在于对特定情况缺乏认知，照搬成功模式而缺少对新环境的考量，思考过于简化而导致的反科学。而民间智慧与技艺就是在此场景下不可或缺的知识，他们有当地的成功经验、灵活的应对技巧。作者再以雅各布斯对现代主义城市规划的三点批判为由驳斥全盘的官方实践思路。雅各布斯认为现代主义的城市规划强调视觉秩序和功能分区。以效率最大化实现为实践宗旨却忽略的三件事：1.规划者的计算公式立足于指标效率而忽略了人类行为中蕴含的丰富目的性。2.人们喜欢混合型的功能多样的城区，这些城区也会因时而变。3.现代主义城市规划伤害了民间秩序，它试图将城市变成没有灵魂的艺术品，而不是「生活着的」城市。规划师们缺少的是民间体察，对生活在城市中的人民的生活的了解，而这本该是城市规划的出发点与归宿。\n\n## 第三章\n本章关于人的塑造。人类作为哺乳动物与其他动物的一个重要区别是将游戏作为人类的第三大无目的行为。作者举例引用了开放性的探索游乐园��例，说明它们比常规游乐园更能给孩子带来玩耍的目的性、创造力和热情。它是一则关于无政府状态的寓言、一个自治社会的模型。设计这种开放性乐园表达了创作者的谦逊， 这种谦逊将游乐园的形态交由孩子自己完成，包容孩子的天性与创造力，意味最低程度的监管，是反家长式领导的（paternalism）。与之相反的是学生宿舍的标准化装修。这让我想到另外一个点，在学校和教室这一封闭区域内，教师是权力的中心，底下的学生全都被权力所注视，形成福柯所说的全景敞视场景， 为我们展示了一种微观权力技术在现代社会中强大的[规训](https://www.notion.so/2c6d026aca824738b2fe8cf80ece4528)作用。作者还举了两座不同设计的战争纪念碑的例子来说明开放性带来的意义。前者是华盛顿越南战争纪念碑，其开放性的设计让其承载访客自己的含义、历史，访客能以时间线索找寻逝者名字，比起冰冷的整齐的字母排列，更容易让悼念之人找到回忆的入口，完成纪念的意义。而后者硫磺岛纪念碑则更多的是战争标志的雕像，它更多的向访客传递纪念碑的信息而非完成纪念的意义。接着作者讲了效率与开放性的矛盾问题。效率建基在稳定性的基础之上，从而与开放性、适应性是背道而驰的，而人之优于动物者，在于其强大的灵活性与适应性。效率观念有两大缺陷：1.过分依赖稳定，稳定实际上是特例；2.忽略人的因素，效率与人的积极性密切相关。衡量一项制度的优越性除了经济视角，还能从制度对人的改造方面着手。但相比于GDP，我们并没有一个可准确计算的GHP（gross human product）作为参考。作者提出两个参考标准：1.人在工作中的能力成长；2.人在工作中的自我满意程度。接着作者着重批判了流水线生产，因为其发明目的就是为了消解工匠-工艺知识，建立在劳动力“愚蠢化”的基础之上，是一种伤害劳动力技能和知识的制度。再从权力的分配角度看，流水线的决定权仅掌握在少数工程师手中，造成的是负的“净民主生产”（net democratic product）。一个与流水线非常相似的类比是全民公共义务教育。这一教育就如一条产品单一的生产线，主要目的是生产社会劳动力。衡量标准单一——产出分析型智能。在这一标准下将牺牲众多拥有其他天赋的学生，而社会的成功需要的是多种多样才能人，而不是单一的分析型智能。这种教育现状在我们国家表现的尤为强烈，近几十年教育的内卷程度越来越高，尽管意识到我们在一条错误的赛道上已经使出浑身解数，但现实的残酷，条件的约束，让我们不得不去拼命，我想不到有更优的解决方案，先跑着可能是最不坏的选择。也许我已经患上作者说的“制度性神经症”（institutional neurosis），缺乏同情心与主动性。我们从小就生活在一个个机构（制度）之中，家庭、学校，军队、企业，这些机构优根深蒂固的层级结构和集权管理模式，服从是我们在其中生活的唯一选择，[集权](https://www.notion.so/2ebedd9c8b6a492991f2e8ef7842dd45)环境对塑造人格具有深远影响，作者例举了斯坦利·米尔格姆实验、斯坦福监狱实验来论证。这一碎片的名称作者取为“机构生活的病理学”非常贴切。在集权式的制度机构中，人们往往悬置了自己的独立判断选择服从习惯、服从秩序要求，但就目的而论，这种服从并不一定会带来好结果。本章结尾作者以移除交通信号灯为例，在实验中由于没有交通信号灯，驾驶者会更谨慎，更多的发挥自己的智慧判断、注意力，反而能提升安全性。作者认为，移除信号灯款以被视作对行车负责和公共礼仪的一种温和训练，这一概念也在本书p29第一章无政府主义操演中出现过。这段关于红绿灯的内容让我回想起几年前看的美剧《航空炸弹客》里的类似场景，主角在空无一人的街道上等红灯思考这么做的意义，他觉得这是现代技术与工业化对人的侵蚀。\n\n## 第四章\n这一章作者想为小资产阶级正名。历史上小资产阶级一直是被鄙视的一个阶层，一方面他们被认为是贪利的骑墙派，时刻不放弃成为大资产阶级的渴望，另一方面小资产阶级高不成低不就，只可共享乐无法同吃苦。除此之外作者认为还有一个结构性原因在于他们总有逃避国家控制的办法。作者想论述小资产阶级出于两个原因，一是他们代表的自主、自由与无政府主义情怀核心只差了互惠，二在任何政治体系中他们都承担了重要的社会经济功能。这里作者对小资产的定义较为宽泛。我们认为的无产阶级的贫农也被作者视作小资产阶级。而小资产者梦想受挫时标准的革命导火索，如「耕者有其田」式的农民土地革命。总之，作者在小资产身上看到了强烈的自主、自尊的追求。在社会功能上，小资产们是大公司侦查的创新对象，是各类民众运动追求平等主义的一个诉诸对象，还能在社区中提供金钱购买不到的邻里服务。\n\n#  第五章\n这一章讲政治，但这个政治似乎并非我们惯常讨论的政治，而是指一种公共讨论。在开篇，作者再一次吐槽了应试教育与标准化考试。而这种标准化是看似客观实则机械的。这些标准都将质的衡量转化为量的衡量，从而通过一套貌似单一、客观的尺度实现了案例之间的比较。它们在最高意义上是一种宽领域、具有欺骗性的“消除政治的机器”，用来把政治合理性方面的疑问转化为专家操作下中立、客观的管理规程。这种去政治化的把戏掩盖了一点：对政治中的互助与试错之可行性的信念在深层心理中已经缺失，而这一信念是无政府主义者和民主主义者都深深珍视的。量化标准的第一个问题是是缺乏准确性，作者以科学引文索引中的各种问题来说明此点，量化标准的第二个问题是会产生“标准对行为的殖民”而消解其自身的有效性。可以用古德哈特定律来说明：当一个衡量标准成为目标时，它就不再是一个好的衡量标准。类似的还有坎贝尔定律：若一个社会指标被用于社会决策的程度越高，这指标就越容易受到腐化的压力影响，也越倾向扭曲和损害这指标所测定的社会过程。作者认为质量化测量的宏大诉求有两个源头：第一，提倡机会平等且反对特权、财富、头衔世袭的民主主义信仰；第二，相信价值可以被科学地测量的现代主义信念。所有行政管理技术（如SAT考试）的最大缺陷在于，它们以平等和民主之名，行“反政治机器”之实，将广泛存在的合理公共讨论从公共领域中清除，把管理权交到掌握技术的管理机构手中。它们压制了可能会兼容并包、卓有成效的争论，社会政策、技术智能的意义、精英的选拔、平等和多样性的价值、经济增长和发展之目的等议题原本都可以付诸这样的争论。\n关于应试教育，阅读时我产生了一个相反的想法：应试教育针对特定能力的培养固然会牺牲掉其他的人类天赋，但一个可以为之辩护的点我觉得是人类科学技术的大发展已然让知识分门别类细化到一定的门槛，要进入某一细分领域必须具备相关的基础业务知识，而获取这些知识的能力便建基在这一应试教育模式之下。换句话说，如此「孤注一掷」式的应试教育它可能不是最优解，却可能是人类渴望再次进步的一个最不坏的解。当然，这种进步的视角是落在数学、科学、技术之上，而不是人文、艺术之上。\n\n## 第六章\n这章是关于具体和流变。开篇作者用一法国反纳粹小镇上的居民保护犹太人的事例来说明人们行事是行动在先，然后再为行动找到一套逻辑。抽象的原则是实践的产物，而不是相反。小镇居民一开始处于自保而不愿答应收留犹太人，但见到具体的犹太人的惨状后，作出了改变，这一事迹在反纳粹活动中被歌颂。历史学家和社会科学研究员的研究摆脱了亲历者的局限性，知道了事件的来龙去脉，就不可避免地会受事件走向影响，从而漠视事件的偶发性。结论导向的研究往往忽视历史亲历者的真是感受。如果一个重要历史事件被程式化，在传播之中成为一个精简的符号、一种虚假的逻辑和秩序，那么它在第一时间被经历的方式就会被极度歪曲。作者举了一个生动的例子，即通过电视观看篮球比赛转播。在屏幕上一切动作都比现实放缓，为了观赏方便甚至导播还会加入慢镜头，这与现实球场上的对抗完全不同，带着上帝视角让观众简化了球员比赛的难度。清理、简化、浓缩历史事件的习惯不只是人类的自然癖性，不只是编历史教科书时的必然要求，更是一种具有高度利害关系的政治争夺。也许许多历史变革并非人们刻意计划为之，而是临时与自发行为的结果；有组织的社会运动常常是那些无序抗议和示威的产物，而非其诱因；人类自由方面的显著进步往往不是规范的制度程序的结果，而是未经规划的、不可预测的自发行动，是自下而上打破传统社会秩序的成果。","month":6,"country":"美国"},{"title":"哥德尔证明","author":"[美] Ernest Nagel, [美] James R. Newman, [美] Douglas R. Hofstadter (编)","start":"2022-06-29","finish":"2022-07-06","rating":8.4,"pages":"168","doubanLink":"https://book.douban.com/subject/35371799/","cover":"https://neodb.social/m/book/2022/04/30c9a58e0b-50b4-46bf-ab07-7bf091493884.jpg","review":"没来由的对哥德尔不完备定理感兴趣，但苦于数学水平限制，也只能对着维基百科上的定理描述反复念叨。这本书以相对通俗易懂的方式对哥德尔证明的来龙去脉及证明过程做了简述，满足了我的部分需求。阅读时还惊讶的发现本书的编者是年初读的奇书GEB的作者侯士达，他在前言中还表示这本书是当初让他动笔写出GEB的最重要的两本书之一。","month":7,"country":"美国"},{"title":"表达自由的法律限度","author":"侯健","start":"2022-07-09","finish":"2022-07-13","rating":8.5,"pages":"92","doubanLink":"https://book.douban.com/subject/1657408","cover":"https://neodb.social/m/book/2021/11/28683f0f31-562f-4535-bb90-9e9949c62c7a.jpg","review":"大半年前，看了安东尼刘易斯的《言论的边界》——一部美国宪法第一修正案的简史，作者通过大量的司法案例实践，梳理了两百多年来关于言论自由这一「社会核心价值观」在美国的发展。当时我还深深的臣服于霍姆斯大法官关于言论自由的判定。然而在这本书里，“明显且即刻的危险”这个在我看来挽救言论自由的原则，成了批判的对象。但不得不说米克尔约翰的论证也令我心悦诚服。本书在开篇将人民自由与人民自治结合在一起帮助读者理解权利法案的背景，论证中作者保留了第一修正案的绝对自由——用于保护公言论，而将第五修正案用来保护私言论，并着重批判了“明显且即刻的危险”破坏自治原则，不利教育年轻公民，错用修正案的问题。BTW，本书的译后记也值得一读。","month":7,"country":"中国"},{"title":"作文课","author":"尚爱兰","start":"2022-05-21","finish":"2022-07-16","rating":8.2,"pages":"296","doubanLink":"https://book.douban.com/subject/34852641/","cover":"https://neodb.social/m/book/2022/05/15ebea82d5-9129-457f-8acb-705e2950285d.jpg","review":"看完这本书，没学到多少如何教孩子写作的技巧，倒是收集了不少片单。在与孩子（一年级）沟通写作的过程中，我也逐渐明白与其逼着孩子绞尽脑汁的挤出一点字儿来，不如让她先开始真正的感受生活。好比没有充分浸润过的海绵，是无法挤出水来的。至于感受生活，也可分为两个层面，一个是现实生活，带着孩子去游山玩水，去待人接物，另一个则是虚拟世界，电影、动漫、书籍都是这种呈现，当然作为家长有必要也有义务在内容选择上进行把关。","month":7,"country":"中国"},{"title":"病人家属，请来一下","author":"王兴","start":"2022-07-11","finish":"2022-07-18","rating":8.2,"pages":"287","doubanLink":"https://book.douban.com/subject/35604398/","cover":"https://neodb.social/m/book/2021/12/064e013b98-cb62-44ea-be90-4a14077792fe.jpg","review":"写得很真诚，但低于期待，有一些实操上的Tips。","month":7,"country":"中国"},{"title":"首无·作祟之物","author":"[日]三津田信三","start":"2022-07-18","finish":"2022-07-26","rating":8.4,"pages":"456","doubanLink":"https://book.douban.com/subject/6249670/","cover":"https://neodb.social/m/item/book/2026/02/12/3d506b42-63d1-4c20-8c98-3a415e1a1f8a.jpg","review":"谜面设定精彩，以为自己能猜到一二，但被作者破题时的一波三折看得心悦诚服。人头，无头尸的用法也被作者用到了妙处，是一本非常值得一读的本格推理。","month":7,"country":"日本"},{"title":"僧侣与哲学家","author":"[法] 让-弗朗索瓦•何维勒, [法] 马修•理查德","start":"2022-07-18","finish":"2022-08-05","rating":8.1,"pages":"344","doubanLink":"https://book.douban.com/subject/25978763/","cover":"https://neodb.social/m/book/2021/09/1793404e39-027d-45f8-95d5-dbba52eda710.jpg","review":"我认为评分过誉了，对话体的内容很难系统性的进行理论的论述，所以不管是哲学还是佛学感觉都没多少收获，相对而言父亲的水平更高一些。","month":8,"country":"法国"},{"title":"智识的生产技术","author":"[日] 梅棹忠夫","start":"2022-07-27","finish":"2022-08-09","rating":8.2,"pages":"222","doubanLink":"https://book.douban.com/subject/26786537/","cover":"https://neodb.social/m/book/2021/12/041d391fc7-4b2d-4c0b-89e6-08daa6770e9f.jpg","review":"# 读后感\n\n认识这本书，是在《卡片笔记写作法》的评论区，那条评论似乎是将本书称为其姊妹篇。因为我感觉《卡片笔记写作法》挺有启发的，遂也找来这本《智识的生产技术》来阅读。在内容上我认为两本书的近似度还不足以称之为姊妹篇，《卡片》一书在理论上更完备，应用场景更贴合我们的时代（毕竟中文版是2021年出版），而《智识》一书则有更多作者探索性的想法，当然是相对当时而言的。本书成书于1960年代，在互联网还未发明（互联网前身1969年发明）的时代，其讨论的内容具有一定的前瞻性，甚至我觉得如果将作者梅棹忠夫放在如今的科技时代，他必定也会是一个极客（Geek）。即使在60年前，作者对信息的检索、处理，电脑程序的编写能力方法普及等作了正确的预见。本书的写作目的也在于作者对预测即将来临的信息时代所做的一种智识准备，用一句现在听来可能有些土的话便是「工欲善其事必先利其器」。文章内容阅读起来没有丝毫困难，反而对于现在的我而言有一种怀旧的复古之感（Nostalgia）。因为就现在的从事学术研究的人而言，手头拥有工具的富有是作者当时不可比拟的，我们可能更多的会纠结于不同工具的比较，不同工作流的选择，而作者的时代，则更多的是要创造自己的工具和工作流。\n\n## 问责教育\n\n开篇作者对当时的日本教育进行了批驳，总结而言说的是学校教授的往往都是关于 what 的知识而缺少关于 how 的知识，这点在当今国内的教育环境中也尤为明显。举例来说，我做学生的时候都还要背诵历史事件发生的具体时间点，但关于为何会发生这样的历史事件，通常是将结论直给，而不去分析得出结论的逻辑依据。应试的时候我们也只用背好课本内容作为答案，而不用独立的思考推演。久而久之，在面对实践知识时，我们往往会不由自主的倾向于去寻找某一确定的答案，从理论的角度着手，而散失了自己去动手实践学习的能力。近处的例子还有面对信息技术蓬勃发展，学校方面应对的教学内容相对滞后，搜索引擎都普及20年后，学校里还并没有任何课程教育学生如何使用搜索引擎。\n\n## 智识生产\n\n作者区别了智识生产和智识消费，区别在于前者时某种新颖的**信息**生产，而后者就算进行了智识活动，也不包含信息生产，如读趣味性的书、打麻将、下象棋能都是一种智识消费。当然依我所见，作者所指的意思应该是消遣性的打麻将和下象棋行为，如果是研究棋谱，研究麻将规律等的智识活动我认为还是应该被归类到智识生产中。而随着时代的发展，智识生产技术已成为人人都应具备的基本素养，在作者眼里，它是对个人精神卫生的一种捍卫，效率倒是其次，「秩序与安宁」才是首要。\n\n## 从笔记到卡片\n\n达芬奇随身携带笔记本做笔记的习惯影响了学生时代的作者，因此建立起制作_发现记事簿_的习惯。在使用中作者也发掘出更多的制作技巧，如一页一事、编写索引，但随着工作内容的变化，笔记本的记事模式**适合保存笔记，但不适合整理笔记**的特点逐渐显现，尽管有活页笔记本这种形式的改良，但其灵活性的问题始终没能有效解决。因职业关系，在田野调查中作者开始使用卡片笔记法。在应用过程中卡片笔记法的优势逐渐得到体现，作者设计的一种笔记卡片还得到了广泛推广。\n\n## 卡片的选择与使用\n\n作者发明的京大型卡片B6开本12.8cm *18.2cm，重量105g，带1cm宽浅色分割线。卡片在使用时遵循「记录，以便忘却」的原则，可以称之为忘却装置。因此在记录时应该记录完整的文章，不能用符号、简写能缩略形式代替。在记录卡片时应该做到一卡一事，记上日期，与标号。卡片记录最不同寻常的一点是要求记录者**不要关心分类问题**，卡片不是用来存储知识分类的，**反复翻阅卡片**才是重要的。通过盘活、操卡片使之成为智识生产作业的创新工具。至于知识的碎片化不成体系的问题，作者认为那是没操作过卡片的人的庸人自扰，通过积累效应，卡片的优势终会显现。\n\n## 标准化\n\n除了介绍卡片作者还谈到了如何制作报纸的剪贴、信封、照片等类似卡片结构的东西。他强调了标准化与规范化制作的必要性。显然这些东西已经逐渐远离我们这个时代，就互联网世界而言，信息都已经上云。甚至就笔记而言，现在的学生们也很可能是直接制作在iPad等移动设备之上。为了标准化，作者甚至会委托制作固定格式的信纸、稿纸，而不在市场上直接购买。因为就当时的市场情况而言商家可能不会持续的供应同一种商品，这会导致作者所希望的标准化得不到延续。其实类似的情况在我们选择笔记软件的时候也是一样的，选择笔记软件的时候如果不能确定长期的使用某一款软件或者这款软件会因为规模问题、盈利问题退出市场，或者经常性的有较大设计的变化那都是不利于我们进行笔记制作的。因此在选择软件的时候我们可能要参考用户的评价、软件开发者的理念、软件公司的规模、公司的盈利模式、过往产品的历史等作为我们选择的依据。\n\n## 整理\n\n整理有几个原则：\n\n1. 确定理想位置\n2. 确定位置方法的体系化\n3. 物归原处\n\n在文件整理历史上作者经历了捆绑法、袋装法、夹装法、格架子法等，最终确定了直立式文件归档法：将文件资料夹持在一个个对折起来的文件夹中，然后像卡片一样直立排列，由于文件夹上带有凸耳，上面可以书写标题，所以什么样的文件资料放在什么地方一目了然。之历史文件归档系统应用于铁皮文件柜，被作者称为柜存文件，柜存文件都是事务性文件资料是一种文件资料的保管装置与敞开式文件区别，后者主要是参考资料类文件资料，是一种资料的保存装置。这种整理技术原理还被作者应用于家务、空间分配上。\n\n## 读书\n\n在谈完智识生产技术的硬件装置问题后，作者接着开始讲如何读书了。他的读书习惯与我有些类似，尽量读完一本书、制作已读书本的信息记录、铅笔画线，只不过我现在有更方便的电子工具作为替代，用微信读书划线、用Notion做读书记录。除此之外，作者还提到了一些有意思的读书看法。\n\n1. 堆叠读书，读完的书堆叠在一起而不急着做笔记，但因为堆叠，在视觉上会给自己提醒，一段时间后再做起到了温故知新的效果。这也是一个任何电子化阅读无法与实体书阅读媲美的理由——实体书的视觉效果不仅来自于其内容本身，还在于它的存在本身。\n2. 双重读书，读书有两条脉络，一条是作者构建的文章脉络，一条是读者固有的思维脉络。读书笔记记录的应是第二条脉络，因为第一条脉络就是书的实体，无需再记。但是我这篇笔记可能更像两种脉络的混合。对于感兴趣的非虚构书籍，在每读完一章后，我就迫不及待的把本章的大概内容与阅读感受记下来，以防止接着读后会忘记之前内容，完成一本书后，按照间隔重复的原则在后续回顾自己的笔记。\n3. 书籍不是「为了说点什么」而读的，应该是「为了不说什么」而读的。这是从著书立说者角度而言，因为那些已经被表达的奇思妙想已不值得再被书写，读书就是为了明确哪些值得被发表的观点还没被发表。\n\n## 写字\n\n写字部分作者重点探讨了日文在进行智识生产时的一些问题与应对方式。尽管处在1960年代，作者已经预见性的抛弃书写方式转用打字机。然而当时的日文打字机发展刚刚起步，对于罗马字、平假名、片假名如何选择，如何使用以及在技术上的兼容性都存在问题，作为只背过五十音图的我而言，也只能猜想个大概。究其原因，在于中文不像英文那样可以用二十六个字母便能生成任意文章，常用汉字就有五千个，这导致在打印机的设计上必须采取不同的结构方式，而日文则受中文影响，在更通用的假名之外也夹杂着不少汉字。不过相对而言，中文世界在这方面的做过的努力也很少听说。除此之外，作者还对信函、日记、论文的撰写提出了一些观点，都融入了其卡片笔记下内涵，对比同时期的中文世界，则更令人唏嘘了。\n","month":8,"country":"日本"},{"title":"海风中失落的血色馈赠","author":"[加拿大] 阿利斯泰尔·麦克劳德","start":"2022-08-12","finish":"2022-08-12","rating":8.3,"pages":"192","doubanLink":"https://book.douban.com/subject/30401373/","cover":"https://neodb.social/m/book/2021/10/12783d3583-5e91-4479-96a9-e88d50e3abc5.jpg","review":"被封面吸引，作为非虚构阅读间隙用作调剂的短篇，超过预期。","month":8,"country":"加拿大"},{"title":"把自己作为方法","author":"项飙, 吴琦","start":"2022-08-09","finish":"2022-08-18","rating":8.1,"pages":"320","doubanLink":"https://book.douban.com/subject/35092383/","cover":"https://neodb.social/m/book/2021/09/159d338836-fb91-4468-a76e-7a376f4d070d.jpg","review":"最近看了两本对谈的书，都低于预期，可能这种形式的内容呈现，很难将作者的思想脉络表达清楚。这本书给我的留下的最大印象的两个关键词是乡绅、距离感。前者让我重新思考与自己周遭世界的关系，让我产生去接触周遭世界，去了解具体的事、具体的人的兴趣；后者则是一种观察的方法，保持距离，保持清醒。","month":8,"country":"中国"},{"title":"狂热分子","author":"[美] 埃里克·霍弗","start":"2022-08-14","finish":"2022-08-29","rating":8.2,"pages":"207","doubanLink":"https://book.douban.com/subject/3057556/","cover":"https://neodb.social/m/book/2021/09/15c71b39e6-6952-424b-ac50-ded66c16a43c.jpg","review":"全书格言警句频频，与今之现实关联，或多或少能产生一些共鸣，但也无法再进一步，毕竟缺乏进一步的论证，故后劲不够。而作者对群众运动、领袖气质等的分析，倒可以被借鉴到其他剧作的人物创作之中。权当记录一些好词好句，为以后装点门面之用。","month":8,"country":"美国"},{"title":"铁钉案","author":"[荷] 高罗佩","start":"2022-08-29","finish":"2022-09-01","rating":8.3,"pages":"320","doubanLink":"https://book.douban.com/subject/30457504/","cover":"https://neodb.social/m/book/2021/09/16ef17f483-1c94-4338-9c9c-db773c033f21.jpg","review":"这是我看的第一本狄公案。带着现代的侦探小说眼光，高佩罗先生的诡计设定自然并不够看，尤其是在我最近刚看过《首无·作祟之物》后，对本作开篇的无头尸案一眼就能看穿。但好在它也提供了以往读过的西方侦探小说和日本推理小说所不能提供的愉悦——那便是中国特色，引人入胜的楔子，章回体的文本，古代中国的官吏制度……虽然以英文写就，但翻译后的语感可以让我完全沉浸在中式文字的美感之中。作为中国读者，我想这是一种独有的感受。诚如书后推荐语所言「大唐狄公案系列是高佩罗在世界侦探小说领域内开创的极其珍贵的一个支脉」\n\n本作的后记（二）也是我在其他推理作品中未曾见过的创作心得体会，高佩罗先生在此讲述了自己的创作动机，创作方式，写作时间的安排，遇到的问题，内容上的取舍。那一句「主要是为了向东方读者证明，他们本民族的古代探案文学中拥有何其丰富的现代侦探小说素材」更是令我感到钦佩又汗颜。","month":9,"country":"荷兰"},{"title":"叫魂","author":"[美] 孔飞力","start":"2022-09-05","finish":"2022-09-19","rating":8.5,"pages":"368","doubanLink":"https://book.douban.com/subject/25912076/","cover":"https://neodb.social/m/book/2021/09/15f5e77aba-63ef-4a82-9a21-4a629532c414.jpg","review":"虽然是一本学术著作，但读之并没有艰涩无聊之感。作为一个洋人，作者对几百年前清朝社会的细致入微描写让我倍感佩服，甚至每一处对话，事件都有详尽的引文出处。从社会背景到社会心理，再到官僚体制、帝王心术，从庙堂之高到江湖之远作者向我们详尽的阐释了叫魂案发生时的清朝模样。这不仅是一本好看的书，更是一本值得学习的书。","month":9,"country":"美国"},{"title":"来自新世界 （上下）","author":"[日] 贵志祐介","start":"2022-08-31","finish":"2022-09-27","rating":8.6,"pages":"1076","doubanLink":"https://book.douban.com/subject/25752955/","cover":"https://neodb.social/m/book/2021/09/1511b418a5-c322-4a0d-bb70-516c1e6cc245.jpg","review":"看过动画两年半后再看小说，依然感受到震撼。当人类产生咒力时，我想到了一个名字——日版X战警。当然，作者的设定不是合家欢的剧情，而是引入了相当深入的生物进化论、社会心理学、基因工程等硬科幻，创造了一个新世界「宇宙」。人类作为一个整体是自私自利的，只有偶尔在个体上看见人性的光辉，但想象力能改变一切。","month":9,"country":"日本"},{"title":"博尔赫斯谈话录","author":"[阿] 豪尔赫·路易斯·博尔赫斯 著, [美] 威利斯·巴恩斯通 编","start":"2022-09-21","finish":"2022-10-04","rating":8.3,"pages":"382","doubanLink":"https://book.douban.com/subject/25952961/","cover":"https://neodb.social/m/book/2021/09/1604e201ff-db55-41ba-94b0-c2489fbb7e62.jpg","review":"看过一些博尔赫斯的短篇，不太好理解，但却令人着迷。这本谈话录则提到了不少那些迷的来源。尽管博尔赫斯声称自己看的书不多，但大多数我还是没读过，而他重复读好书的习惯值得学习。但对于诗歌类，也许是出于译作之故，书中的诗我都难以进入。读完这本谈话录，又扩充了不少待读书目。","month":10,"country":"美国"},{"title":"箭术与禅心","author":"[德] 奥根·赫立格尔","start":"2022-08-27","finish":"2022-10-08","rating":8.3,"pages":"144","doubanLink":"https://book.douban.com/subject/35493034/","cover":"https://neodb.social/m/book/2021/09/15a3d96363-4eb1-43c1-ac79-77f093c48092.jpg","review":"一本薄薄的小书，断续读完，似乎抓住了什么，又似乎什么都没抓住，转念一想，这还真有点禅。根据作者的描述，我想其实在幼时我就知道禅了，那便是武侠剧上主角与大师练剑时大师说的：学剑有三层，第一层手中有剑，心中有剑；第二层手中无剑，心中有剑；第三层手中无剑；心中亦无剑。这第三层便是作者在本书中着力讲的禅心与禅道。要做到第三层，须经艰苦卓绝的训练，还要秉持无为之为、无艺之艺、无心无念，将刻意变成不刻意，让不刻意变成自然。\n\n我不知道这玄而又玄的描述能否有效，但有一点是我想尝试的：正确呼吸，放下我。\n","month":10,"country":"德国"},{"title":"鼠之夜","author":"[日] 连城三纪彦","start":"2022-09-28","finish":"2022-10-12","rating":8.5,"pages":"319","doubanLink":"https://book.douban.com/subject/35058746/","cover":"https://neodb.social/m/item/doubanbook/2026/01/01/8706fcd7-4778-4128-a859-659e40a8308a.jpg","review":"反转、再反转，尽管都是短篇，且比我的年纪还大上不少，但篇篇精彩，最爱其中的《奇妙的委托》。","month":10,"country":"日本"},{"title":"魔术师时代","author":"[德]沃尔夫拉姆·艾伦伯格","start":"2022-10-09","finish":"2022-10-22","rating":8.5,"pages":"480","doubanLink":"https://book.douban.com/subject/34464687/","cover":"https://neodb.social/m/book/2021/09/1614b9f802-303b-4ada-a3e6-c531c2c05f66.jpg","review":"在此之前只读过维特根斯坦的传记，而对海德格尔、本雅明只是略有所闻，卡西尔从未听过，以这样的背景看这本书，还是显得不自量力了。但尽管如此，本书还是有不少亮点，它将四个同时代的德国思想家、哲学家的十年人生传记放在一起，在叙述上有一种电影镜头切换般的质感。在描述上又将四人的世俗日常与哲学思辨的进行穿插，尽量做到了不枯燥的同时揭示他们思想的发展。至少在前半部分我还是读的津津有味的，直到开始重点讲海德格尔的此在开始，实在无法跟上了。此外，个人印象较为深刻的部分是语言哲学相关的内容，尤其是关于翻译的那段论述和维特根斯坦的逻辑哲学论的解读。\n另外，非常喜欢本书的封面和内页设计，纸张厚度摸着也有质感，唯一美中不足的是平装版握在手里翻页有点吃力。","month":10,"country":"德国"},{"title":"马可瓦尔多","author":"[意] 伊塔洛·卡尔维诺","start":"2022-10-24","finish":"2022-10-28","rating":8.3,"pages":"160","doubanLink":"https://book.douban.com/subject/34799583/","cover":"https://neodb.social/m/book/2021/09/150eee2be7-ef9a-4d4e-b450-0b0b911d66d4.jpg","review":"充满幽默与讽刺的笔调、有点阿甘式的主人公、写给大孩子们的童话书。我最喜欢里面那篇《月亮与GNAC》。","month":10,"country":"意大利"},{"title":"语言学的邀请","author":"[美] 塞缪尔·早川, [美] 艾伦·早川","start":"2022-10-31","finish":"2022-11-04","rating":8.7,"pages":"299","doubanLink":"https://book.douban.com/subject/26431646/","cover":"https://neodb.social/m/book/2021/09/163503b8f9-cb08-467f-b268-368a39e3d912.jpg","review":"语言学的邀请\n人与动物的区别，在于人类能够运用语言。语言带来了文明。我们从小习得语言这项技能，使之成为习惯，以致于我们说话就像走路一般习以为常，而从未反思语言本身。本书作为语言学的入门，很好的帮助读者理解、解蔽了语言。作者提供了各种阐释语言的视角以及众多精彩的例子，以致于让我感觉自己都不需要迈步，而是被直接抬进这扇大门的。\n\n从小学开始我们的语文课便作为语言教学的主课。我们学习识字、诵读、阅读理解、言辞写作、艺术欣赏全在语文课上。但同时它也丢失或者忽略了本该作为重点的语言知识，如言辞的逻辑，语言的内向意义与外向意义，语言作为符号层面的定义。这些知识的忽略会引发各种麻烦，经济上的、政治上的、逻辑上的。我很喜欢的知乎科普作者贾明子甚至[建议](https://www.zhihu.com/question/562148431/answer/2731506383)将语文分为四科取而代之，它们分别是：演讲与沟通、自然语言逻辑和语义学基础、文学鉴赏与文学批评、文学写作与学术写作。中学语文所承担的功能不是被高估了，而是被严重低估了。因此，我建议这本书应该入选每个高中生的必读书目。\n\n如维特根斯坦所言：想象一种语言就意味着想象一种生活形式。\n\n下面是我对本书各章节内容作的摘要，剥离了作者精彩的例子，它可以用来回顾书本内容，却绝不能替代阅读本身。\n\n##  第一章语言和生存\n\n开篇作者谈到了社会达尔文主义的盛行，将人类类比为动物从而推出适者生存的思想引起的人类斗争，但人类区别于动物的一大特征是人类能使用语言。语言汇集了知识，而这种知识能穿越时间，形塑、引领、增益和积累人类昔日经验，形成今日生活。因此，社会表面上固然充满竞争，然而真正能使社会前进的下层基础却是大家视为当然的东西——合作。但是，在如今社会文明高度发展的当下，在言辞洪流之中，我们或多或少都会碰到各种麻烦和烦恼。因为我们在生活中每时每刻都不但会受听到个运用的言辞的影响，还会被我们无意中对语言所下的臆断所支配。本书的基本假设是：同类之间通过语言进行广泛合作，是人类生存法基本工具。另外还有一个并行的假设是：假如谈话的结果引发或增加了争执和冲突，不是说的人有毛病，就是听的人有毛病，要不然就是大家都有毛病。\n\n\n## 第二章 符号\n\n人类不同于动物的一个特点之一在于人类能够故意用一样东西来代表另一样东西，也就是象征化过程（symbolic process）。人类的象征化过程无处不在，如服饰、装扮。象征化过程，固然使人类做出了许多不合理的行为，却产生了语言。在各种使用符号的方式中，语言是最发达最精巧最复杂的一种。但是人们往往会养成把符号与他们所代表的事物混为一谈的习惯，从而对社会上存在的某事某物随意的做出评价，从而在各种不同性文化阶层造成严重后果。我们现在所处的环境，是有许多前所未有的语义影响（semantic influences）所形成的，并且大部分也是由他们创造的。因此，现代社会的共鸣所需要的并不仅仅是常识他们必须对一般符号尤其是言辞的能力和限度有一个科学化的理解，才不至于被身边复杂的语义环境完全冲昏头脑。**符号并不就是其所代表的是事物；地图并不就是其所代表的地区；言辞并不就是事实。**我们把这个通过言辞学到的世界叫做言辞世界（verbal world），把我们直接知道的或是能由个人经验直接知道的世界叫做外向世界（extensional world）。言辞世界与外向世界的关系，就像地图与它假定代表的地域之间的关系一样。我们每个人都承袭了许多无用的知识、错误的印象和谬见，那些都是我们从前认为是正确的地图，因此我们所学到的总有一部分是必须抛弃的。有两种方式会让我们脑子里装下错误的、与这个世界不合的地图：第一种是别人给我们的地图原本就是错的；第二种是别人给我们的地图是正确的，只是我们自己误解了他们，从而创造出错误的递出来。\n\n## 第三章 报告性语言\n\n从交换知识和信息的角度来讲，我们最基本的象征行为（symbolic act）就是把我们所看到的听到的感觉到的事情报告给别人。报告时可以证实的。报告的语言发展到最高限度，就成了科学的语言。练习写报告文是增进对语言的注意力的一个捷径。但是要做这种练习，必须避免做出推论与判断。推论都是根据已经观察到的食物对并不直接知道事物所做的结论。推论的优劣程度，通常取决于报告内容或观察来源的优劣击退论者自身能力如何。所以要分清楚自己在报告中陈述的内容是推论还是观察；判断是指作者对他所描写的人事物所有赞许或不赞许的表示。记录事实，不做判断，要尤其注意我们的用词，因为很多词汇本身就代表着一种判断。「怒词」和「喜词」绝不是描写外向世界中实际状况的报告。它们只会把自己降低到与辩论对方同样固执愚蠢的程度。判断下的太早，往往会使我们看不清近在眼前的事物。\n\n然而，只要我们使用的是日常语言，就没有达到完全公正的可能，因为每个人的经验都会先由按照自己的利益和背景选择节略一番，因此我们大家所得到的经验都是一开始就是偏移（slanting）的。既然我们不能不从自己的观点出发来看这个世界，我们就要明白自己所看到的是多么有限。发现自己的偏见是智慧的开端，摆脱自己的偏见是自由的源泉。我们只要能够领悟到某些字词或某些事实会引起何种有利和不利的感觉，那么，就实用目的而言，我们就能达到足够公正的地步。\n\n## 第四章 前后文\n\n字词的含义要通过参考前后文生成。字典的编纂者是历史学家，而不是制定法律的人。字典上的字词定义只承载了这个字词的历史含义，而没发包含它未来可能生发出的新的含义。我们学习字词的意思，必定是在实际的实用场景中习得的。在讨论字义时需要区分外向意义，也叫本义（denotation）以及内向意义，也叫转义或含义（connotation）。外向意义就是指字所代表的东西，内向意义则是指它在我们脑海里所引起的一切。倘若一句话有外向意义，我们便可通过实证的方式平息争论，达成一致；倘若一句话只有内向意义，则可能会引起不断的争论。人类对内向意义的理解偏差，往往会造成悲剧性的后果，也就是说语言可能是悲剧后果的根源之一。如维特根斯坦所说：\n> Whereof all for one cannot speak, thereof one must be silence.\n字义本身也是在不断流动的，没有一个字能有两次意义完全相同，这也是现代语言思潮的基本理论之一。因为一、字义是被其前后文决定的，而没有两个前后文会一模一样；二、每个人的对字的内向意义构成不会完全一样；三、事物本身的流变决定其外向意义并不固定。基于此，养成自动考查前后文的习惯，才能更好的理解别人说的话。最后，作者指出尽管如上所言，字典上的定义仍是一个无价的指南，因为它给出了一个字义区（areas of meaning），世界上没有一个字只有一种正确的意义，却都能分有字义区里的意义。\n\n## 第五章 有助于社会团结的语言\n\n这一章作者探讨是前象征（presymbolic）语言的意义，所谓前象征用法指的是将言辞当成有声音的、表达情感的姿势运用。我们有理由相信，人类将语言用作纯粹的陈述说理工具，在语言发展史上是较新近的事。即使在我们现在的日常语言中，前象征用法也占据相当大的比例。孩子们会对语言的前象征部分保持敏感，比如我对姐姐大发雷霆斥责时，并不懂意思的弟弟也会跟着哭。从交换知识的观点来看，前象征语言多半毫无价值，但是从社交礼节、建立情感、维持交情上它是必需的，因为打破沉默本身就是说话的一个重要功能，作者在此举了在珍珠港事件后他作为日裔在美国坐地铁的例子，用前象征语言来打破沉默，赢得信任，缓解自己的孤立。除此之外，仪式中的前象征语言也具有重大意义，它能加强我们的社会团结，靠大家对一套固定的言辞刺激的共同反应，人类社会才得以维持完整，不致崩溃。当语言变成一种仪式，它所引起的效果，在相当限度内会和它的词句原有性意义变得毫无关系，甚至可以不合文法。因此，我们应警惕自己是否将象征语言的标准套到前象征的言辞上去，而错误的产生许多对世界、人类和民主的悲观看法。\n\n## 第六章 语言的双重任务\n\n除了声调和节奏，语言的感动性来源还有其内向含义，而内向意义可分为两种：说明性（informative）和感动性（affective）。许多字词能够流传，源于其感动性价值多于说明性价值，而有些字词的情感含义又会成为其实际应用的障碍。这里作者举了很多容易理解例子来说明，还是需要阅读原文来加深理解。这种障碍的来源在作者看来可能源于人内心的心理变态而非内心纯洁。\n\n正是因为字词能同时引起说明性含义和情感性含义，所以一起讨论有关宗教，种族，国家和政治团体等题目时，事情就会变得特别复杂。我们要想增进自身理解语言和运用语言的能力，就不能专靠加强我们对语言的说明性含义的认识，而是还要依靠社会经验，在不同的情形里与不同的人打交道和阅读文学作品等方法，使自己对语言的情感性成分能有更加深切的了解。\n\n## 第七章 控制社会的语言\n\n用言语来控制、指导并影响别人未来行动的努力，可以称为语言的指示性用法（directive ueses of language），语言的这一工具属性也是将人类与其他物种深刻区别开来的特性之一。政客、学者、商人都在使用指示性语言来影响受众，除语言外，人们还会加上许多非语言的感动来加强指示性语言的效果，如仪式、服装等视觉、听觉效果。仪式等伴随指示性语言而来的活动，以及指示性语言中的情感成分，其目的都是为了在人们的记忆中留下深刻的印象。每一个用指示性语言作出或明或暗允诺的人，都负有道义上的责任，因为人类之所以能够相互合作，聚集成一个社会，靠的就是相互间的信心。没有协定，没有社会契约人类只能回到洞穴中居住，指示性言辞就可以用来规范人的行为。看上去无比复杂的法律，事实上只是将历代累积编纂起来的指示性语言加以系统化。指示性语言还有需要几点注意到地方：一、随社会发展它们可能变得不合时宜，作者说与其一味强调升旗仪式或唱国歌，不如让孩子们有更多时间去研读、实践民主反而不致使民主沦为空洞的名词；二、要有所预期，任何指示都不能以我们设想的样子出现；三、区分指示性语言和说明性语言，面对指示性语言，保持清醒，少一些幻想。\n\n##  第八章传达感情的语言\n\n本章作者探讨了用传达情感的几种方法，包括文学与演讲中的韵律、节奏，隐喻和直喻，典故，讥讽、感伤和幽默以及在报告文中通过通过事实陈述达到感动人的效果（关于隐喻，作者谈到的不多，另外一本专讲隐喻的书_metaphors we live by_值得读）。作者提到每一种文化里的青年人都得研究他们自己的文学和历史，因为只有这样他们才能去理解哦并参与自己群体内的思想和情感的交流。而文化作品也是分等级的，越高级的作品越会倾向于提供更多的事实给读者，让读者自己思考从而作下判断。文学虽没有科学那般精准的一般化的特点，却也有其无法替代的功能，它能精妙的表达出各种感情间的差别，这是无法用科学冰冷的术语所展现的。而文学带给人的象征性体验（symbolic experience）或者间接性经验（vicarious experience），能让只有一生的人能通过阅读度过许多个、不同种的人生。在文学作品中尝试、体会、学习不同种的人生，无论是悲苦、幸福抑或是平平的人生，那都能带给人以知识，经验，以获得成熟，成为文明人。\n\n## 第九章 艺术和激荡的情绪\n\n表达情感的文学作品具备“生存价值”，原因在于根据学者和批评家深刻的见解，以及近代心理学和精神分析学的研究结果，情感性语言最重要的功用就是缓和激荡的情绪。通过象征策略（symbolic strategies）——即用种种方法将我们的经验重新分类，将情绪包围起来，使其变得的容易为我们所忍受。文学也成为了我们适应环境的方法之一，它们能为一种运用符号的动物完成一种必须的生理作用，也就是帮助我们维持精神健康和心理平衡。然而对于文学的价值批判并没有多少合用的科学知识，尤其是关于其艺术和美学价值时。在作者看来，把自己的经验用适当的符号表达出来，再将其整理成一个首位一贯的整体，是一种综合性行动。一个伟大的小说家、戏剧家或诗人，就是一个将许多广泛的人生经验完美地综合起来使它们有一种秩序的人。艺术就是一种秩序，而不论是人生经验（需要整理的材料）还是写作技巧（整理的方法），都是永远学不完的。艺术的目的，便在于这种秩序化的整理帮助其受众肃清其内心的混乱。\n\n##  第十章 我们是怎样得到知识的\n\n我们经验里的物体并不是东西本身，而是我们的神经系统（有诸多限制）与神经系统以外的东西互相起的作用（类似康德的物自体概念）。我们认识事物是通过抽象化过程进行的，作者这里提出了一个抽象化阶梯很形象的介绍了从某个具体事物的低级抽象到概念的高级抽象过程。而学习语言不仅仅是学习字词，而是要将字词与它们代表的事物正确的联系起来，这种联系就是定义。为了达到使人理解的目的，下定义时应该沿着抽象阶梯向下追溯，并且要减少定义，因为更多时候定义会造成语言的空转，成为一种同语反复（tautology），当然我个人认为定义还有一个作用在于可以炫耀自己的学识。沿着抽象阶层一层一层上升是人类特有的能力，但若一个人的陈述只停留在高阶抽象层，那么他的听众就无法明白他的意思，同样只停留在低阶抽象层只会让人抓不住重点。优秀的陈述，需要高阶抽象层和低阶抽象层、语言和现实的互相发挥作用。\n\n## 第十一章 捕风捉影\n\n这一章主要讲人们脑子中的语言概念与现实搞混之后所带来的问题，作者举了不少生动的例子。文明越进步，越能感觉到我们的神经系统自动地会略去当前事物的许多特性，倘若我们不知道有些特性已被略去，或者感觉不到抽象化过程，我们便会一看见（听见）某种事物便信以为真，从而使看见和相信成为一个过程。如书中例子，某人看见纸花也会产生花粉过敏，我们现实中的谈癌色变。因为外界的经验事物被抽象成高阶的语言，这种语言再与记忆中的观念产生联系，从而将过去的经历感觉投射到面前的经验事物之上。语言的魔力便由此产生。书中还举了坐过牢的人找不到工作最后又去犯罪成为犯人的自我实现式预言。要抵御这种人们精神中的“幼稚领域”，一个方法��意识到言辞与它们所代表的事物之间没有必然联系，另一个是深刻的认识抽象阶梯和抽象化过程。\n\n## 第十二章 分类\n\n这一章讲搅浑抽象阶层后，不同分类带来的问题。我们把事物叫做什么名字、在哪一点或哪条线上将两种不同的东西分开，会根据我们的利益和分类目的而定。倘若我们接触不同的教育拥有不同的文化，连我们的世界看起来都会不是同一个样子。这里我想到维特根斯坦所说的一种语言即一种生活形式。即使狮子会说话，我们也无法理解，他在说什么。不幸的事，多数人都不会一直注意到自己是怎样对事物进行分门别类的。要抵御这种精神上的迷津特别要注意诶长语言中的这种语用：xx毕竟是xx，同一个xx实际上是不同的分类，如生意毕竟是生意，小孩毕竟是小孩。这都是一种托辞。柯齐勃史甚至建议在使用的名次后面加上编号已示区别。大多数理论问题，归根结底，都属于分类问题和名字问题。“真理”的科学实验，就像它的社会实验一样，都是以实用为标准。\n\n## 第十三章 二元价值观点与多元价值观点\n\n本章探讨的内容个人认为非常值得阅读，它与我们当今所处的社会环境、政治环境息息相关。主要讲的是逻辑谬误之一的假两难推理（False Dilemma）。很大程度上，我觉得源于人类的思维惰性，为了不给自己的思考增加压力，很自然的人们倾向于用二元价值来判定事物。作者探讨了政治上的二元观点，以纳粹德国与苏联为例，这一两分法给人类带来的苦难。二元价值观点只能产生争斗精神，而无法提升我们准确评价世界的能力。**所有二元价值的喧噪和夸张的话语，都是一种蒙蔽大众耳目使他们不去注意更加切身问题的方法。**这不免让我想到疫情防控下的人们对不是动态清零的就使躺平的描述。接着，作者论述了多元价值的好处。民主过程中的许多特性需要以多元价值为前提。价值观点的丰富伸缩性，是民主政体发达的标志。二元价值观点差不多总是以表现情感的姿态出现，它可能仍是文明生活中的启动工具，引起人们的兴趣，但载我们到目的地的转向工具却是多元价值观点或无穷多价值观点。因此，与人交谈时，保持开放的心态，应用多元价值观点，才能获得最大的好处。最后，作者对上述观点应用例外项——逻辑，作了说明。逻辑是讨论语言的语言，并不是讨论事物或事件的语言。\n\n## 第十四章 一团糟\n\n本章主要讲言辞中的内向观点对我们造成的坏影响了。技术的进步既可以帮助也可以损害交换知识的自由，这点，作为中国人体会应该会更加深刻。一旦自由交换知识的路径收到阻碍，其产生的影响反而比没有知识更加恶劣，因为识字的人的愚妄比不识字的人更复杂。前几章分析的几种错误的评价法，一可以概括为一个词——内向观点（intensional orientation），即只根据言辞而不是根据言辞所代表的事实去采取行动。比如不注意前后文；自动反应倾向，把不能抽象阶层混为一谈；只注意相同的方向而不注意不同方向；满足与定义（即更多的字词）来解释言辞。这种内向观点就是一种脱离语言实际的观点，会造成语言的空转。它的严重结果之一是会造成一种毫无根据的、非常容易幻灭的自信心。作者用了“上教堂的人”、“开车的女人”作为例子论述。而讲话太多与内向观点形成是一个恶性循环。作者罗列了四大内向观点形成的来源：一、教育，我们的教育往往脱离实际，分不清实然与应然，讲指示性言辞与说明性言辞混为一谈从而忘记语言的真正目的；二、流行小说，为了迎合读者，让读者读起来舒服、容易同时可以方便快速的进行创作，流行小说的情节往往脱离实际追求内向观点；三、广告，作者认为广告是内向观点的最大来源，广告的目的是尽量让观众在心里造成自动反应，通过心理暗示把内向观点提升为消费者生活中最主要的原则，促进观众对言辞和别的符号的病态反应。广告可能是形成一般人日常生活习惯和文化的最大的语言力量之一；四、电视，其作为比纸媒更丰富的媒介载体对观众有更大的吸引力，但受制于视觉效果，缺少深度并且很难提升抽象阶层到更具普遍性的更高层级，为了博取眼球，许多新闻像娱乐、许多娱乐像广告、许多广告像新闻，而众多电视剧总是围绕二元价值观点打转以达到和流行小说类似的目的。由于时代的局限，作者没有提及互联网，在我看来互联网的特性包含上面四个媒介，并且比之更加复杂。短视频的流行蕴含了广告与流行小说的特点，微博评论区更是内向观点的放大器。脱离了面对面的广场式交流，配合网络放大器让脱离实际的博眼球言辞更易于传播。在流量为王，流量变现的时代，一切能吸引人注意力的方法都是被趋之若鹜的，我们被囿于自己制造的信息茧房中，舒服的躺在那张由内向观点编织的躺椅之中。\n\n##  第十五章 老鼠和人\n\n这一章作者主要讲的是社会变革中应用外向观点的重要性。开篇以 Norman Maier 的“神经病”老鼠实验为例类比人类在家庭、生活、国际争端上类似的遇到的原地打转似得“无法解决”问题。出现这种问题的基本原因，作者归咎于“制度惰性”（insititutional inertia），人们一旦对制度习以为常，最后就会觉得它是唯一正确而恰当的行事办法，从而倾向于保护自己的制度，使它们不受到挑战或者攻击。这种过时的制度、习惯和形式仍然继续存在的现象被称为“文化落伍”（cultural lag）。解决社会问题的症结在于如何使一般人在旧制度里养成习惯适应新制度。如危机时刻，战争的到来，人类制度便能做出极大改变。每一个引起多人争辩的公共问题，其内容都离不开制度适应（institutional adaptation），将社会问题当成制度适应问题看待才能慢慢将问题转向外向的，变成实际的讨论。只有外向的讨论和外向的回答得到传播，才能破除阵营之间的选择。因为内向的定义和较高的抽象问题无法解决吃饭这类实际问题，外向世界里的问题一定要用外向的手段才能解决。科学的态度便是一种外向的态度，重点是要将其用于社会领域。极少数人把社会看作一台机器，却将其视为一堆活动着的制度的总和。\n\n## 第十六章 走向内心和外界的秩序\n\n最后一章，作者对前述讨论评价的方法做了总结，同时提出了一些个人的处事准则。总结：\n1. 一张地图并不就是它所代表的地域；言辞并不就是事物（第二、十章）；\n2. 言辞的意义不在言辞中，而在我们的脑海里（第二、十一章）；\n3. 前后文决定意义（第四章）；\n4. 留心“是”字，因为它可能会代表一种错误的评价法，草是绿的（神经系统的工作，第十、十一章）、张先生是上海人（抽象阶层混淆，第十一章）、做生意毕竟是做生意（一个指示，第七章）、一样东西就是一样东西（分类法变动第十、十二、十三章）；\n5. 认清指示与说明之间的差别（第七章）；\n6. 认清“真”字至少有四种不同意义；\n7. 当你想要“以火攻火”时，记住消防员时用水的（第十三章）；\n8. 二元价值观点是启动用的机器，不是驾驶用的机器（第十三章）；\n9. 小心定义，它是用言辞解释言辞。思考时尽量用实例（第十一章）；\n10. 没有一个字能有两次意思完全相同，牛1不是牛2，牛2不是牛3。\n最后，请认识你自己，忠于你自己，少说话，多观察，少做判断，多作报告，用外向的方法研究事物。将语言视为人类合作的工具。\n","month":11,"country":"美国"},{"title":"罪与罚","author":"[俄] 陀思妥耶夫斯基","start":"2022-10-16","finish":"2022-11-14","rating":8.5,"pages":"617","doubanLink":"https://book.douban.com/subject/25887912/","cover":"https://neodb.social/m/book/2021/09/1537df3f8f-7887-463e-9790-60003ab35e5d.jpg","review":"第三本陀氏的书（前两本是白痴与地下室手记），更加能读进去了，逐渐喜欢上他的这种这种心理描写，长篇大论式的对谈。本书的哲学意涵并不复杂，套用前不久看的《语言学的邀请》中提到的言辞概念，主角拉斯科尔尼科夫的问题在于他仅仅从内向意义去理解考察拿破仑，以他自认为的超人哲学去思考那些历史名人，他一直在「设想」拿破仑会怎么做，这是没有意义的，在这点上他只能沉默而不能发言。他能做的是更多的从外向意义去理解拿破仑，即拿破仑他做过什么，他是怎么做的。回到小说结尾，也正是那个身边具体的人，给了他生活意义的救赎。","month":11,"country":"俄罗斯"},{"title":"献给阿尔吉侬的花束","author":"[美] 丹尼尔·凯斯","start":"2022-11-08","finish":"2022-11-16","rating":8.5,"pages":"288","doubanLink":"https://book.douban.com/subject/26362836/","cover":"https://neodb.social/m/book/2021/09/152a683f39-9001-4143-8685-88d82921d571.jpg","review":"献给阿尔吉侬的花束\n这应该算作软科幻吧，通过手术刺激将智障患者的智力短时间内提高到两倍多。作者也机制的没有过多的着笔在超人智力的描绘上，毕竟所有读者和作者本身并没有那般智力，而是转向情感方面。开篇引用的柏拉图洞穴隐喻非常贴切。\n\n> 眼睛的困惑有两种，也来自两种起因，不是因为走出光明，就是因为走进光明所致，不论是人体的眼睛和心灵的眼睛。\n\n全书的主线正是暗合了主角从黑暗到光明，再从光明到黑暗的过程。但有意思的是，所谓的黑暗并不是只有黑暗，身处黑暗的查理也有友情支撑生活，而在光明中的查理却也会体会到人心的黑暗。作者巧妙的用了主角的实验报告作为叙事载体，通过第一人称视角将主角的经历淋漓尽致的展现，尤其是通过语词使用的变化来体现主角智力水平的变化。\n","month":11,"country":"美国"},{"title":"宵待草夜情","author":"[日] 连城三纪彦","start":"2022-11-21","finish":"2022-11-24","rating":8.4,"pages":"214","doubanLink":"https://book.douban.com/subject/26367367/","cover":"https://neodb.social/m/book/2021/09/173bc7aed3-bd69-4b94-9815-ac07b2c8064a.jpg","review":"五个故事，五个女主，五段错位的感情。连城老师的推理，不仅在逻辑演绎上，却更在感情笔墨之中。因此，当反转来临之时，当案件揭晓之际，这种恍然大悟不仅是谜题公布后的大快人心，却更是被深刻体察后良苦用心。","month":11,"country":"日本"},{"title":"东京本屋","author":"[日] 吉井忍","start":"2022-12-20","finish":"2022-11-30","rating":8.7,"pages":"440","doubanLink":"https://book.douban.com/subject/26819477/","cover":"https://neodb.social/m/book/2021/09/1699c69ee4-5a8c-4c90-b987-6ba8afe6ac30.jpg","review":"东京本屋\n遇见这本书是今年最大的意外之喜。作者是一位嫁给中国人的日本记者，有趣的事这是她用中文写作的书。她花了六七年时间采访了十来家位于东京的独立书店（本屋），以采访式的对话体写作。口语式的对谈，辞藻并不华丽，日味中文带给我一种平静的力量。书店的经营困难，在这个时代已是显而易见的事情，更不用说规模体量都更小的独立书店。它们能存在下去，需要店主莫大的勇气与付出，平衡现实与理想，却也更能体现出一种匠心。书中BACH和Book Truck这两家店主给我印象最深，他们让我看到在逐利之外的另一种生活方式的可能。\n\n我真正与书结缘也是近两年的事情，学生时代看书并不多，去书店也只是买辅导书。这两年开始将业余时间主要投入在阅读中，但遗憾是所在小城市的当地并没有书中类似的独立书店可以参观消费，因此所有选书购书都是通过网络完成。网络虽然给图书的传播带来了便利，却也少了那份书店所能提供的身临其境感，而独立书店的存在更彰显着店主个人的品味与取向，可看作一份具象的「书单」。书店这个产业虽然不致消亡，但数量规模的萎缩亦难避免。只祝愿独立书店们能保有自身的同时能有一些其他渠道平衡现实的限制，并在可能时我能尽一点绵薄之力。\n\n另，文景出版的纸质在我读过的书里一直保持着高质量，本书有众多关于独立书店的彩色照片，非常有质感。","month":11,"country":"日本"},{"title":"快乐王子","author":"[英] 王尔德","start":"2022-12-01","finish":"2022-12-07","rating":7.5,"pages":"137","doubanLink":"https://book.douban.com/subject/25774843/","cover":"https://neodb.social/m/book/2021/12/10a749aa83-2183-4a6d-a31a-c3115c963dba.jpg","review":"凑单买的，难以欣赏","month":12,"country":"英国"},{"title":"日常生活中的自我呈现","author":"〔美〕欧文·戈夫曼（Erving Goffman）","start":"2022-11-25","finish":"2022-12-13","rating":8.1,"pages":"272","doubanLink":"https://book.douban.com/subject/35947819/","cover":"https://neodb.social/m/book/2022/10/1343bae789-2c23-45f8-b9b6-bf21b7cebb74.jpg","review":"这本书对我而言精彩的部分在于作者各种信手拈来的生活实例，反倒是理论部分得出的过程过于轻便了，以至于作者一开始说理我就开始走神。人生就是一出戏，因此，尽管打开本书对其理论不知所云，合上书本进入生活却都是它描写的生活意象。从这个角度说，本书可以是外星文明研究地球人类的日常生活呈现的上佳书籍。\n另，读此书时，想到了另一本书《有限与无限的游戏》中提到的萨特的一句话：相信是知道自己相信，而知道自己相信是不相信。","month":12,"country":"美国"},{"title":"少女的坟墓","author":"（美）迪弗","start":"2022-12-12","finish":"2022-12-30","rating":7.8,"pages":"497","doubanLink":"https://book.douban.com/subject/3610136/","cover":"https://neodb.social/m/book/2021/11/279637a528-db81-4bde-8607-48b00fc7c0df.jpg","review":"十几年前买的书，年末总算拿出来打算读完，又碰上新冠。总的来说观感一般，有种急于冲着改编成电影而写的意思，翻转也很生硬，感情戏特别尴尬。","month":12,"country":"美国"}];
-
-// ========== 数据注入结束 ==========
-
-// 月份元数据（根据实际月份动态生成）
-const actualMonths = [...new Set(books.map(b => b.month))].sort((a, b) => a - b);
-const monthMeta = {};
-actualMonths.forEach(m => { monthMeta[m] = MONTH_COLORS[m - 1]; });
-
-// 月份范围标签
-const monthLabels = actualMonths.map(m => `${m}月`);
-const MONTH_RANGE = `${Math.min(...actualMonths)}月 – ${Math.max(...actualMonths)}月`;
-document.getElementById('subtitle').textContent = 'Nickilism';
-
-// 统计
-const totalBooks = books.length;
-const avgRating = (books.reduce((sum, b) => sum + b.rating, 0) / totalBooks).toFixed(1);
-const totalPages = books.reduce((sum, b) => sum + (parseInt(b.pages) || 0), 0);
-
-// 国家统计（只统计非空国家）
-const countryCount = {};
-books.forEach(b => {
-  if (b.country) {
-    countryCount[b.country] = (countryCount[b.country] || 0) + 1;
-  }
-});
-
-// 每月统计
-const monthCounts = {};
-actualMonths.forEach(m => { monthCounts[m] = 0; });
-books.forEach(b => { if (monthCounts[b.month] !== undefined) monthCounts[b.month]++; });
-
-// 更新统计
-document.getElementById('total-books').textContent = totalBooks;
-document.getElementById('avg-rating').textContent = avgRating;
-document.getElementById('total-pages').textContent = totalPages;
-
-// 计算阅读天数中位数
-const readingDays = books.map(b => {
-  const start = new Date(b.start);
-  const finish = new Date(b.finish);
-  return (finish - start) / (1000 * 60 * 60 * 24);
-}).sort((a, b) => a - b);
-const medianReadingDays = readingDays.length % 2 === 0
-  ? (readingDays[readingDays.length/2 - 1] + readingDays[readingDays.length/2]) / 2
-  : readingDays[Math.floor(readingDays.length/2)];
-document.getElementById('avg-reading-time').textContent = medianReadingDays.toFixed(1);
-
-// 渲染国家分布
-const countryGrid = document.getElementById('country-grid');
-Object.entries(countryCount).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
-  const badge = document.createElement('div');
-  badge.className = 'country-badge';
-  badge.innerHTML = `<span class="country-flag">${COUNTRY_FLAGS[country] || ''}</span>${country}<span class="country-count">×${count}</span>`;
-  countryGrid.appendChild(badge);
-});
-
-// 星星计算
-function stars(rating) {
-  let full, half;
-  if (rating >= 9) { full = 5; half = 0; }
-  else if (rating >= 8.5) { full = 4; half = 1; }
-  else if (rating >= 8.0) { full = 4; half = 0; }
-  else if (rating >= 7.5) { full = 3; half = 1; }
-  else if (rating >= 7.0) { full = 3; half = 0; }
-  else { full = 2; half = 0; }
-  const empty = 5 - full - half;
-  return '<span class="star-filled">★</span>'.repeat(full) +
-         (half ? '<span class="star-half">★</span>' : '') +
-         '<span class="star-empty">☆</span>'.repeat(empty);
-}
-
-// 筛选器
-const filterMap = {
-  all: () => true,
-  high: b => b.rating >= 8.3,
-  normal: b => b.rating > 7.9 && b.rating < 8.3,
-  low: b => b.rating <= 7.9,
-};
-
-const highCount = books.filter(b => b.rating >= 8.3).length;
-const normalCount = books.filter(b => b.rating > 7.9 && b.rating < 8.3).length;
-const lowCount = books.filter(b => b.rating <= 7.9).length;
-
-const filterBtns = [
-  { key: 'all', label: `全部 (${totalBooks})` },
-  { key: 'high', label: `🟢 高分作品 (${highCount})` },
-  { key: 'normal', label: `🟡 普通作品 (${normalCount})` },
-  { key: 'low', label: `🔴 低分作品 (${lowCount})` },
-];
-
-// 添加国家筛选按钮
-Object.entries(countryCount).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
-  filterBtns.push({
-    key: `country-${country}`,
-    label: `${COUNTRY_FLAGS[country] || ''} ${country} (${count})`
-  });
-  filterMap[`country-${country}`] = b => b.country === country;
-});
-
-// 添加月份筛选按钮
-actualMonths.forEach(m => {
-  const count = books.filter(b => b.month === m).length;
-  filterBtns.push({
-    key: `month-${m}`,
-    label: `${m}月`
-  });
-  filterMap[`month-${m}`] = b => b.month === m;
-});
-
-let currentFilter = 'all';
-let currentSortField = 'finish';
-let currentSortDir = 'desc';
-let booklistOpen = true;
-
-const filtersEl = document.getElementById('filters');
-filterBtns.forEach(fb => {
-  const btn = document.createElement('button');
-  btn.className = 'filter-btn' + (fb.key === 'all' ? ' active' : '');
-  btn.textContent = fb.label;
-  btn.onclick = () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentFilter = fb.key;
-    const filtered = books.filter(filterMap[fb.key]);
-    renderWall(filtered);
-    renderBooklist(getSortedList(filtered));
-    if (booklistOpen) {
-      document.getElementById('booklist-content').classList.add('open');
-      document.getElementById('booklist-toggle').classList.add('open');
-    }
-  };
-  filtersEl.appendChild(btn);
-});
-
-// 渲染封面墙
-function renderWall(list) {
-  document.getElementById('wall-count').textContent = `${list.length} 本`;
-  const wallEl = document.getElementById('cover-wall');
-  wallEl.innerHTML = '';
-  // 按 finish 时间升序排列
-  const sorted = getSortedList(list);
-  sorted.forEach(b => {
-    const item = document.createElement('div');
-    item.className = 'cover-item';
-    item.innerHTML = `
-      <div class="cover-link" onclick="window.open('${b.doubanLink}', '_blank')" title="${b.title}">
-        <div class="cover-img-wrap">
-          <img src="${b.cover}" alt="${b.title}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 150%22><rect fill=%22%23f6f5f4%22 width=%22100%22 height=%22150%22/><text x=%2250%22 y=%2280%22 text-anchor=%22middle%22 fill=%22%23a39e98%22 font-size=%2210%22>${b.title}</text></svg>'">
-          <div class="cover-overlay">
-            <div class="cover-title">${b.title}</div>
-            <div class="cover-author">${b.author}</div>
-            <div class="cover-rating">${stars(b.rating)} ${b.rating}</div>
-          </div>
-        </div>
-      </div>`;
-    wallEl.appendChild(item);
-  });
-}
-
-// 渲染书单列表
-function renderBooklist(list) {
-  const content = document.getElementById('booklist-content');
-  content.innerHTML = list.map((b, idx) => {
-    const m = monthMeta[b.month];
-    let reviewSection = '';
-    if (b.review) {
-      const needsTruncation = b.review.length > 60;
-      const truncatedText = needsTruncation ? b.review.substring(0, 60) + '...' : b.review;
-      reviewSection = `
-        <div class="book-review" id="review-${idx}" data-full="${encodeURIComponent(b.review)}" data-truncated="${needsTruncation}">
-          ${truncatedText.replace(/\n/g, '<br>')}
-        </div>
-        ${needsTruncation ? `<button class="review-more-btn" onclick="toggleReview(${idx}, this)">展开</button>` : ''}
-      `;
-    }
-    return `<div class="book-row">
-      <div class="book-info">
-        <div class="book-title"><a href="${b.doubanLink}" target="_blank" style="color:inherit;text-decoration:none;">${b.title}</a></div>
-        <div class="book-author">${b.author}</div>
-        <div class="book-meta">
-          <span class="month-tag" style="background:${m.bg};color:${m.color}">${m.label}</span>
-          <span class="star-rating">${stars(b.rating)}</span>
-          <span class="rating-num">${b.rating}</span>
-          ${b.pages ? `<span class="pages-tag">${b.pages}页</span>` : ''}
-        </div>
-        ${reviewSection}
+    <!-- ===== Header ===== -->
+    <header>
+      <div class="title-block">
+        <h1>阅读记录</h1>
+        <p id="subtitle">{{MONTH_RANGE}} 2022</p>
       </div>
-      <div class="book-dates">${b.start}<br>${b.finish}</div>
-    </div>`;
-  }).join('');
-}
+      <div class="year-badge">2022</div>
+    </header>
 
-function toggleReview(idx, btn) {
-  const review = document.getElementById(`review-${idx}`);
-  const isCollapsed = btn.textContent === '展开';
-  const fullText = decodeURIComponent(review.dataset.full);
+    <!-- ===== Stats Grid ===== -->
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-label">已读书目</div>
+        <div class="stat-value" id="total-books">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">平均评分</div>
+        <div class="stat-value" id="avg-rating">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">总页数</div>
+        <div class="stat-value" id="total-pages">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">阅读天数中位数</div>
+        <div class="stat-value" id="avg-reading-time">—</div>
+      </div>
+    </div>
 
-  if (isCollapsed) {
-    review.innerHTML = fullText.replace(/\n/g, '<br>');
-    btn.textContent = '收起';
-  } else {
-    review.innerHTML = fullText.substring(0, 60) + '...';
-    btn.textContent = '展开';
-  }
-}
+    <!-- ===== Country Stats ===== -->
+    <div class="country-section">
+      <div class="section-title">国家分布</div>
+      <div class="country-grid" id="country-grid"></div>
+    </div>
 
-// 展开/收起书单
-function toggleBooklist() {
-  const toggle = document.getElementById('booklist-toggle');
-  const content = document.getElementById('booklist-content');
-  booklistOpen = !booklistOpen;
-  toggle.classList.toggle('open', booklistOpen);
-  content.classList.toggle('open', booklistOpen);
-}
+    <!-- ===== Chart ===== -->
+    <div class="chart-wrap">
+      <div class="section-title">每月阅读量</div>
+      <div class="chart-container">
+        <canvas id="monthChart" role="img"></canvas>
+      </div>
+    </div>
 
-// 排序函数
-function getSortedList(list) {
-  const sorted = [...list];
-  const dir = currentSortDir === 'desc' ? -1 : 1;
-  switch (currentSortField) {
-    case 'finish': return sorted.sort((a, b) => a.finish.localeCompare(b.finish) * dir);
-    case 'rating': return sorted.sort((a, b) => (a.rating - b.rating) * dir);
-    case 'pages': return sorted.sort((a, b) => ((parseInt(a.pages) || 0) - (parseInt(b.pages) || 0)) * dir);
-    default: return sorted;
-  }
-}
+    <!-- ===== Filters ===== -->
+    <div class="filters" id="filters">
+      <span class="filter-label">筛选</span>
+    </div>
 
-// 排序按钮事件
-document.querySelectorAll('.sort-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const field = btn.dataset.sort;
-    if (currentSortField === field) {
-      // 同字段点击 → 切换方向
-      currentSortDir = currentSortDir === 'desc' ? 'asc' : 'desc';
-    } else {
-      // 不同字段 → 切换到该字段，默认降序
-      currentSortField = field;
-      currentSortDir = 'desc';
+    <!-- ===== Cover Wall ===== -->
+    <div class="wall-section">
+      <div class="wall-header">
+        <h2>书影留存</h2>
+        <span id="wall-count">— 本</span>
+      </div>
+      <div id="cover-wall"></div>
+    </div>
+
+    <!-- ===== Book List ===== -->
+    <div class="booklist-section">
+      <button class="booklist-toggle" id="booklist-toggle" onclick="toggleBooklist()">
+        <span>书籍清单</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="sort-bar" id="sort-bar">
+        <button class="sort-btn active" data-sort="finish">时间 ↓</button>
+        <button class="sort-btn" data-sort="rating">评分 ↓</button>
+        <button class="sort-btn" data-sort="pages">页数 ↓</button>
+      </div>
+      <div class="booklist-content" id="booklist-content"></div>
+    </div>
+
+    <!-- ===== Footer ===== -->
+<footer id="footer" style="display: flex; align-items: center; justify-content: center; gap: 0;">导出于 2026-05-07 · <a href="https://github.com/Nickilism/reading-tracker" target="_blank" style="color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; margin-left: 0.25em; line-height: 1; margin-bottom: 2px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="display: block;"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a></footer>
+  <script>
+    // ========== 数据注入开始 ==========
+    // 以下变量由生成脚本注入
+
+    const YEAR = 2022;
+    const GENERATED_DATE = "2026-05-07";
+
+    // 12个月颜色配置
+    const MONTH_COLORS = [
+      { bg: '#b5d4f4', color: '#0c447c', label: '1月' },
+      { bg: '#9fe1cb', color: '#085041', label: '2月' },
+      { bg: '#fac775', color: '#633806', label: '3月' },
+      { bg: '#f5c4b3', color: '#712b13', label: '4月' },
+      { bg: '#d4c4f4', color: '#4c147c', label: '5月' },
+      { bg: '#f4d4b5', color: '#7c4414', label: '6月' },
+      { bg: '#b5f4d4', color: '#147c54', label: '7月' },
+      { bg: '#f4b5d4', color: '#7c1454', label: '8月' },
+      { bg: '#d4f4b5', color: '#547c14', label: '9月' },
+      { bg: '#b5d4f4', color: '#147c8c', label: '10月' },
+      { bg: '#f4b5b5', color: '#7c1414', label: '11月' },
+      { bg: '#b5f4f4', color: '#147c7c', label: '12月' },
+    ];
+
+    // 国家前缀映射（支持多种括号格式）
+    const COUNTRY_PREFIX_MAP = {
+      // 方括号
+      '[日]': '日本', '[美]': '美国', '[德]': '德国', '[英]': '英国',
+      '[法]': '法国', '[塞尔维亚]': '塞尔维亚', '[韩]': '韩国', '[俄]': '俄罗斯',
+      '[以色列]': '以色列', '[爱尔兰]': '爱尔兰', '[英美]': '英美', '[荷]': '荷兰',
+      '[意大利]': '意大利', '[奥]': '奥地利', '[奥地利]': '奥地利', '[阿根廷]': '阿根廷',
+      '[波兰]': '波兰', '[葡萄牙]': '葡萄牙', '[古希腊]': '古希腊',
+      '[瑞典]': '瑞典', '[加拿大]': '加拿大', '[澳]': '澳大利亚',
+      '[英国]': '英国', '[加]': '加拿大', '[意]': '意大利', '[波]': '波兰',
+      '[阿]': '阿根廷', '[荷]': '荷兰',
+      // 圆括号
+      '(日)': '日本', '(美)': '美国', '(德)': '德国', '(英)': '英国',
+      '(法)': '法国', '(韩)': '韩国', '(俄)': '俄罗斯', '(荷)': '荷兰',
+      '(意)': '意大利', '(奥)': '奥地利', '(葡萄牙)': '葡萄牙',
+      '(古希腊)': '古希腊', '(俄罗斯)': '俄罗斯',
+      // 中文圆括号
+      '（日）': '日本', '（美）': '美国', '（德）': '德国', '（英）': '英国',
+      '（法）': '法国', '（韩）': '韩国', '（俄）': '俄罗斯',
+      '（意）': '意大利', '（葡萄牙）': '葡萄牙',
+      // 中文方括号 〔 〕
+      '〔美〕': '美国', '〔英〕': '英国', '〔日〕': '日本', '〔德〕': '德国',
+      '〔法〕': '法国', '〔俄〕': '俄罗斯', '〔意〕': '意大利', '〔波〕': '波兰',
+    };
+
+    // 国家旗帜
+    const COUNTRY_FLAGS = {
+      '中国': '🇨🇳', '日本': '🇯🇵', '美国': '🇺🇸', '德国': '🇩🇪',
+      '英国': '🇬🇧', '法国': '🇫🇷', '塞尔维亚': '🇷🇸', '韩国': '🇰🇷',
+      '俄罗斯': '🇷🇺', '以色列': '🇮🇱', '爱尔兰': '🇮🇪', '英美': '🇺🇸',
+      '荷兰': '🇳🇱', '意大利': '🇮🇹', '奥地利': '🇦🇹', '阿根廷': '🇦🇷',
+      '波兰': '🇵🇱', '葡萄牙': '🇵🇹', '古希腊': '🇬🇷', '瑞典': '🇸🇪',
+      '加拿大': '🇨🇦', '澳大利亚': '🇦🇺', '西班牙': '🇪🇸', '捷克': '🇨🇿',
+    };
+
+    // 检测字符串是否包含中文字符
+    function hasChineseChars(str) {
+      return /[\u4e00-\u9fa5]/.test(str);
     }
-    // 更新按钮文字
-    const fieldLabels = { finish: '时间', rating: '评分', pages: '页数' };
-    document.querySelectorAll('.sort-btn').forEach(b => {
-      const f = b.dataset.sort;
-      const a = (currentSortField === f) ? currentSortDir : 'desc';
-      b.textContent = fieldLabels[f] + (a === 'desc' ? ' ↓' : ' ↑');
-      b.classList.toggle('active', currentSortField === f);
+
+    // 标准化作者名字符串，去除各种括号及其内容
+    function stripCountryPrefixes(author) {
+      return author
+        .replace(/\[([^\]]+)\]/g, '')   // [xxx]
+        .replace(/\(([^\)]+)\)/g, '')     // (xxx)
+        .replace(/（([^）]+)）/g, '')      // （xxx）
+        .replace(/《([^》]+)》/g, '')     // 《xxx》
+        .replace(/【([^】]+)】/g, '')     // 【xxx】
+        .trim();
+    }
+
+    // 国家推断
+    function deriveCountry(author) {
+      // 1. 先匹配前缀映射表
+      for (const [prefix, country] of Object.entries(COUNTRY_PREFIX_MAP)) {
+        if (author.includes(prefix)) return country;
+      }
+      // 2. 无前缀时，根据姓名文字判断
+      const nameOnly = stripCountryPrefixes(author);
+      if (hasChineseChars(nameOnly)) {
+        return '中国';
+      }
+      // 3. 纯英文名默认为美国
+      return '美国';
+    }
+
+    // 书籍数据（由生成脚本注入）
+    const books = [{"title":"哥德尔、艾舍尔、巴赫","author":"[美] 侯世达","start":"2021-11-14","finish":"2022-01-05","rating":8.4,"pages":"1053","doubanLink":"https://book.douban.com/subject/1291204/","cover":"https://neodb.social/m/book/2021/09/15057272e8-cae8-4920-b8b1-2dcaba1c4dcb.jpg","review":"断断续续看了接近俩月，脑袋里印象最深的两个词是同构和自指，前半本书还能勉强跟上，后半本就力不从心了，佩服作者天马行空式的想象力。","month":1,"country":"美国"},{"title":"奥古斯都","author":"[美] 约翰·威廉斯","start":"2022-01-06","finish":"2022-01-14","rating":8.5,"pages":"374","doubanLink":"https://book.douban.com/subject/27180479/","cover":"https://neodb.social/m/book/2021/09/15cb797418-ef40-40c7-93f4-2c02e0aa8472.jpg","review":"上一次看书信体还是《傅雷家书》，当然没法与《奥古斯都》相提并论。这本书帮我补充了一段古罗马的历史知识，尽管作者说其中不乏故事，但这种文风令人煞是喜爱。以我目前之贫瘠语言，还无法在书评中言说一二，但此书绝对值得再次阅读，其中不乏一些桥段在一开始读时便令人摩挲品味。","month":1,"country":"美国"},{"title":"苏格拉底的申辩","author":"[古希腊] 柏拉图","start":"2022-01-18","finish":"2022-01-24","rating":8.6,"pages":"232","doubanLink":"https://book.douban.com/subject/26934202/","cover":"https://neodb.social/m/book/2021/09/161f2c4a1d-62b5-4870-9b4b-abd73505d03d.jpg","review":"第一次读柏拉图，也是第一次读注疏本。以我一个门外汉的观点看，本书在注疏上做的非常详尽扎���，对比，评价了各个名家注疏的优缺点并辅以作者自己的见解。尽管本人对于历史考究不求甚解，仍然读的津津有味。\n\n在这套申辩与之后的译者解读中，完全被苏格拉底式的生活态度所折服，其「无知之知」的求知之路，打开了我认识知识的另一扇门。他的这种否定性的求知方法，在他否定的地方，并不是简单的否定。在他说「不是」的时候，也蕴含了他「是」什么。「未经省察的生活是不值得过的生活」其审视的对象不仅是自身，亦可使他人。也许对苏格拉底而言，哲学的起点与终点都是「认识自己」，而人不可能有真正的智慧，但却一定存在真正的智慧，所以死亡到底好不好，只有神知道。\n\n##无知之知\n\n苏格拉底的好朋友凯瑞丰在德尔斐神庙求签问还有谁比苏格拉底更智慧，神谕说没有人更比他智慧。苏格拉底难以置信自己会是最智慧的人，因为他认为自己很无知，所以为了理解神谕的意思，他去拜访那些公认的智慧之人，企图在与他们的对话中能明白神谕到底是什么意思（根据注疏，苏格拉底不会怀疑神，而是试图明白神谕是否还有其它解释）。然而在与那些「智慧」之人的对话中，他发现，其实他们并无智慧。不仅如此，他们甚至不知道自己没有智慧，两相比较，大家都不智慧，然而苏格拉底有此自知之明，而他们强不知以为知，那么自然他们便更无知，苏格拉底便更智慧。也因此，他被人们忌恨。他的对话对象中有政治家、诗人、匠人，政治家被人们以为有智慧，却压根不知道自己的智慧为何，诗人们凭借灵感能写出看似有智慧的诗歌，却自己也无法理解，而匠人们，在其从事的工作中的确有一点智慧，但却因此以为自己在其他任何事情上也有智慧，而没有对灵魂和心灵真正的智慧，三种类型的人在苏格拉底式的诘问下都会恼羞成怒，这也是苏格拉底最后会被送上法庭的直接原因。\n\n然而即便如此，在法庭上申辩的决心，对良好生活和正义的追求，让苏格拉底没有因为害怕死亡而做出任何妥协。他在申辩时让法官们不要叫喊，听他用他的方式进行抗辩。甚至明知只要他提出一个相对这种的惩罚方式，比如流放便能免除一死，但他提出的却是法官们让他在市政大厅用膳。这种戏谑的方式，一方面说明苏格拉底对其正义，「好」的追求决心，一方面也是他对死亡的一种不同见解的注脚。死过的人都不会说话，没死过的人都没体验过死亡，自然按照苏格拉底的「无知之知」，死亡到底「好」还是「不好」都是未知的。\n\n「未经省察的生活是不值得过的生活」，苏格拉底不仅省察自己，还省察他人，在这种省察中他践行者他的无知之知，体现着他的爱知，因为一个智慧之人，首先要「认识自己」。","month":1,"country":"古希腊"},{"title":"动物园","author":"[日] 乙一","start":"2022-01-25","finish":"2022-01-27","rating":7.9,"pages":"368","doubanLink":"https://book.douban.com/subject/26723423/","cover":"https://neodb.social/m/book/2021/09/158c45ce1a-61bd-4746-bed7-418f3b603176.jpg","review":"没有背景了解，奔着推理来看的，推理性较强的两篇是衣橱和小白屋，七个房间前段都比较好，但结尾过于直白简单了，个人比较喜欢神的咒语。总体而言，感觉一般吧。","month":1,"country":"日本"},{"title":"大问题","author":"[美] 罗伯特·所罗门, [美] 凯思林·希金斯","start":"2022-01-10","finish":"2022-02-04","rating":8.4,"pages":"462","doubanLink":"https://book.douban.com/subject/30176572/","cover":"https://neodb.social/m/book/2021/11/28ea99c2de-160e-4688-9c68-a944545353ee.jpg","review":"以问题为导向介入哲学，比之之前看的西方哲学史，《大问题》无疑更适合入门，至少在引起兴趣方面要强出不少。但也正因此，它缺少那些以时间线索编排的哲学史书本所能提供的关于哲学的发展和各位哲学大家思想汇总的清晰脉络。","month":2,"country":"美国"},{"title":"地下室手记","author":"(俄罗斯) 陀思妥耶夫斯基","start":"2022-02-07","finish":"2022-02-15","rating":8.4,"pages":"216","doubanLink":"https://book.douban.com/subject/34990839/","cover":"https://neodb.social/m/book/2021/09/1511b305e8-ac4c-43e7-8634-c5b29cff0d9d.jpg","review":"即使是距离本书创作一个半世纪还多的当代，书中主人公「地下室人」的内心世界与我们仍有很多重叠。这种徒劳的企图在我们不在意，甚至是看不起、厌恶的人群中寻找身份认同矛盾行为，深刻的揭示人作为社会性动物的不可理喻性。","month":2,"country":"俄罗斯"},{"title":"到灯塔去","author":"[英] 弗吉尼亚·伍尔夫","start":"2022-02-10","finish":"2022-02-17","rating":7.5,"pages":"312","doubanLink":"https://book.douban.com/subject/35152219/","cover":"https://neodb.social/m/item/book/2023/12/10/5be1a06c-c2de-40c7-822b-e6d8c42062af.png","review":"看到那么多好评，我想应该不是书本的问题，但我自认自己应该也不会有太大的问题，然而这本书我实在读不下去，不管它是意识流还是象征的表现手法，始终无法与作者产生共鸣，这种频率的不对位也许就是无缘吧。","month":2,"country":"英国"},{"title":"Atomic Habits","author":"James Clear","start":"2022-01-28","finish":"2022-02-21","rating":8.3,"pages":"320","doubanLink":"https://book.douban.com/subject/30355759/","cover":"https://neodb.social/m/book/2021/09/16b54ff245-74bb-4307-be52-1eba93c7af23.jpg","review":"读的是英文原版，作者的语言平实易懂，为了能有更好的阅读效果，在每一章读毕我都对章节内容做了总结，尽管作者也贴心的给了每一章的 Chapter Summary，但我想自己动手写一写印象会更深刻。\n\n本书讲的是习惯养成，一个非常老生常谈的日常生活问题。作者的厉害之处在于能将这样一个问题讲透，并结合自己的经历，各种颇具说服力的例子，提出具备操作性的习惯养成办法。他用了四法则、习惯得分卡、指差确认、习惯堆叠、两分钟准则、金发女郎准则等概念化的术语，形成一套习惯养成的逻辑，将枯燥无味的重复性行动拆解成可以按部就班的体系化操作指南，值得借鉴学习。\n\n下面的章节终结只是我对作者内容的邯郸学步，摘录了我认为的核心内容，相较而言，作者的写作方式是在每一章先用例子来引入，再分析解释核心观点，在代入感上会强很多。\n\n## Chapter 1 主要讲一些耳熟能详的关于习惯益处的知识点\n\n- 要关注微小的改善，长此以往必将积累成客观的变化，习惯如同复利。\n- 设定目标固然能提供方向，但没有系统性的方法驱动，最终难免跑偏，因此与其将关注点放在目标的设定，不如做好系统性方法的建设，因为成功与失败的人他们都有相同的目标，却区别在方法的使用。\n\n## Chapter 2 主要讲对习惯的重新认识\n\n通常人们决定要养成某个习惯是出于想要获得某种结果，如体重减轻，肌肉增长，知识变多。但作者提出，关键点并不在于结果，过分关注结果产出反而会影响习惯培养的积极性。更有效的方式是你将改变的重点放在自我的身份认知(identity)上。简单来说两步走，一先设定一个你想成为的人，二用阶段式的小成功来证明自己。想要成为一个健康的人，你自然不会去吃垃圾食品，想要成为一个学者，你自然会去读书。用这套论述，养成习惯变等于成为一个新自己，习惯在这里的作用不是给你带来一个好的结果，而是它们会改变你对自我认知信念，我每天读书学习，我自然会认为我是一个有识之士，我每天健走不吃垃圾食品，我自然是一个健康之人。\n\n基于身份认知的习惯会形成一个反馈循环，认知->习惯->认知，当然，如果是坏习惯，那将是一个恶性循环。\n\n## Chapter 3 介绍如何养成好习惯以及戒掉坏习惯\n\n习惯被养成是因为同一种行为被重复了多次。为何这一行为会被重复执行，在于它能解决我们的问题。因此，习惯养成的目的是出于解决问题。不仅如此，在习惯养成前，我们解决问题时通常需要耗费更多的精力投入，但一旦养成习惯，这一行为就会变成「自动的」，多次重复的行为会让我们的身体建立这种自动化的程序，从而让其能将更多精力聚焦在其他新的更重要的问题上。书中一句概括的话说得好：Habits are mental shortcuts learned from experience. （习惯是从经历中学会的思维捷径）\n\n习惯的养成过程可以被分成四个步骤：提示(cue)、渴望(craving)、回应(response)、奖赏(reward)。所以，要养成一个好习惯就是要让提示变得明显、渴望变得有吸引力、回应变得简单、奖赏变得让人满足，而要戒掉坏习惯则从上面四个方面的反向进行努力。作者称之为行为变化四法则。\n\n## Chapter 4-7 关于行为变化四法则第一条：让cue变得明显\n\n- 通过足够的训练，习惯会让人们的大脑会形成从线索提示到预测结果的自然连接，而无需有意识的介入。在开始改变行为之前，人们应对自己的习惯先有一个明确的认识，作者介绍了两种方法 Habits Scorecard 和 Pointibg-and-Calling，前者帮助我们认识自己的行为习惯，后者可以强化我们想要养成的行为习惯。\n- 「实施决心」和「习惯堆叠」两个办法可以让cue 变得明显。前者要求在制定计划时明确说出在何时何地干何事，在我看来类似心理暗示，相比「激情」式的行为变化，即那些看完某视频或例子后以为自己觉悟而作的无具体时间地点的行为变化，「实施决心」通过更具体的要求来给自己暗示，好比给自己承诺。后者则是在已有习惯的基础上将新的计划安排在其(reward)后，类似饭前洗手、饭后刷牙这类习惯，关键是要找准被堆叠的母习惯。\n- 人是视觉化为主的动物，习惯又由cue激发，因此，通过在环境中的显眼位置设置cue，能有效的改变我们的生活习惯。而随着时间积累，这种cue会从单一物品变成整个场景。引导我们行为的不是场景中的物品，而是我们与它们之间的关系。所以，面对场景时，我们应该思考的是我们与之包含物品之间的关系而非它包含了什么物品。在卧室看到床时，我们要思考关系是它是用来睡觉的，而不是躺着玩手机的，不同的物品和场景有不同的功能，通过将场景、物品分区分类分功能，能帮助我们建立与之对应的习惯。同样的如果要戒掉坏习惯，可以考虑从更换场景、物件上入手。有一点要注意的是不要轻易将不同习惯的场景混在一起，因为那样容易让我们滑下那些更简单更喜欢的习惯中去，如不要在拉屎的时候玩手机…\n- 要戒掉坏习惯，自我控制只是短期办法。给吸烟患者看黑肺的照片，给肥胖之人看体重都只能增加其焦虑，反而继续坏习惯。同过让cue变得不明显，看不见，才是戒断习惯的长期有效办法。比起拒绝诱惑，选择避开它，让自己看不见它才是更有效的办法。\n\n## Chapter 8-10 关于行为变化四法则第二条：让行动变得有吸引力\n\n- 人类与动物一样在进化过程中，大脑都预置了一些设定来指导我们的行为，进化是一个缓慢的过程，而大脑的进化显然并为跟上我们这个物质以变得极大丰富的时代的发展。所以现代社会，各行各业可以利用各种这类预置来施加影响以图谋得利。食品工业通过各种盐、糖、卡路里们的组合来制造让我们垂涎欲滴的食物，尽管肥胖症严重却无法控制自己的饮食习惯。互联网社交网络通过算法、界面设计、数据分析来穷尽对我们思维习惯的考察，吞噬我们的所有可用时间，即使明知不对还能让人就犯。它们采取的方法都利用到了四法则中的第二条，让这些行为变得有吸引力。科学家们发现习惯是由多巴胺驱动的一个反馈循环，当我们越是期望某一行为时，多巴胺分泌便越增多，从而更想要去行动，在这一循环中，是对某一奖赏的期望，而不是得到，使得我们去行动。书中用到的多巴胺激凸图很好的解释了这点。一个有效的让某一行为变得有吸引力的办法是「诱惑捆绑」，将这一行为和能让我们期待的另一行为捆绑在一起进行，在我看剧后，我会做一百个俯卧撑，类似上面提到的「习惯堆叠」\n- 人是群体性的动物，我们的习性会在群体生活中被塑造。哪种行为对我们有吸引力在一定程度上被我们的文化所影响。我们会不知觉的模仿身边的亲友、所处的族群以及自己的仰慕对象。利用这一点，我们可以根据自己想要培养的习惯加入到已将之视为平常的群体中，同时他们与我们有一定的共同点，如此来自然的培养习惯。此外，族群对我们的可能还有负面影响，以至于在把我们带偏，在本能做对的事情上做了符合大家的错误的决定。\n- 我们的行为在表面上看是渴望做某事，更深层的是对某种动机的满足（习惯发朋友圈：期望得到社交认同，习惯用搜索引擎：减少不确定性）这些渴望满足的动机，古来有之。找到这些动机，分析我们行为的目的，通过使坏习惯的戒断的好处变得明显来帮助戒断。通过在我们感觉良好的事情前植入想要获得的习惯让它变得有吸引力。习惯的成因是行为之前的预测，这些预测导致上面所说的情感动机。如发朋友圈，我预测会有人点赞留言，从而满足社交认同心理。当行为与预测匹配时，会反复的重复行为获得情感动机的满足，最终形成习惯。\n\n## Chapter 11-14 关于行为变化四法则第三条：让行动变简单\n\n- 习惯养成前我们应该更多的投入到行动中而不是计划中（摄影案例），能让行为成为习惯的关键因素不是时间而是它被重复的频率(联想到 spaced repetition)。当一个行为重复的足够多次后，它会变得「自行其是」，从而成为习惯。\n- 人天生是趋懒避累的生物，我们的行为自然会滑向那些所需努力最小的事物上，从某种意义上说每一个习惯都是你获得你想要的事物的绊脚石。因此，为了养成好的习惯，我们应准备好周身的环境，让其能减少我们行为的阻力，反之，为了戒断某个习惯，我们应采取反向措施，阻挠、降低我们行为的便捷性。\n- 日常生活中我们的行为有接近一半是出于习惯，习惯只是我们每天众多瞬间时刻的入口，却影响着接下去的时间。值得注意的是，习惯也经常会影响那些决定我们人生道路的决定性选择。选择犹如岔路口，一些会提高人生质量，一些让人堕入黑暗。因此习惯非常重要。作者介绍了一个「两分钟规则」，说的是当你要开始一个新习惯的时候，你应该少于两分钟来完成它。两分钟干的事情要尽量仪式化，其目的是让习惯尽可能的有一个简单轻松的开始。它的意义不在于做两分钟本身，而是掌握开始做事情这个习惯，再逐渐加强优化获得更深入的提高。\n- 第三条法则的反面是让行为改变变得艰难，用于戒断习惯。承诺机制的运用可以再当下做出好意的决定以期在未来得到好的行为，而这么做的最终目的是形成行为的习惯。作者举了雨果写书，朋友断网的例子。有些单次的决定还能带来长效的好处，如更换好的床垫、遮光窗帘等。我们还能利用技术手段来帮助我们断开坏行为，当然现在的社交平台、互联网大公司也正在做着相反的事情，用技术使人沉迷，攫取用户注意力。\n\n## Chapter 15-17 关于行为变化四法则第四条：让行动变的满足\n\n- 前面三条法则是关于当下的行为，即让当下的行为变得易于进行从而养成习惯；而第四条法则是关于让这一行为在下一次也能被我们乐于执行的方法。人类大脑的演化使得我们更容易倾向即刻的满足而不去想延迟的满足。坏习惯之所以能被养成，一个重要原因就是它们提供了即刻的满足感，无论是吸烟、甜食、性，它们在当下就能满足人们的感官刺激，然而长远来看，它们带来的问题却是灾难性的。而好的习惯，往往在此刻却是带来不舒服的，只有大时间尺度下才会体现它的益处。因此行为改变的准则是：即刻得到奖赏的被不断重复，即刻得到惩罚的则被避免。为了让我们能适应延迟满足，作者提出了一个技巧，它不违逆我们的天然人性，而是善加利用。即让每一次有益习惯行为的结尾插入一点「奖励」，让我们获得即刻的满足感。作者举了几个例子，其中一个是设立一个旅游账户，那么每次避免点外卖、吃甜食时就在往账户里存一笔小钱，获得即刻满足感。这样的满足感会对提升下次进行这一行为的概率，长此以往能重新建立你对自己的身份认同，最终得到好习惯的真正奖励。\n- 可视化的行为衡量方法有助于加强我们习惯的建立，一方面它加强行为本身，二方面也能提供一点满足感。这里作者引入了习惯跟踪器，它可以是你手写本子也可以用现代化的手法自动记录，习惯记录器的好处是1.它带来了视觉提示让你行动起来；2.激励你取得进步和不断掉记录继续保持行动；3.每一笔记录都是一种小奖赏让你得到满足。我们难免有例外的时候，但是无论如何始终坚持不要连续两次破坏一个习惯，那将变成一个新的习惯。还有需注意的是，习惯记录器本身也有缺点，一是它没那么好坚持，需要在习惯上叠加习惯，二是它可能会让我们偏离目标，作者引用了古德哈特定律，「当一个指标变成目标，它将不再是一个好的指标」，类似的还有坎贝尔定律。\n- 第四法则的反面运用，可以有效戒断坏习惯——通过让行为的结果得到即刻的惩罚，当然惩罚的力度要比坏习惯给的安慰强。除此之外，作者还介绍了「习惯合约」来帮助达成行为的坚持。通过与我们身边的熟人进行沟通，可以是口头约定，最好是书面承诺，并设置违背行为后的惩罚来督促我们坚持自己的习惯。\n\n## Chapter 18 关于天赋\n\n这章是关于如何开发和利用自己的天赋（基因），有点成功学意味。从事自己擅长的事情时习惯总是好培养的，或者反过来，因为你喜欢做这件事，自然就培养出了习惯，从而使之变成你擅长的。作者谈论的主要方法其实很直白：在开发你既得天赋的同时，去探索那些你可能擅长的领域，用谷歌的例子作者推荐将开发和探索的时间花费比例大概定在 80-90% : 10-20%。每个人都会有自己的一些特点，关键是找到并利用它们，并将它们组合运用，培养成习惯，使自己在某一领域得到发展。我们的基因现在已无法改变，但要让基因起作用，离不开努力工作，坚持习惯，并且没有这些 hardworking 你也不知道自己是否具备那样的基因。\n\n## Chapter 19 Goldilocks准则\n\n这个准则的名字来源于一个叫做「三只熊」的儿童故事，故事中一个叫 Goldilocks 的小女孩品尝了三碗不同的燕麦粥并说喜欢既不烫也不冷，温度刚刚好的那一碗。「刚刚好」这一概念很容易理解并且在各种领域学科得到应用。作者这里引入这一准则用来说明对于我们的做事动力而言，难度低了我们会觉得无聊，难度高了则备受打击，需要找到那个「刚刚好」可以应对的难度值，那么会让我们保持最佳的动力。当我们运用第三法则中的「两分钟规则」时，习惯若已建立，我们若不改变加深难度，那种轻易的感觉会很快让我们觉得无聊，从而让习惯又被放弃。科学家们发现要想在工作中达致心流状态，这项工作的难度值差不多要比你的能力高出4%左右。成功最大的敌人不是失败而是无聊。也许这也是视频游戏、小黄片、垃圾食品等等持续提供新鲜感的习惯被轻易保持下来的原因。这种「不确定性奖励」它不会令我们产生新的渴望（craving），却能放大渴望本身。\n\n## Chapter 20 好习惯的缺点\n\n习惯一旦养成，它的好处是能自动化的行动，让我们能有更多精力去掌握其他细节。但习惯还只是通向精通的必要要条件，而不是充分条件。要精通某项技能，除了习惯，还要关注任何值得改进的细节。而一项静止的习惯，往往会成为通向精通的阻力。因为它被自动化后，很难让人主动再对习惯精雕细琢，这一舒适圈刚好形成在我们的行为开始变得自动化的那一刻，也即我们开始感觉自己要精通某项技能的那一刻。对于任何习惯，反思与审查是长期优化的有效办法，可以让我们对自己的表现保持警觉。在习惯的养成中，我们会逐渐的建立自身的身份认同，当外部环境要求我们变化时，越深入的身份认同，越难超越和改变。我们可以做的是提取身份认同中的特质属性，通过这些搭配这些不同的特质属性来演变新的身份认同。\n","month":2,"country":"美国"},{"title":"斐多","author":"(古希腊) 柏拉图","start":"2022-02-21","finish":"2022-02-25","rating":8.4,"pages":"122","doubanLink":"https://book.douban.com/subject/26259073/","cover":"https://neodb.social/m/book/2021/11/02c4d5b6d0-8192-4120-88ff-a14339a22ade.jpg","review":"柏拉图的斐多篇，记述的是斐多回忆述说苏格拉底被雅典法律处死当天服药自尽时与好友们的对话。柏拉图通过苏格拉底之口阐述了著名的回忆说、理念论等哲学思辨。带着两千多年的人类科学发展、知识储备回看这一文本，苏格拉底的一些观点难免让我无法认同，但他对知识的谦卑、对哲学的追求并不妨碍我的崇拜，即使是两年多年后的现在我们仍然无法看清楚意识、灵魂。几年前我在微信签名上写下「皮囊易逝 灵魂不朽」，很惊喜的在书中看到了对应。","month":2,"country":"古希腊"},{"title":"说理","author":"陈嘉映","start":"2022-03-02","finish":"2022-03-15","rating":8.2,"pages":"428","doubanLink":"https://book.douban.com/subject/34996424/","cover":"https://neodb.social/m/book/2021/12/11b3187bdf-515c-4df0-a28d-e7e30f9482c4.jpg","review":"如果不是分成颗粒度较小的小节形式，这本书我要读完可能会更不容易。阅读过程中时常会神游书外，但也有一些章节看的会深有体会。如果把真本书的知识内容比喻成一张网络，那么我看到的点亮的只有零星的一些。还是缺少沉下心来的态度，而总想着完成自定的阅读进度。","month":3,"country":"中国"},{"title":"科学革命","author":"[美] 劳伦斯·普林西比","start":"2022-03-16","finish":"2022-03-19","rating":8.5,"pages":"288","doubanLink":"https://book.douban.com/subject/25777854/","cover":"https://neodb.social/m/book/2021/09/18501b9178-8490-4c92-b648-ee61776b4dd3.jpg","review":"这本书与牛津通识读本《科学哲学》以及库恩的《科学革命的结构》我认为可以作为中学生的必读书目。我们当下的生活是如此依赖于科学技术，「科学」甚至经常作为一个褒义词出现，科学主义无处不在，因此了解科学出处、反思科学、解构科学应是学习科学者的必经之路。本书通过言简意赅的文字表述，代表性的例子选取告诉我们科学是如何从自然哲学中脱胎而来，其中也不乏一些我们对科学史的错误常识辟谣。行文流畅，阅读感受轻松，可作为三本书中的第一本阅读。","month":3,"country":"美国"},{"title":"告白","author":"[日]凑佳苗","start":"2022-03-21","finish":"2022-03-24","rating":8.5,"pages":"256","doubanLink":"https://book.douban.com/subject/34809715/","cover":"https://neodb.social/m/book/2021/11/01139367ed-2952-4a42-9bb0-b53c4f1a839f.jpg","review":"「可见对于同一件事，因角度不同， 看法天差地别的情况在这世上比比皆是。\n」小说篇首的这句话便是整本小说的主题，电影《罗生门》抑或小说《竹林中》都早已出现，并不鲜见。但作者能以青少年犯罪为载体，通过案件当事人和相关人的角度对案件发生的始末和动机进行了解释，让每一次反转都发生在人性的拐角处，使得整本小说的可读性极高，同时在家庭教育、校园伦理、法律等方面做了实例化的探讨让小说的社会意义也上了层次。尤其值得推荐的是，作者并没有俗套的制造出一个皆大欢喜的结尾，来弘扬人性光辉。","month":3,"country":"日本"},{"title":"包法利夫人","author":"[法] 福楼拜","start":"2022-03-25","finish":"2022-04-02","rating":8.5,"pages":"302","doubanLink":"https://book.douban.com/subject/25897678/","cover":"https://neodb.social/m/book/2021/09/15735152cf-46f6-4171-a023-943cb460b301.jpg","review":"福楼拜以文字考究精确著称，我无缘读得懂原文，但即使是中译本，也能间接的感受一二。尤其是书中几个经典桥段，通过视角切换、通过对话主题对比将人物刻画的淋漓尽致，足见大师手笔。作为名著，尽管大致剧情早已被各种渠道剧透过。但读至结尾，内心仍能泛起波澜。\n\n这次读的是实体书，但同时我会打开微信读书对应的电子版，一来方便做笔记照抄，二来也想看看他人的阅读心得。令我诧异的是，在众多文字评论中，竟然有不少是在同情心疼爱玛的，甚至居然还有认为查理卑微下贱的。\n道德批判按下不表，我在阅读此书时对爱情倒有了点新认识。\n\n书中爱玛一开始追求的便不是浪漫的爱情，她要的只是浪漫本身，罗道尔夫也好，赖昂也好，都是满足她浪漫感觉的媒介，她从未真正爱过谁，所以也谈不上有真的爱情。\n\n理型对象只存在于她自己的心中，任何现实载体都只是对其理型对象的模本，再精确的模本也只能提供一时的惊艳，时间荡涤后，剩下的只有裂纹和细节上的误差。而这种误差便如同癌细胞般会肆意扩散，达至晚期时，任何当初的山盟海誓都已烟消云散，眼里只有这些误差，且揪着它们去攻击这个模本。人们抱着浪漫之情企图寻找自己的爱情，在一个惊艳对象上以为自己找到了，其实找到的就是这样的爱情模本。真正的爱情应当从那个人出发，归于那个人，而不要为了浪漫，为了契合，为了匹配。我又想起了康德的道德律令，爱情也一样，爱情的目的应该是其爱的对象本身，应以人为目的，而非拿人当工具。","month":4,"country":"法国"},{"title":"凶年（全2册）","author":"[美]大卫·西蒙（David Simon）","start":"2022-02-22","finish":"2022-04-06","rating":8.3,"pages":"790","doubanLink":"https://book.douban.com/subject/35352576/","cover":"https://neodb.social/m/book/2021/09/1571038444-4c21-45d8-a973-aa349892a73d.jpg","review":"在看过五季《火线》和两本《凶年》后，巴尔的摩已成为我的美国故乡。","month":4,"country":"美国"},{"title":"人间椅子","author":"（日）江户川乱步","start":"2022-04-03","finish":"2022-04-14","rating":8.3,"pages":"288","doubanLink":"https://book.douban.com/subject/6558046/","cover":"https://neodb.social/m/book/2021/09/1516e96306-ce27-4701-be21-4d4114639975.jpg","review":"寥寥数笔就能描写出离奇的氛围、荒诞的情节、细腻的心里，这便是大师的短篇。","month":4,"country":"日本"},{"title":"ルックバツク","author":"[日] 藤本 タツキ","start":"2022-04-18","finish":"2022-04-19","rating":8.2,"pages":"144","doubanLink":"https://book.douban.com/subject/35533868/","cover":"https://neodb.social/m/item/bangumi/2024/12/23/79c238ee-7d4f-4ec5-a460-77d8469d3a03.jpg","review":"成年后没看过漫画，这一部的观看契机是播客《迟早更新》以及Oasis的那首歌。很简短的一个故事，从文学意义上讲，我感觉并不值这么高的评分，当然，这本就是漫画，不是文学，所以我只能以一个门外汉的角度进行评价。","month":4,"country":"日本"},{"title":"中国历代政治得失","author":"錢穆","start":"2022-04-10","finish":"2022-04-27","rating":8.5,"pages":"178","doubanLink":"https://book.douban.com/subject/6803721/","cover":"https://neodb.social/m/book/2021/11/01c340ef17-a01a-4fdb-a179-1f4860343a63.jpg","review":"第一次读竖排繁体书，获益良多。从小接受的国内义务教育，对中国古代的政治、历史的所有观点皆来自教科书，填鸭式的教育让我忘了反思。而钱穆老先生这本书，让我重新认识了一遍中国古代政治。虽是一本不厚的小书，但内容覆盖范围极广，历代的皇帝与政府的关系、政府的组织架构、科举制度、赋税制度、兵役制度等拓宽了我的历史视野。钱老提出的历史意见与时代意见，制度与法术，封建社会的探讨也另我印象深刻，但也因为书小，有些观点看起来有些武断而缺乏论证。某种程度上本书让我联想到了费孝通白乡土中国，这也是本值得复读的好书。","month":4,"country":"中国"},{"title":"城堡","author":"[捷克] 卡夫卡","start":"2022-04-19","finish":"2022-04-29","rating":8,"pages":"287","doubanLink":"https://book.douban.com/subject/26986881/","cover":"https://neodb.social/m/book/2021/11/2714b973c2-2586-4628-8649-54524073568e.jpg","review":"读完包法利夫人接着读这荒诞的城堡，反差有点大，说实话，我感觉并不那么容易读下去。也许应该先尝试尝试卡夫卡的短篇。","month":4,"country":"捷克"},{"title":"The Almanack of Naval Ravikant","author":"Naval Ravikant, Eric Jorgenson","start":"2022-05-05","finish":"2022-05-12","rating":8.2,"pages":"242","doubanLink":"https://book.douban.com/subject/35219712/","cover":"https://neodb.social/m/book/2021/09/1601ff050a-256e-4c62-9e39-2217040ab7d0.jpg","review":"\n前言\n这本书的内容是关于过去十年 Naval Ravikant 的推特、播客和散文中的金句整理汇编。Naval Ravikant 于1974年生于印度新德里，9岁时随母亲还有兄弟一起搬到了美国纽约。他现在是知名的美国企业家与投资者，他是 AngelList 的联合创始人，董事长兼前首席执行官。他在早期投资了200多家公司，包括 Uber，FourSquare，Twitter 等。他在事业上取得相当大的成就，并在 Twitter 上分享自己的成功之道和人生思考，这本书就是这些内容的汇编。\n\n总体来讲，这本书在豆瓣以及 Goodreads 上的评价都相当高，但就内容而言，我觉得还是有点偏鸡汤的。当然，我并不反对鸡汤，能间或的喝上几口对于身体思想也不无裨益。我一直以来都觉得与其阅读成功者关于自己成功的秘诀，并不如观察失败者分享自己失败的原因有价值，因为成功往往会有偶然性，而失败往往蕴含更多的必然性，然而市面上少见有关于失败者分享自己失败经验的。大概，失败者并不那么容易开口分享。\n\n以下是我在阅读这本书时作的一些记录，因为读的是英文原版，所以这些记录大致上是翻译了作者的原话。当然，作者书中的内容会更具体，而我只是摘抄了我认为有启发性的东西。内容遗��是不可避免的，甚至观点传递上也难免有所疏漏，权当自己的记录，若你对书本感兴趣，还是得自己亲身阅读。就语言风格而言，Naval 的用词朴实易懂，就我的英文水平而言几乎没有阅读障碍，将文本当作英文语感训练也是不错的。\n记录\n1. 财富和金钱不同，金钱的获得来自于出卖自己的时间或者劳动力，而财富则是你在睡觉时也能给你金钱积累的东西。要获得财务自由，要将经历时间投入到财富的积累上，而不是金钱的积累。\n2. 现代社会到处都是能获利的杠杆 (leverage)，将经历投入到自己感兴趣的事业上，将要做的事情成为目的 (for their own sake)，而不是手段，往往能将事情做的更好而获得更高的回报。 注：杠杆* (leverage) 就像一个放大器，它能放大你的回报，过去的社会通过出卖劳动力来拿回报，工作几个小时就只有固定的几个小时的薪资，而现在不同，通过资本运作、公司、技术、生产力，能让一项工作成倍的得到回报。代码工程师是一个非常好的说明例子.*\n3. 如果社会能通过训练你完成一项工作，那么同样也可通过训练他人来替代你的工作。\n4. 忘记财富与贫穷的对立、忘记白领与蓝领的对立，现在的对立是有杠杆和无杠杆之间的对立。有三大类的杠杆：1、劳动力杠杆——其他为你工作的人，2、金钱杠杆，上个世纪主要的杠杆形式，3、一个全新的杠杆——没有复制成本的产品，包括书本、媒体、代码。其中代码可能是最强大的无需许可的杠杆。\n5. 一周40小时工作制是工业时代的残余。知识工作者的工作更像运动员——训练和冲刺，然后休整和评估。\n6. 销售 (sell) 与创建 (build) 是成为伟大技术公司一员的条件，这两个概念都有宽泛的定义，如果两者你都不会，那么开始学习。\n7. Accountability（不知道如何翻译，暂且称为责任等级）随着所处工作层级升高而升高，责任等级越高则能拥有更高的杠杆，如底层的房屋装修工是没有责任等级的，他的责任等级属于他的包工头，扩大自己的责任等级，是增加杠杆的有利途径。\n8. 对从事的事情要拥有所有权和股权，所有权能让你主动的去做事情，而股权则是你获利的杠杆，让你能有被动 (passive) 的收入。\n9. 要以你的判断获得报酬，而不是时间。一个被验证过有判断力的人，辅之以高责任等级和良好清晰的记录，是积累财富的关键。例子：巴菲特。\n10. 将时间计入你的每个决定中，量化你的时薪，从而判断做一项事情是否值得。这个量化要超过你自己当前的预期，直到让你觉得荒谬的地步。\n11. 财富积累是近代社会演化出来的正和游戏，而社会地位则是一个零和游戏，那些攻击创造财富的人，经常只是为了寻求社会地位。\n12. 在哪个城市、和谁在一起、做什么工作，是值得我们好好思量的事情，人们往往轻易决定这几项事情而将生命中的大部分时间居住在某个城市，和某个人在一起，做某一项工作。\n13. 退休就是当你不用为了想象的明天而牺牲今天的时光。当今天已让你自足，你也就退休了。\n14. 遇见好运的四种方式：1、希望好运降临 2、忙碌的准备，跌跌撞撞进好运 3、练就识别好运来临的眼光并抓住它 4、成为某方面独一无二的能手，好运自会来找你。\n15. 你不会因为花时间去省钱而变得富有，但你可以省时间去赚钱而变得富有。\n16. 当代经济社会，努力工作是一项被高估的能力，而判断力则是被低估的能力。你前进的方向比你前进的速度更重要，尤其是在加上杠杆的时候。\n17. 清晰的思考者是比聪明更好的恭维词汇。一个清晰的思考者能串联最基础的知识，用最简单易懂的语言讲述复杂的概念。只知道概念者，只是在记忆，而不是真的学会。\n18. 紧张源于你认为你所是，松弛源于你所是。——佛家谚语\n19. 不要被身份、标签所累，要重估最底层的原则，如果你的行为想法能非常切合某一主义思想，那么你要开始高度怀疑自我了。（与原子习惯里的培养习惯方法相违背）\n20. 当你想要批判一个人的时候，不要去批判那个具体的人，而要去批判他的这类行为和行事的方法；当你想要赞美一个人，找到最能符合你要赞美品质的那一个人，然后去赞美他。如此，人们的自我和身份认知就不会与你对着干，而是来帮你的忙。\n21. 在决策阶段，大脑就像一个记忆预测机器，会根据过往的经验来预测当前的情况。但是这一预测最好是有一些原则和心智模型的支撑，否则只要环境改变则预测就失效。建立心智模型的最有效方法就是读书，每天都一小时科学、数学或哲学书，可能让你在七年内成为人类成功的上层梯队中的一员。\n22. 大脑的空间是有限的，神经元也是有限的，但我们可以通过各种形式的记录，把它们当成指针、地址或助记符来记录有潜在经验支持的根深蒂固的原则。\n23. 了解一点复杂理论，会让我们知道人们是多么的无知，是多么的不善于预测。\n24. 多了解一些微观经济学、博弈论、委托人-代理人问题，有助于创办公司。\n25. 如果你拿不定主意，答案就是不，例如是否嫁给某个人、是否接受某个工作、是否搬去某个城市，因为现代社会总是充满选择，通过互联网人们是高度连接的。\n26. 如果你在做一个难分伯仲的艰难选择，选择那个会带给你短期痛苦的。因为大脑会因为短期的痛苦而给另外一个选择加分，要有长期的眼光，利用复利的概念去看待问题。（short-term pain, long-term gain）\n27. 读你所喜欢的，直到你喜欢读。（一个值得思考的教孩子的观点）\n28. 先建立读书习惯，喜欢读书的想法。读书的时候跳读、选择性阅读、把握内容主旨，专注于那些能带来预测能力的新概念。不要畏惧难懂的书，因为有阅读压力，才表明你在阅读中有所收获。\n29. 一本书不一定要从头读到尾，可以从你喜欢的地方开始，不要有心里负担。\n30. 学好逻辑与数学，一旦你掌握好这两门技艺，那么没有书会再难倒你。\n31. 阅读时要有牢固的知识基础，因此要读经典，读知识流派的开创者。\n32. 任何经历两千多年还能流传至今的书，都是经过无数智者过滤后的选择，这些书中的一般原则大概率都是对的。\n33. 一个平和的心态、一副健康的身体、一个充满爱的家庭，这些东西是买不到的，它们只能靠挣取。\n34. 生命中最重要的三大件是财富、健康和幸福。我们以这样顺序去追求它们，但就重要性而言却是倒过来的。\n35. 也许幸福不是通过遗传或者选择而得，而是一个高度个人化的技巧，它可以被学习，就如健身，就如事业上的成功。\n36. 幸福来自于对外部世界的接纳，以一种中立的视角达致的一种平和安宁的心态。\n37. 安宁市休息时的幸福，幸福是运动中的安宁，你可以随时将安宁与幸福进行转换。\n38. 几个能让自己变得幸福快乐的小技巧，需要虔诚的练习：\n1. 冥想，带着目的去冥想，思考理解自己的心智是如何工作的。\n2. 知晓自己的每时每刻，如果想批判某人，停下来想一想这么做的积极意义是什么？\n3. 更多的接受阳光，向上看，保持微笑。\n4. 每当发现自己渴望某事物时，问问自己是否没有这个事物我就将变得不幸福？你会发现多数时候并不是的。\n5. 不摄入咖啡因让我更幸福，让我情绪更稳定。\n6. 每天锻炼让我更幸福。\n7. 批判的越多，你就越与自己分离。有那么一瞬你会觉得快乐，因为你觉得自己比别人好，但随后，你会觉得孤独，随之产生负面情绪。世界只是反映了你自己的感受。\n8. 告诉你的朋友们你是幸福的，然后你会被迫遵守它。你的朋友也会期望你是一个幸福的人。\n9. 通过最大限度地减少对这三个智能手机应用程序的使用来恢复时间和快乐：电话、日历和闹钟。\n10. 你的秘密越多，你将越不快乐。\n11. 没有例外——所有屏幕活动都与较少的幸福相关，所有非屏幕活动与更多幸福相关\n12. 政治、学术、社会地位都是零和游戏。正和游戏创造积极的人。\n39. 如何学会接受不可改变之事？从根本上说，只用一招：拥抱死亡。没什么可留下的。我们都会离开。我们的孩子将会离开。我们的作品将是尘埃。我们的文明将是尘埃。我们的星球将是尘埃。我们的太阳系将是尘埃。在宏伟的事物计划中，宇宙已经存在了一百亿年。它将再存在一百亿年。而我们只不过是其中的一瞬。\n40. 医生不会让你健康。营养学家不会让你苗条。老师不会让你变得聪明。导师不会让你平静。导师不会让你变得富有。运动鞋不会让你健康。最终，你必须承担责任。拯救自己。\n41. 没有人能比你更能做你自己，倾听和学习，但是不要模彷，每个人都是独特的存在，每个人都有自己特定的知识、能力和渴望，世界上没有其他人能做到。\n42. 你认为什么习惯对你的生活影响最大？日常的晨练。\n43. 过多的糖分导致身体的肥胖，过多的分心导致心灵的肿胀。\n44. 自然用数学说话，数学是我们对自然语言的逆向工程。\n45. 生命是否有意义？我有三种可能的答案：1、意义是个人的，你要自己去找意义；2、生命没有意义，一切事物都将灰飞烟灭，宇宙归于热寂；3、时间之矢源于熵增，熵增不可逆，宇宙终将归于热寂，而我们所有行事的意义便是加速熵增，加速热寂的到来，让能量分散，让我们成为同一。\n46. 什么是你的核心价值观？1、诚实，对自己诚实，不要看人行事，离开任何我无法诚实以待的人；2、我不相信短期的想法或交易。所有生命中的好处都来自复利，不管是金钱、关系、爱、健康或者习惯。我只想与我认为会余生相伴的人在一起，我只做能在长期上有回报的工作；3、与人相处，我相信同伴关系，我不认可等级关系；4、不要生气，也不要与易生气的人在一起。\n47. 越老的问题，需要越老的答案。\n\n","month":5,"country":"美国"},{"title":"学术与政治","author":"[德] 马克斯·韦伯","start":"2022-05-04","finish":"2022-05-16","rating":8.3,"pages":"264","doubanLink":"https://book.douban.com/subject/35489050/","cover":"https://neodb.social/m/book/2021/12/066af7522c-70fd-49a2-b217-122c9339ea80.jpg","review":"虽说是给大学生的演讲稿，但我读起来还是颇为艰涩，以《以学术为天职》倒还好，还能看的津津有味，尤其是韦伯谈到世界的祛魅，心有戚戚焉。但后面《以政治为天职》和关于《客观性》的这两篇以我目前的能力还着实无法看进去，留待以后有机会再学习吧。","month":5,"country":"德国"},{"title":"希腊棺材之谜","author":"[美] 埃勒里·奎因","start":"2022-05-16","finish":"2022-05-26","rating":8.3,"pages":"383","doubanLink":"https://book.douban.com/subject/3112726/","cover":"https://neodb.social/m/book/2021/09/16eb2010e6-e781-42c3-8455-3c77a02837a1.jpg","review":"一波四折，案中有案，结尾的反转着实没有想到。奎因动不动就拉丁文法文的引用我觉得也是此书的一处妙招。","month":5,"country":"美国"},{"title":"洞穴奇案","author":"[美] 彼得·萨伯, Peter Suber","start":"2022-06-01","finish":"2022-06-10","rating":8.7,"pages":"208","doubanLink":"https://book.douban.com/subject/35183164/","cover":"https://neodb.social/m/book/2021/09/16fbf23335-9031-4309-92eb-2c88e9a70cd9.jpg","review":"一开始被书名吸引，一位这是一本推理小说，直到翻开看了前言，才发现这是一本虚构案件读法官陈词。读完虚构案件难免会联想到此前看过的哈佛大学公开课_Justice_里探讨过的类似内容，一个是电车难题，另一个是英女王诉杜德利与斯蒂芬案的真实案件。无论是哪一种情景设计，最终是让按钮决定的人，让法官限于法律与道德的两难之间。\n\n此书由富勒首版于1949年，他虚拟了5位法官的精彩陈词，50年后由萨伯再次接续虚拟了另外9位法官的不同陈词。就我个人感觉而言，富勒的5位法官陈词位认为更加短小精悍，在法理道理的探讨上更为聚焦，而萨伯的9位法官也许因为可供分析的角度越来越少的缘故，在内容铺陈上略显松散，观点十二甚至有凑数之嫌，观点十三则过于激进。\n\n总体而言，阅读这本书就是一场思辨盛宴。在这里我们将读到一个关于区分实定法和自然法、法律语言和法律目的、司法职能和行政职能、司法性立法和立法机构立法、公义常识与立法精神、立法司法与道德关系、紧急避难抗辩与「故意」词义、法官的自由裁量权等的学术性专题讨论。\n\n作为一个非法学专业的普通人，遇到这样一个巧妙设计的案件，以法官角色代入，自己该如何做出判决呢？这本身就是一件有意思的事情，它需要我们援引法条说服自己的同时还要说服众人。然而不同的人对同一件事就是会有不同的观点，像前言所述，这个案例并不是富勒的结论，而是他的提问。\n\n在此，我也不自量力想提一点微小的看法，是关于紧急避难抗辩的。尽管在陈词中，有的法官支持杀人者的紧急避难抗辩，有的反对，但我的一个反对意见，没有出现在法官陈词中：我们首先假设杀人者即幸存者们的紧急抗辩成立。根据霍姆斯法官提出的，如果杀人对于船上的人的存活是必要的，那在法律上就是正当的。也就是说杀人者吃被杀者威特莫尔的肉而幸存是必要。现在，假设在杀人者行凶的当下，威特莫尔有一股突如其来的求生欲望，在被杀人者围攻的某一时刻，突然暴起将其中一位反杀，那么威特莫尔这一行为是否也属于紧急避难？根据霍姆斯法官的观点，显然威特莫尔的杀人对他的存活是必要的，在法律上是正当的，也是紧急避难。于是，在一场杀人事件上，正反双方都具备了紧急避难条件，这显然是可笑的，这样的杀人事件无论结局如何都没有错的一方，杀人不问对象，只要有结果就成了正义。\n\n","month":6,"country":"美国"},{"title":"禅与摩托车维修艺术","author":"[美]罗伯特·M.波西格","start":"2022-05-21","finish":"2022-06-11","rating":8.2,"pages":"494","doubanLink":"https://book.douban.com/subject/30208077/","cover":"https://neodb.social/m/book/2021/09/18b3d10c71-5e6c-49a2-a851-92b1123a2db5.jpg","review":"书本叙述时穿插着两条世界线，一条是作者与儿子的骑行之旅，另一条是在前者的肖陶扩中回忆那个曾经的他「斐德洛」在精神分裂前的思想之旅。书本探讨的精神主题多元，包括教育、科技、艺术、宗教、哲学、修辞学等，倒是与书名中的禅相关的内容寥寥无几，最核心则是关于「良质」的阐释。为了调和古典理性与浪漫主义，主体与客体，斐德洛提出了良质，尽管良质难以或者根本无法定义，他仍试图以各种方式去解释描述，甚至还在老子的《道德经》、佛陀、印度教等中找到了对应。斐德洛有强大的勇气去挑战柏拉图与亚里士多德的哲学观，但我并没有在书中看到与之匹配的思想解释。全书给我留下最深印象的是关于庞加莱的那一段文本：按作者的意思，庞加莱的约定主义——事实是基于理性美学而预先选择的。数学发明者的真实作用在于选择这些组合，以便减少无用者，或者设法避免制造它们的麻烦。以欧几里德几何公设举例，选择不同的第五公设可以以推出形式完备的其他几何，如罗式几何、黎曼几何。这一看法并没有回答真理何以可能的问题，因为按照约定主义，真理只是加以喜好的选择，而无真实的客观性，科学现实的源头不过是一种主观的、反复无常的和谐。而斐德洛的良质能在此扮演调和的角色，作者认为事实的预先选择并非基于主观的、反复无常的“任何你喜欢的东西”，而是基于良质，即现实自身。良质是一个二元的、主观-客观的形而上学系统中的第三个形而上学实体。 ","month":6,"country":"美国"},{"title":"阿莱夫","author":"[阿根廷] 豪·路·博尔赫斯","start":"2022-06-07","finish":"2022-06-19","rating":8.3,"pages":"203","doubanLink":"https://book.douban.com/subject/25796122/","cover":"https://neodb.social/m/item/book/2023/11/17/c7b20e8a-cb42-4b22-b300-e4e51475cf18.jpg","review":"博尔赫斯玩转的时空如迷宫一般难解。","month":6,"country":"阿根廷"},{"title":"How to Take Smart Notes","author":"Sönke Ahrens","start":"2022-06-13","finish":"2022-06-22","rating":8.5,"pages":"176","doubanLink":"https://book.douban.com/subject/30216624/","cover":"https://neodb.social/m/book/2021/09/15bbb95fa9-c023-47d6-98ee-e8a2ee5539c7.jpg","review":"本书的主线是论证卢曼笔记法何以优秀，但之所以不能将其看成是一部如何做笔记的手册，是因为作者还提供了践行这种笔记法的 How and Why，因此有不少读者批评作者有凑字数之嫌，我并不认同。作者在论证过程中也充满其他具有颠覆性的知识，如幸存者偏差、蔡格尼格效应，记忆技巧、意志力研究，学习原理等等，他们都被合适的编排在与卢曼笔记法制作相关的背景之下。尤其是作者在书中多处驳斥了传统教育对学生以主题指导方法写作的弊病，指出头脑风暴的问题令人印象深刻。毫无疑问作者也在践行卢曼笔记法，我们有理由期待假以时日作者也会有更多优秀作品诞生。\n\n不同与以往的根据主题发散，通过头脑风暴，再去阅读进行写作的自上而下的过程，卢曼的方法是反向的自下而上的过程。在阅读中进行积累——卡片制作。通过闪念卡片、文献卡片、永久卡片，逐渐累积知识，再通过让卡片之间建立连接，通过索引标志方便的找寻卡片，从而让某个写作主题自然浮现，因此当要就有关主题进行写作时，只需要去参考自己积累的卡片就能水到渠成。\n\n这种方法大大减少了就一张空白纸开始写作时那种抓耳挠腮的困难，将重要的工作放在了平时的阅读积累、笔记制作上。人的心力和精力都是有限的，我们能同时处理的多任务研究表明最多只有7件事情左右。而且多任务处理会使我们分心，减短持续注意力的时间。尽管很多人以为自己在这种多任务方式下工作会更有效率，但有控制对照组的实验表明，长期实践多任务的人不仅在任务质量上会变差，同时还会损害他们回到顺序任务时的效率。卢曼笔记法的工作流可以避免多任务处理问题，帮助我们更好的集中注意力。它可以将写作时的不同任务分层，提供一个清晰的可分离的任务结构。因此通过工作流的建立，利用卢曼卡片能将任务结构外化，分解成一个个子项，一个时间只做一件事情，将头脑从用于短期记忆的压力中释放出来，更多的去做思考上的事情。不仅如此，这种方法相比主题发散的方法，在阅读内容越多，笔记越多的时候，会更有优势。因为它不仅不会让主题下面的内容过多而显得凌乱，却能增加不同知识之间的连接。\n\n每个人都天生带有认知偏见，我们会喜欢与自己认同的人在一起，也会欢迎那些让我们认同的观点。自上而下的笔记方法，即先确定主题再进行阅读写作的方法，更容易让我们带上固有的认知偏见去做研究，在阅读中我们会更倾向于去挖掘那些符合我们既有观点的文章。而自下而上的方法，即卢曼笔记法，能有效的避免这种认知偏见。我们没有带着某个主题和目的去阅读，做笔记尽管有所取舍，但标准并不是支持与反对，而是相关与不相关。然后发散，连接以往笔记内容，当需要写文章时，在笔记卡片盒里找出那些做好的永久笔记，稍微修改一番就能使用。\n\n一般认为人们学习新[知识](https://www.notion.so/p-27a0d7cdfd404f4a81e7b983cac9219e) 的能力随着年纪的增长的确是衰退的，毕竟任何人的脑容量都是限定的。但是随着年岁的增长，我们已经内化的知识之间的练习却是越来越紧密的。如果将新知识看成是孤立的知识，的确，比起年轻的自己，我们接受新东西的能力会差一些。如果将新知识与我们已有知识建立连接，让其对接在我们已经内化的知识之上，成为我们思想网络中的一个节点，相比孤立知识，毫无疑问我们能更快的学习它。而卢曼笔记法的关键作用就是在于建立这种连接。我相信没有哪个知识是“孤立无援”的，如果有，它就不是知识，而只是信息。只要有知识背景，我们总能找到新知识与其的连接之处。而这种连接开始构建后，会形成正反馈，随着知识的增多，他的扩大不是线性的，而是指数级的。\n\n制作卢曼笔记的时候，一个关键点是不能原封不动的摘抄文本内容，而是要用自己的语言进行精简重写，因为只有动笔重写的时候你才能将注意力从文本内容转向文本的框架、模式和类别上来。因此通常我们学生被教育的阅读方法，在阅读的时候划线，更多的只是带给我们一种在阅读的假象，当下次碰到类似的内容时，曝光效应会让学生们觉得那些熟悉的知识就是已经理解的知识，实际上，他们根本没有将这些知识内化。这让我想到我们当下的“为你读书”类的播客节目。这类[知识](https://www.notion.so/p-27a0d7cdfd404f4a81e7b983cac9219e) 播客以为你快速读书，掌握书中知识为卖点宣传，界面上甚至会显示你用了XX小时、听了XX本书，一看就是满满的学富五车感。这种知识虚荣感不仅只会让听者失去了真正阅读书籍的机会，而且还会让他产生一点关于某类知识的模糊而不坚实的印象而导致认知偏见。真正的知识掌握，不仅要方法，也要下功夫，这是毫无疑问的。好比为了获得好的身材，去健身房却只是请一个教练在你面前演示怎么锻炼是没用的，一定要自己上场，出汗。因此研究得最多、最成功的学习方法是“详细阐释”(elaboration)。\n\n想写出一篇好文章，你只需要有一篇好的草稿，想要有一篇好的草稿，你只需要将做好的笔记转成连贯的文字，而这一系列的笔记就是你用卢曼笔记法做笔记时存放在 Slip-box里的。你真正需要做的是拿起笔，去阅读。卢曼笔记法让记笔记的学者不在成为学术研究的中心，他更像一只勤劳的蜘蛛在编织他自己的知识之网，而学术的主体、成果、论文便是被这张网捕获的猎物。\n\n阅读完这本书，我不敢说自己能完全明白卢曼笔记法的准确步骤和流程，但是作者在论述 How and Why 的时候还是给我提供了很多意想不到的洞见和采取行动的鼓励。在具体的工具选择上，我纠结于 Obsidian 和 Notion，前者能提供更加方便优美的双链形式，而后者在电脑端和移动端的体验更加一致，而我又是免费的 Team Plan 用户。因为一直在 Notion 做读书笔记，最终还是选择继续在 Notion 上开展新的笔记方法，根据我的粗浅理解以及条件限制，我暂定的笔记工作流如下：\n1. 先带着输入设备（电脑、手机）阅读文本、划线->\n2. 为了不影响阅读，收集完一天的划线后，重写关键内容进行摘记->\n3. 摘记时用关键字插入[[]]的 link to page，这些关键字全部集合在一个 slip-box 的 page 里，因为 notion 支持双链，所以能在关键字的 page 页面下看到所有 backlink->\n4. 根据不同文本的摘记积累，对关键词page内容做更新扩充，形成主题->\n5. 不同关键词 page 之间也会根据类似主题进行 link（因为即使不同主题，也会有重叠的知识内容）\n最终效果是文本的摘记之间会互联，由摘记产生的关键字主题之间会互联。这是我阅读这本书时开始尝试的笔记方法，从直觉上来讲，比我之前囫囵吞枣般的划线归档会好，最终效果如何，还是要用时间来印证。","month":6,"country":"美国"},{"title":"杜撰集","author":"[阿根廷] 豪·路·博尔赫斯","start":"2022-06-21","finish":"2022-06-24","rating":8.3,"pages":"92","doubanLink":"https://book.douban.com/subject/25796061/","cover":"https://neodb.social/m/item/book/2023/11/17/8fdf217d-445f-4240-8d9c-a7fde42989e3.jpg","review":"对我而言，比阿莱夫好看些，我喜欢其中的三个故事，第一个和最后一个以及中间的死亡与指南针。","month":6,"country":"阿根廷"},{"title":"六论自发性","author":"[美] 詹姆斯·C. 斯科特","start":"2022-06-19","finish":"2022-06-28","rating":8.5,"pages":"230","doubanLink":"https://book.douban.com/subject/30441554/","cover":"https://neodb.social/m/book/2021/09/154a0c61e5-40e8-41de-9762-cee12b93f8d3.jpg","review":"# 六论自发性\n\n## 前言\n\n本书原著首发于2012年，作者是人类学家詹姆斯·C·斯科特。全书内容可以概括为表达一个[无政府主义](https://www.notion.so/p-d9727011fff94dd6bf2fb0bcc51ee1e2) 思想者关于国家、关于革命、关于平等的想法。\n\n作者从无政府主义的角度观察当今的国家政治、教育、公共讨论、景观设计等议题。无政府主义的最大特点是互惠性，是不经等级制度和国家制度达成的合作。19、20世纪间，科学的极大发展导致“世界的祛魅”，使得无政府主义者以为科学将解决一切问题，取代政治，由专家来治理世界。但由于市场经济的发展，导致不存在纯粹的民主制，其制度内的机构都掌握在买主手中，导致在现存制度内解决问题的希望渺茫。而大规模的反抗和运动会演变成政治权威与法西斯主义。国家摧毁了自愿合作所产生的自然的积极精神和责任意识。导致我们失去了互助的习性。\n\n同时作者认为当下的社会科学自满于精英主义者的视角，而忽视无产者、农民等的目的、价值和实践，只拿他们填充社会经济数据中的数值。在书中对此作了重点批判。\n\n全书提出了许多现今社会的问题，尽管没有提及多少解决方案，但无政府主义者视角对我而言颇为新颖，彻底改变了我对这个政治词汇的认识，是一次非常有收获的阅读，以下是我做的各章摘抄换穿插的一点微不足道的想法。\n\n## 第一章\n在前文所述背景下，本书第一章作者定义了一种“日常形式的抵抗”，它极少进入历史记载，却暗中对政权、国家和军队产生了巨大的、常常是决定性的影响。贫民，农民等下层阶级匿名、沉默，且往往是共谋的方式行使这种违法的抵抗，偏爱这种小“小打小闹”似的日常操练，能减少公开抵抗带来的风险。“政治特技”具有榜样效应的传染性，它来自于少数抵抗者起初的观察和默会协同，在没有遇到极大的体制惩罚时，它能形成病毒式扩散传播，那便使得无政府主义操演有了后续的可能。反观三个世纪来的所有解放运动，都是从最初的几个勇敢灵魂挑战既定的法律框架开始。而这种挑战往往来自于自发的行为，如果有机构代理，仍处于制度框架内，则这种抵抗容易被消解。本章最后作者还探讨了权力与倾听的关系，Charisma式领导在得到权力的过程中需要 Call and Response，他的领导魅力风格是被他的选民所塑造和选择的，而极权主义国家的决策者，很可能处于一个臆想的世界，因为他们不需要倾听。\n\n## 第二章\n本章是关于民间秩序与官方秩序。作者认为民间秩序的消亡源于无政府主义的宿敌——民族国家的崛起。偏离常规的民间实践被国家制度处理，国家级别的同质化工程（如统一方言）也进一步促成民间实践的消失，除此之外国际组织的标准化制定也将民间实践排除。官方实践是一种流水线工厂似得实践，它能实现权力中心对物质和工作流的极大控制，如福特T型车工厂、麦当劳汉堡制作。子随父姓也是一种以监管规训为目的随国家发展而普及的官方实践。命名、景观、建筑和工作流程的特定规划，显示出了秩序、理性、抽象性和系统简洁性，这使它们为等级制度中的权力所用即官方实践。然而很多时候，这种强制性本身是一种折中的妥协方案，无法适应个异性场景，作者举了几个科学种植的林学为例子。归根结底，失败的原因在于对特定情况缺乏认知，照搬成功模式而缺少对新环境的考量，思考过于简化而导致的反科学。而民间智慧与技艺就是在此场景下不可或缺的知识，他们有当地的成功经验、灵活的应对技巧。作者再以雅各布斯对现代主义城市规划的三点批判为由驳斥全盘的官方实践思路。雅各布斯认为现代主义的城市规划强调视觉秩序和功能分区。以效率最大化实现为实践宗旨却忽略的三件事：1.规划者的计算公式立足于指标效率而忽略了人类行为中蕴含的丰富目的性。2.人们喜欢混合型的功能多样的城区，这些城区也会因时而变。3.现代主义城市规划伤害了民间秩序，它试图将城市变成没有灵魂的艺术品，而不是「生活着的」城市。规划师们缺少的是民间体察，对生活在城市中的人民的生活的了解，而这本该是城市规划的出发点与归宿。\n\n## 第三章\n本章关于人的塑造。人类作为哺乳动物与其他动物的一个重要区别是将游戏作为人类的第三大无目的行为。作者举例引用了开放性的探索游乐园��例，说明它们比常规游乐园更能给孩子带来玩耍的目的性、创造力和热情。它是一则关于无政府状态的寓言、一个自治社会的模型。设计这种开放性乐园表达了创作者的谦逊， 这种谦逊将游乐园的形态交由孩子自己完成，包容孩子的天性与创造力，意味最低程度的监管，是反家长式领导的（paternalism）。与之相反的是学生宿舍的标准化装修。这让我想到另外一个点，在学校和教室这一封闭区域内，教师是权力的中心，底下的学生全都被权力所注视，形成福柯所说的全景敞视场景， 为我们展示了一种微观权力技术在现代社会中强大的[规训](https://www.notion.so/2c6d026aca824738b2fe8cf80ece4528)作用。作者还举了两座不同设计的战争纪念碑的例子来说明开放性带来的意义。前者是华盛顿越南战争纪念碑，其开放性的设计让其承载访客自己的含义、历史，访客能以时间线索找寻逝者名字，比起冰冷的整齐的字母排列，更容易让悼念之人找到回忆的入口，完成纪念的意义。而后者硫磺岛纪念碑则更多的是战争标志的雕像，它更多的向访客传递纪念碑的信息而非完成纪念的意义。接着作者讲了效率与开放性的矛盾问题。效率建基在稳定性的基础之上，从而与开放性、适应性是背道而驰的，而人之优于动物者，在于其强大的灵活性与适应性。效率观念有两大缺陷：1.过分依赖稳定，稳定实际上是特例；2.忽略人的因素，效率与人的积极性密切相关。衡量一项制度的优越性除了经济视角，还能从制度对人的改造方面着手。但相比于GDP，我们并没有一个可准确计算的GHP（gross human product）作为参考。作者提出两个参考标准：1.人在工作中的能力成长；2.人在工作中的自我满意程度。接着作者着重批判了流水线生产，因为其发明目的就是为了消解工匠-工艺知识，建立在劳动力“愚蠢化”的基础之上，是一种伤害劳动力技能和知识的制度。再从权力的分配角度看，流水线的决定权仅掌握在少数工程师手中，造成的是负的“净民主生产”（net democratic product）。一个与流水线非常相似的类比是全民公共义务教育。这一教育就如一条产品单一的生产线，主要目的是生产社会劳动力。衡量标准单一——产出分析型智能。在这一标准下将牺牲众多拥有其他天赋的学生，而社会的成功需要的是多种多样才能人，而不是单一的分析型智能。这种教育现状在我们国家表现的尤为强烈，近几十年教育的内卷程度越来越高，尽管意识到我们在一条错误的赛道上已经使出浑身解数，但现实的残酷，条件的约束，让我们不得不去拼命，我想不到有更优的解决方案，先跑着可能是最不坏的选择。也许我已经患上作者说的“制度性神经症”（institutional neurosis），缺乏同情心与主动性。我们从小就生活在一个个机构（制度）之中，家庭、学校，军队、企业，这些机构优根深蒂固的层级结构和集权管理模式，服从是我们在其中生活的唯一选择，[集权](https://www.notion.so/2ebedd9c8b6a492991f2e8ef7842dd45)环境对塑造人格具有深远影响，作者例举了斯坦利·米尔格姆实验、斯坦福监狱实验来论证。这一碎片的名称作者取为“机构生活的病理学”非常贴切。在集权式的制度机构中，人们往往悬置了自己的独立判断选择服从习惯、服从秩序要求，但就目的而论，这种服从并不一定会带来好结果。本章结尾作者以移除交通信号灯为例，在实验中由于没有交通信号灯，驾驶者会更谨慎，更多的发挥自己的智慧判断、注意力，反而能提升安全性。作者认为，移除信号灯款以被视作对行车负责和公共礼仪的一种温和训练，这一概念也在本书p29第一章无政府主义操演中出现过。这段关于红绿灯的内容让我回想起几年前看的美剧《航空炸弹客》里的类似场景，主角在空无一人的街道上等红灯思考这么做的意义，他觉得这是现代技术与工业化对人的侵蚀。\n\n## 第四章\n这一章作者想为小资产阶级正名。历史上小资产阶级一直是被鄙视的一个阶层，一方面他们被认为是贪利的骑墙派，时刻不放弃成为大资产阶级的渴望，另一方面小资产阶级高不成低不就，只可共享乐无法同吃苦。除此之外作者认为还有一个结构性原因在于他们总有逃避国家控制的办法。作者想论述小资产阶级出于两个原因，一是他们代表的自主、自由与无政府主义情怀核心只差了互惠，二在任何政治体系中他们都承担了重要的社会经济功能。这里作者对小资产的定义较为宽泛。我们认为的无产阶级的贫农也被作者视作小资产阶级。而小资产者梦想受挫时标准的革命导火索，如「耕者有其田」式的农民土地革命。总之，作者在小资产身上看到了强烈的自主、自尊的追求。在社会功能上，小资产们是大公司侦查的创新对象，是各类民众运动追求平等主义的一个诉诸对象，还能在社区中提供金钱购买不到的邻里服务。\n\n#  第五章\n这一章讲政治，但这个政治似乎并非我们惯常讨论的政治，而是指一种公共讨论。在开篇，作者再一次吐槽了应试教育与标准化考试。而这种标准化是看似客观实则机械的。这些标准都将质的衡量转化为量的衡量，从而通过一套貌似单一、客观的尺度实现了案例之间的比较。它们在最高意义上是一种宽领域、具有欺骗性的“消除政治的机器”，用来把政治合理性方面的疑问转化为专家操作下中立、客观的管理规程。这种去政治化的把戏掩盖了一点：对政治中的互助与试错之可行性的信念在深层心理中已经缺失，而这一信念是无政府主义者和民主主义者都深深珍视的。量化标准的第一个问题是是缺乏准确性，作者以科学引文索引中的各种问题来说明此点，量化标准的第二个问题是会产生“标准对行为的殖民”而消解其自身的有效性。可以用古德哈特定律来说明：当一个衡量标准成为目标时，它就不再是一个好的衡量标准。类似的还有坎贝尔定律：若一个社会指标被用于社会决策的程度越高，这指标就越容易受到腐化的压力影响，也越倾向扭曲和损害这指标所测定的社会过程。作者认为质量化测量的宏大诉求有两个源头：第一，提倡机会平等且反对特权、财富、头衔世袭的民主主义信仰；第二，相信价值可以被科学地测量的现代主义信念。所有行政管理技术（如SAT考试）的最大缺陷在于，它们以平等和民主之名，行“反政治机器”之实，将广泛存在的合理公共讨论从公共领域中清除，把管理权交到掌握技术的管理机构手中。它们压制了可能会兼容并包、卓有成效的争论，社会政策、技术智能的意义、精英的选拔、平等和多样性的价值、经济增长和发展之目的等议题原本都可以付诸这样的争论。\n关于应试教育，阅读时我产生了一个相反的想法：应试教育针对特定能力的培养固然会牺牲掉其他的人类天赋，但一个可以为之辩护的点我觉得是人类科学技术的大发展已然让知识分门别类细化到一定的门槛，要进入某一细分领域必须具备相关的基础业务知识，而获取这些知识的能力便建基在这一应试教育模式之下。换句话说，如此「孤注一掷」式的应试教育它可能不是最优解，却可能是人类渴望再次进步的一个最不坏的解。当然，这种进步的视角是落在数学、科学、技术之上，而不是人文、艺术之上。\n\n## 第六章\n这章是关于具体和流变。开篇作者用一法国反纳粹小镇上的居民保护犹太人的事例来说明人们行事是行动在先，然后再为行动找到一套逻辑。抽象的原则是实践的产物，而不是相反。小镇居民一开始处于自保而不愿答应收留犹太人，但见到具体的犹太人的惨状后，作出了改变，这一事迹在反纳粹活动中被歌颂。历史学家和社会科学研究员的研究摆脱了亲历者的局限性，知道了事件的来龙去脉，就不可避免地会受事件走向影响，从而漠视事件的偶发性。结论导向的研究往往忽视历史亲历者的真是感受。如果一个重要历史事件被程式化，在传播之中成为一个精简的符号、一种虚假的逻辑和秩序，那么它在第一时间被经历的方式就会被极度歪曲。作者举了一个生动的例子，即通过电视观看篮球比赛转播。在屏幕上一切动作都比现实放缓，为了观赏方便甚至导播还会加入慢镜头，这与现实球场上的对抗完全不同，带着上帝视角让观众简化了球员比赛的难度。清理、简化、浓缩历史事件的习惯不只是人类的自然癖性，不只是编历史教科书时的必然要求，更是一种具有高度利害关系的政治争夺。也许许多历史变革并非人们刻意计划为之，而是临时与自发行为的结果；有组织的社会运动常常是那些无序抗议和示威的产物，而非其诱因；人类自由方面的显著进步往往不是规范的制度程序的结果，而是未经规划的、不可预测的自发行动，是自下而上打破传统社会秩序的成果。","month":6,"country":"美国"},{"title":"哥德尔证明","author":"[美] Ernest Nagel, [美] James R. Newman, [美] Douglas R. Hofstadter (编)","start":"2022-06-29","finish":"2022-07-06","rating":8.4,"pages":"168","doubanLink":"https://book.douban.com/subject/35371799/","cover":"https://neodb.social/m/book/2022/04/30c9a58e0b-50b4-46bf-ab07-7bf091493884.jpg","review":"没来由的对哥德尔不完备定理感兴趣，但苦于数学水平限制，也只能对着维基百科上的定理描述反复念叨。这本书以相对通俗易懂的方式对哥德尔证明的来龙去脉及证明过程做了简述，满足了我的部分需求。阅读时还惊讶的发现本书的编者是年初读的奇书GEB的作者侯士达，他在前言中还表示这本书是当初让他动笔写出GEB的最重要的两本书之一。","month":7,"country":"美国"},{"title":"表达自由的法律限度","author":"侯健","start":"2022-07-09","finish":"2022-07-13","rating":8.5,"pages":"92","doubanLink":"https://book.douban.com/subject/1657408","cover":"https://neodb.social/m/book/2021/11/28683f0f31-562f-4535-bb90-9e9949c62c7a.jpg","review":"大半年前，看了安东尼刘易斯的《言论的边界》——一部美国宪法第一修正案的简史，作者通过大量的司法案例实践，梳理了两百多年来关于言论自由这一「社会核心价值观」在美国的发展。当时我还深深的臣服于霍姆斯大法官关于言论自由的判定。然而在这本书里，“明显且即刻的危险”这个在我看来挽救言论自由的原则，成了批判的对象。但不得不说米克尔约翰的论证也令我心悦诚服。本书在开篇将人民自由与人民自治结合在一起帮助读者理解权利法案的背景，论证中作者保留了第一修正案的绝对自由——用于保护公言论，而将第五修正案用来保护私言论，并着重批判了“明显且即刻的危险”破坏自治原则，不利教育年轻公民，错用修正案的问题。BTW，本书的译后记也值得一读。","month":7,"country":"中国"},{"title":"作文课","author":"尚爱兰","start":"2022-05-21","finish":"2022-07-16","rating":8.2,"pages":"296","doubanLink":"https://book.douban.com/subject/34852641/","cover":"https://neodb.social/m/book/2022/05/15ebea82d5-9129-457f-8acb-705e2950285d.jpg","review":"看完这本书，没学到多少如何教孩子写作的技巧，倒是收集了不少片单。在与孩子（一年级）沟通写作的过程中，我也逐渐明白与其逼着孩子绞尽脑汁的挤出一点字儿来，不如让她先开始真正的感受生活。好比没有充分浸润过的海绵，是无法挤出水来的。至于感受生活，也可分为两个层面，一个是现实生活，带着孩子去游山玩水，去待人接物，另一个则是虚拟世界，电影、动漫、书籍都是这种呈现，当然作为家长有必要也有义务在内容选择上进行把关。","month":7,"country":"中国"},{"title":"病人家属，请来一下","author":"王兴","start":"2022-07-11","finish":"2022-07-18","rating":8.2,"pages":"287","doubanLink":"https://book.douban.com/subject/35604398/","cover":"https://neodb.social/m/book/2021/12/064e013b98-cb62-44ea-be90-4a14077792fe.jpg","review":"写得很真诚，但低于期待，有一些实操上的Tips。","month":7,"country":"中国"},{"title":"首无·作祟之物","author":"[日]三津田信三","start":"2022-07-18","finish":"2022-07-26","rating":8.4,"pages":"456","doubanLink":"https://book.douban.com/subject/6249670/","cover":"https://neodb.social/m/item/book/2026/02/12/3d506b42-63d1-4c20-8c98-3a415e1a1f8a.jpg","review":"谜面设定精彩，以为自己能猜到一二，但被作者破题时的一波三折看得心悦诚服。人头，无头尸的用法也被作者用到了妙处，是一本非常值得一读的本格推理。","month":7,"country":"日本"},{"title":"僧侣与哲学家","author":"[法] 让-弗朗索瓦•何维勒, [法] 马修•理查德","start":"2022-07-18","finish":"2022-08-05","rating":8.1,"pages":"344","doubanLink":"https://book.douban.com/subject/25978763/","cover":"https://neodb.social/m/book/2021/09/1793404e39-027d-45f8-95d5-dbba52eda710.jpg","review":"我认为评分过誉了，对话体的内容很难系统性的进行理论的论述，所以不管是哲学还是佛学感觉都没多少收获，相对而言父亲的水平更高一些。","month":8,"country":"法国"},{"title":"智识的生产技术","author":"[日] 梅棹忠夫","start":"2022-07-27","finish":"2022-08-09","rating":8.2,"pages":"222","doubanLink":"https://book.douban.com/subject/26786537/","cover":"https://neodb.social/m/book/2021/12/041d391fc7-4b2d-4c0b-89e6-08daa6770e9f.jpg","review":"# 读后感\n\n认识这本书，是在《卡片笔记写作法》的评论区，那条评论似乎是将本书称为其姊妹篇。因为我感觉《卡片笔记写作法》挺有启发的，遂也找来这本《智识的生产技术》来阅读。在内容上我认为两本书的近似度还不足以称之为姊妹篇，《卡片》一书在理论上更完备，应用场景更贴合我们的时代（毕竟中文版是2021年出版），而《智识》一书则有更多作者探索性的想法，当然是相对当时而言的。本书成书于1960年代，在互联网还未发明（互联网前身1969年发明）的时代，其讨论的内容具有一定的前瞻性，甚至我觉得如果将作者梅棹忠夫放在如今的科技时代，他必定也会是一个极客（Geek）。即使在60年前，作者对信息的检索、处理，电脑程序的编写能力方法普及等作了正确的预见。本书的写作目的也在于作者对预测即将来临的信息时代所做的一种智识准备，用一句现在听来可能有些土的话便是「工欲善其事必先利其器」。文章内容阅读起来没有丝毫困难，反而对于现在的我而言有一种怀旧的复古之感（Nostalgia）。因为就现在的从事学术研究的人而言，手头拥有工具的富有是作者当时不可比拟的，我们可能更多的会纠结于不同工具的比较，不同工作流的选择，而作者的时代，则更多的是要创造自己的工具和工作流。\n\n## 问责教育\n\n开篇作者对当时的日本教育进行了批驳，总结而言说的是学校教授的往往都是关于 what 的知识而缺少关于 how 的知识，这点在当今国内的教育环境中也尤为明显。举例来说，我做学生的时候都还要背诵历史事件发生的具体时间点，但关于为何会发生这样的历史事件，通常是将结论直给，而不去分析得出结论的逻辑依据。应试的时候我们也只用背好课本内容作为答案，而不用独立的思考推演。久而久之，在面对实践知识时，我们往往会不由自主的倾向于去寻找某一确定的答案，从理论的角度着手，而散失了自己去动手实践学习的能力。近处的例子还有面对信息技术蓬勃发展，学校方面应对的教学内容相对滞后，搜索引擎都普及20年后，学校里还并没有任何课程教育学生如何使用搜索引擎。\n\n## 智识生产\n\n作者区别了智识生产和智识消费，区别在于前者时某种新颖的**信息**生产，而后者就算进行了智识活动，也不包含信息生产，如读趣味性的书、打麻将、下象棋能都是一种智识消费。当然依我所见，作者所指的意思应该是消遣性的打麻将和下象棋行为，如果是研究棋谱，研究麻将规律等的智识活动我认为还是应该被归类到智识生产中。而随着时代的发展，智识生产技术已成为人人都应具备的基本素养，在作者眼里，它是对个人精神卫生的一种捍卫，效率倒是其次，「秩序与安宁」才是首要。\n\n## 从笔记到卡片\n\n达芬奇随身携带笔记本做笔记的习惯影响了学生时代的作者，因此建立起制作_发现记事簿_的习惯。在使用中作者也发掘出更多的制作技巧，如一页一事、编写索引，但随着工作内容的变化，笔记本的记事模式**适合保存笔记，但不适合整理笔记**的特点逐渐显现，尽管有活页笔记本这种形式的改良，但其灵活性的问题始终没能有效解决。因职业关系，在田野调查中作者开始使用卡片笔记法。在应用过程中卡片笔记法的优势逐渐得到体现，作者设计的一种笔记卡片还得到了广泛推广。\n\n## 卡片的选择与使用\n\n作者发明的京大型卡片B6开本12.8cm *18.2cm，重量105g，带1cm宽浅色分割线。卡片在使用时遵循「记录，以便忘却」的原则，可以称之为忘却装置。因此在记录时应该记录完整的文章，不能用符号、简写能缩略形式代替。在记录卡片时应该做到一卡一事，记上日期，与标号。卡片记录最不同寻常的一点是要求记录者**不要关心分类问题**，卡片不是用来存储知识分类的，**反复翻阅卡片**才是重要的。通过盘活、操卡片使之成为智识生产作业的创新工具。至于知识的碎片化不成体系的问题，作者认为那是没操作过卡片的人的庸人自扰，通过积累效应，卡片的优势终会显现。\n\n## 标准化\n\n除了介绍卡片作者还谈到了如何制作报纸的剪贴、信封、照片等类似卡片结构的东西。他强调了标准化与规范化制作的必要性。显然这些东西已经逐渐远离我们这个时代，就互联网世界而言，信息都已经上云。甚至就笔记而言，现在的学生们也很可能是直接制作在iPad等移动设备之上。为了标准化，作者甚至会委托制作固定格式的信纸、稿纸，而不在市场上直接购买。因为就当时的市场情况而言商家可能不会持续的供应同一种商品，这会导致作者所希望的标准化得不到延续。其实类似的情况在我们选择笔记软件的时候也是一样的，选择笔记软件的时候如果不能确定长期的使用某一款软件或者这款软件会因为规模问题、盈利问题退出市场，或者经常性的有较大设计的变化那都是不利于我们进行笔记制作的。因此在选择软件的时候我们可能要参考用户的评价、软件开发者的理念、软件公司的规模、公司的盈利模式、过往产品的历史等作为我们选择的依据。\n\n## 整理\n\n整理有几个原则：\n\n1. 确定理想位置\n2. 确定位置方法的体系化\n3. 物归原处\n\n在文件整理历史上作者经历了捆绑法、袋装法、夹装法、格架子法等，最终确定了直立式文件归档法：将文件资料夹持在一个个对折起来的文件夹中，然后像卡片一样直立排列，由于文件夹上带有凸耳，上面可以书写标题，所以什么样的文件资料放在什么地方一目了然。之历史文件归档系统应用于铁皮文件柜，被作者称为柜存文件，柜存文件都是事务性文件资料是一种文件资料的保管装置与敞开式文件区别，后者主要是参考资料类文件资料，是一种资料的保存装置。这种整理技术原理还被作者应用于家务、空间分配上。\n\n## 读书\n\n在谈完智识生产技术的硬件装置问题后，作者接着开始讲如何读书了。他的读书习惯与我有些类似，尽量读完一本书、制作已读书本的信息记录、铅笔画线，只不过我现在有更方便的电子工具作为替代，用微信读书划线、用Notion做读书记录。除此之外，作者还提到了一些有意思的读书看法。\n\n1. 堆叠读书，读完的书堆叠在一起而不急着做笔记，但因为堆叠，在视觉上会给自己提醒，一段时间后再做起到了温故知新的效果。这也是一个任何电子化阅读无法与实体书阅读媲美的理由——实体书的视觉效果不仅来自于其内容本身，还在于它的存在本身。\n2. 双重读书，读书有两条脉络，一条是作者构建的文章脉络，一条是读者固有的思维脉络。读书笔记记录的应是第二条脉络，因为第一条脉络就是书的实体，无需再记。但是我这篇笔记可能更像两种脉络的混合。对于感兴趣的非虚构书籍，在每读完一章后，我就迫不及待的把本章的大概内容与阅读感受记下来，以防止接着读后会忘记之前内容，完成一本书后，按照间隔重复的原则在后续回顾自己的笔记。\n3. 书籍不是「为了说点什么」而读的，应该是「为了不说什么」而读的。这是从著书立说者角度而言，因为那些已经被表达的奇思妙想已不值得再被书写，读书就是为了明确哪些值得被发表的观点还没被发表。\n\n## 写字\n\n写字部分作者重点探讨了日文在进行智识生产时的一些问题与应对方式。尽管处在1960年代，作者已经预见性的抛弃书写方式转用打字机。然而当时的日文打字机发展刚刚起步，对于罗马字、平假名、片假名如何选择，如何使用以及在技术上的兼容性都存在问题，作为只背过五十音图的我而言，也只能猜想个大概。究其原因，在于中文不像英文那样可以用二十六个字母便能生成任意文章，常用汉字就有五千个，这导致在打印机的设计上必须采取不同的结构方式，而日文则受中文影响，在更通用的假名之外也夹杂着不少汉字。不过相对而言，中文世界在这方面的做过的努力也很少听说。除此之外，作者还对信函、日记、论文的撰写提出了一些观点，都融入了其卡片笔记下内涵，对比同时期的中文世界，则更令人唏嘘了。\n","month":8,"country":"日本"},{"title":"海风中失落的血色馈赠","author":"[加拿大] 阿利斯泰尔·麦克劳德","start":"2022-08-12","finish":"2022-08-12","rating":8.3,"pages":"192","doubanLink":"https://book.douban.com/subject/30401373/","cover":"https://neodb.social/m/book/2021/10/12783d3583-5e91-4479-96a9-e88d50e3abc5.jpg","review":"被封面吸引，作为非虚构阅读间隙用作调剂的短篇，超过预期。","month":8,"country":"加拿大"},{"title":"把自己作为方法","author":"项飙, 吴琦","start":"2022-08-09","finish":"2022-08-18","rating":8.1,"pages":"320","doubanLink":"https://book.douban.com/subject/35092383/","cover":"https://neodb.social/m/book/2021/09/159d338836-fb91-4468-a76e-7a376f4d070d.jpg","review":"最近看了两本对谈的书，都低于预期，可能这种形式的内容呈现，很难将作者的思想脉络表达清楚。这本书给我的留下的最大印象的两个关键词是乡绅、距离感。前者让我重新思考与自己周遭世界的关系，让我产生去接触周遭世界，去了解具体的事、具体的人的兴趣；后者则是一种观察的方法，保持距离，保持清醒。","month":8,"country":"中国"},{"title":"狂热分子","author":"[美] 埃里克·霍弗","start":"2022-08-14","finish":"2022-08-29","rating":8.2,"pages":"207","doubanLink":"https://book.douban.com/subject/3057556/","cover":"https://neodb.social/m/book/2021/09/15c71b39e6-6952-424b-ac50-ded66c16a43c.jpg","review":"全书格言警句频频，与今之现实关联，或多或少能产生一些共鸣，但也无法再进一步，毕竟缺乏进一步的论证，故后劲不够。而作者对群众运动、领袖气质等的分析，倒可以被借鉴到其他剧作的人物创作之中。权当记录一些好词好句，为以后装点门面之用。","month":8,"country":"美国"},{"title":"铁钉案","author":"[荷] 高罗佩","start":"2022-08-29","finish":"2022-09-01","rating":8.3,"pages":"320","doubanLink":"https://book.douban.com/subject/30457504/","cover":"https://neodb.social/m/book/2021/09/16ef17f483-1c94-4338-9c9c-db773c033f21.jpg","review":"这是我看的第一本狄公案。带着现代的侦探小说眼光，高佩罗先生的诡计设定自然并不够看，尤其是在我最近刚看过《首无·作祟之物》后，对本作开篇的无头尸案一眼就能看穿。但好在它也提供了以往读过的西方侦探小说和日本推理小说所不能提供的愉悦——那便是中国特色，引人入胜的楔子，章回体的文本，古代中国的官吏制度……虽然以英文写就，但翻译后的语感可以让我完全沉浸在中式文字的美感之中。作为中国读者，我想这是一种独有的感受。诚如书后推荐语所言「大唐狄公案系列是高佩罗在世界侦探小说领域内开创的极其珍贵的一个支脉」\n\n本作的后记（二）也是我在其他推理作品中未曾见过的创作心得体会，高佩罗先生在此讲述了自己的创作动机，创作方式，写作时间的安排，遇到的问题，内容上的取舍。那一句「主要是为了向东方读者证明，他们本民族的古代探案文学中拥有何其丰富的现代侦探小说素材」更是令我感到钦佩又汗颜。","month":9,"country":"荷兰"},{"title":"叫魂","author":"[美] 孔飞力","start":"2022-09-05","finish":"2022-09-19","rating":8.5,"pages":"368","doubanLink":"https://book.douban.com/subject/25912076/","cover":"https://neodb.social/m/book/2021/09/15f5e77aba-63ef-4a82-9a21-4a629532c414.jpg","review":"虽然是一本学术著作，但读之并没有艰涩无聊之感。作为一个洋人，作者对几百年前清朝社会的细致入微描写让我倍感佩服，甚至每一处对话，事件都有详尽的引文出处。从社会背景到社会心理，再到官僚体制、帝王心术，从庙堂之高到江湖之远作者向我们详尽的阐释了叫魂案发生时的清朝模样。这不仅是一本好看的书，更是一本值得学习的书。","month":9,"country":"美国"},{"title":"来自新世界 （上下）","author":"[日] 贵志祐介","start":"2022-08-31","finish":"2022-09-27","rating":8.6,"pages":"1076","doubanLink":"https://book.douban.com/subject/25752955/","cover":"https://neodb.social/m/book/2021/09/1511b418a5-c322-4a0d-bb70-516c1e6cc245.jpg","review":"看过动画两年半后再看小说，依然感受到震撼。当人类产生咒力时，我想到了一个名字——日版X战警。当然，作者的设定不是合家欢的剧情，而是引入了相当深入的生物进化论、社会心理学、基因工程等硬科幻，创造了一个新世界「宇宙」。人类作为一个整体是自私自利的，只有偶尔在个体上看见人性的光辉，但想象力能改变一切。","month":9,"country":"日本"},{"title":"博尔赫斯谈话录","author":"[阿] 豪尔赫·路易斯·博尔赫斯 著, [美] 威利斯·巴恩斯通 编","start":"2022-09-21","finish":"2022-10-04","rating":8.3,"pages":"382","doubanLink":"https://book.douban.com/subject/25952961/","cover":"https://neodb.social/m/book/2021/09/1604e201ff-db55-41ba-94b0-c2489fbb7e62.jpg","review":"看过一些博尔赫斯的短篇，不太好理解，但却令人着迷。这本谈话录则提到了不少那些迷的来源。尽管博尔赫斯声称自己看的书不多，但大多数我还是没读过，而他重复读好书的习惯值得学习。但对于诗歌类，也许是出于译作之故，书中的诗我都难以进入。读完这本谈话录，又扩充了不少待读书目。","month":10,"country":"美国"},{"title":"箭术与禅心","author":"[德] 奥根·赫立格尔","start":"2022-08-27","finish":"2022-10-08","rating":8.3,"pages":"144","doubanLink":"https://book.douban.com/subject/35493034/","cover":"https://neodb.social/m/book/2021/09/15a3d96363-4eb1-43c1-ac79-77f093c48092.jpg","review":"一本薄薄的小书，断续读完，似乎抓住了什么，又似乎什么都没抓住，转念一想，这还真有点禅。根据作者的描述，我想其实在幼时我就知道禅了，那便是武侠剧上主角与大师练剑时大师说的：学剑有三层，第一层手中有剑，心中有剑；第二层手中无剑，心中有剑；第三层手中无剑；心中亦无剑。这第三层便是作者在本书中着力讲的禅心与禅道。要做到第三层，须经艰苦卓绝的训练，还要秉持无为之为、无艺之艺、无心无念，将刻意变成不刻意，让不刻意变成自然。\n\n我不知道这玄而又玄的描述能否有效，但有一点是我想尝试的：正确呼吸，放下我。\n","month":10,"country":"德国"},{"title":"鼠之夜","author":"[日] 连城三纪彦","start":"2022-09-28","finish":"2022-10-12","rating":8.5,"pages":"319","doubanLink":"https://book.douban.com/subject/35058746/","cover":"https://neodb.social/m/item/doubanbook/2026/01/01/8706fcd7-4778-4128-a859-659e40a8308a.jpg","review":"反转、再反转，尽管都是短篇，且比我的年纪还大上不少，但篇篇精彩，最爱其中的《奇妙的委托》。","month":10,"country":"日本"},{"title":"魔术师时代","author":"[德]沃尔夫拉姆·艾伦伯格","start":"2022-10-09","finish":"2022-10-22","rating":8.5,"pages":"480","doubanLink":"https://book.douban.com/subject/34464687/","cover":"https://neodb.social/m/book/2021/09/1614b9f802-303b-4ada-a3e6-c531c2c05f66.jpg","review":"在此之前只读过维特根斯坦的传记，而对海德格尔、本雅明只是略有所闻，卡西尔从未听过，以这样的背景看这本书，还是显得不自量力了。但尽管如此，本书还是有不少亮点，它将四个同时代的德国思想家、哲学家的十年人生传记放在一起，在叙述上有一种电影镜头切换般的质感。在描述上又将四人的世俗日常与哲学思辨的进行穿插，尽量做到了不枯燥的同时揭示他们思想的发展。至少在前半部分我还是读的津津有味的，直到开始重点讲海德格尔的此在开始，实在无法跟上了。此外，个人印象较为深刻的部分是语言哲学相关的内容，尤其是关于翻译的那段论述和维特根斯坦的逻辑哲学论的解读。\n另外，非常喜欢本书的封面和内页设计，纸张厚度摸着也有质感，唯一美中不足的是平装版握在手里翻页有点吃力。","month":10,"country":"德国"},{"title":"马可瓦尔多","author":"[意] 伊塔洛·卡尔维诺","start":"2022-10-24","finish":"2022-10-28","rating":8.3,"pages":"160","doubanLink":"https://book.douban.com/subject/34799583/","cover":"https://neodb.social/m/book/2021/09/150eee2be7-ef9a-4d4e-b450-0b0b911d66d4.jpg","review":"充满幽默与讽刺的笔调、有点阿甘式的主人公、写给大孩子们的童话书。我最喜欢里面那篇《月亮与GNAC》。","month":10,"country":"意大利"},{"title":"语言学的邀请","author":"[美] 塞缪尔·早川, [美] 艾伦·早川","start":"2022-10-31","finish":"2022-11-04","rating":8.7,"pages":"299","doubanLink":"https://book.douban.com/subject/26431646/","cover":"https://neodb.social/m/book/2021/09/163503b8f9-cb08-467f-b268-368a39e3d912.jpg","review":"语言学的邀请\n人与动物的区别，在于人类能够运用语言。语言带来了文明。我们从小习得语言这项技能，使之成为习惯，以致于我们说话就像走路一般习以为常，而从未反思语言本身。本书作为语言学的入门，很好的帮助读者理解、解蔽了语言。作者提供了各种阐释语言的视角以及众多精彩的例子，以致于让我感觉自己都不需要迈步，而是被直接抬进这扇大门的。\n\n从小学开始我们的语文课便作为语言教学的主课。我们学习识字、诵读、阅读理解、言辞写作、艺术欣赏全在语文课上。但同时它也丢失或者忽略了本该作为重点的语言知识，如言辞的逻辑，语言的内向意义与外向意义，语言作为符号层面的定义。这些知识的忽略会引发各种麻烦，经济上的、政治上的、逻辑上的。我很喜欢的知乎科普作者贾明子甚至[建议](https://www.zhihu.com/question/562148431/answer/2731506383)将语文分为四科取而代之，它们分别是：演讲与沟通、自然语言逻辑和语义学基础、文学鉴赏与文学批评、文学写作与学术写作。中学语文所承担的功能不是被高估了，而是被严重低估了。因此，我建议这本书应该入选每个高中生的必读书目。\n\n如维特根斯坦所言：想象一种语言就意味着想象一种生活形式。\n\n下面是我对本书各章节内容作的摘要，剥离了作者精彩的例子，它可以用来回顾书本内容，却绝不能替代阅读本身。\n\n##  第一章语言和生存\n\n开篇作者谈到了社会达尔文主义的盛行，将人类类比为动物从而推出适者生存的思想引起的人类斗争，但人类区别于动物的一大特征是人类能使用语言。语言汇集了知识，而这种知识能穿越时间，形塑、引领、增益和积累人类昔日经验，形成今日生活。因此，社会表面上固然充满竞争，然而真正能使社会前进的下层基础却是大家视为当然的东西——合作。但是，在如今社会文明高度发展的当下，在言辞洪流之中，我们或多或少都会碰到各种麻烦和烦恼。因为我们在生活中每时每刻都不但会受听到个运用的言辞的影响，还会被我们无意中对语言所下的臆断所支配。本书的基本假设是：同类之间通过语言进行广泛合作，是人类生存法基本工具。另外还有一个并行的假设是：假如谈话的结果引发或增加了争执和冲突，不是说的人有毛病，就是听的人有毛病，要不然就是大家都有毛病。\n\n\n## 第二章 符号\n\n人类不同于动物的一个特点之一在于人类能够故意用一样东西来代表另一样东西，也就是象征化过程（symbolic process）。人类的象征化过程无处不在，如服饰、装扮。象征化过程，固然使人类做出了许多不合理的行为，却产生了语言。在各种使用符号的方式中，语言是最发达最精巧最复杂的一种。但是人们往往会养成把符号与他们所代表的事物混为一谈的习惯，从而对社会上存在的某事某物随意的做出评价，从而在各种不同性文化阶层造成严重后果。我们现在所处的环境，是有许多前所未有的语义影响（semantic influences）所形成的，并且大部分也是由他们创造的。因此，现代社会的共鸣所需要的并不仅仅是常识他们必须对一般符号尤其是言辞的能力和限度有一个科学化的理解，才不至于被身边复杂的语义环境完全冲昏头脑。**符号并不就是其所代表的是事物；地图并不就是其所代表的地区；言辞并不就是事实。**我们把这个通过言辞学到的世界叫做言辞世界（verbal world），把我们直接知道的或是能由个人经验直接知道的世界叫做外向世界（extensional world）。言辞世界与外向世界的关系，就像地图与它假定代表的地域之间的关系一样。我们每个人都承袭了许多无用的知识、错误的印象和谬见，那些都是我们从前认为是正确的地图，因此我们所学到的总有一部分是必须抛弃的。有两种方式会让我们脑子里装下错误的、与这个世界不合的地图：第一种是别人给我们的地图原本就是错的；第二种是别人给我们的地图是正确的，只是我们自己误解了他们，从而创造出错误的递出来。\n\n## 第三章 报告性语言\n\n从交换知识和信息的角度来讲，我们最基本的象征行为（symbolic act）就是把我们所看到的听到的感觉到的事情报告给别人。报告时可以证实的。报告的语言发展到最高限度，就成了科学的语言。练习写报告文是增进对语言的注意力的一个捷径。但是要做这种练习，必须避免做出推论与判断。推论都是根据已经观察到的食物对并不直接知道事物所做的结论。推论的优劣程度，通常取决于报告内容或观察来源的优劣击退论者自身能力如何。所以要分清楚自己在报告中陈述的内容是推论还是观察；判断是指作者对他所描写的人事物所有赞许或不赞许的表示。记录事实，不做判断，要尤其注意我们的用词，因为很多词汇本身就代表着一种判断。「怒词」和「喜词」绝不是描写外向世界中实际状况的报告。它们只会把自己降低到与辩论对方同样固执愚蠢的程度。判断下的太早，往往会使我们看不清近在眼前的事物。\n\n然而，只要我们使用的是日常语言，就没有达到完全公正的可能，因为每个人的经验都会先由按照自己的利益和背景选择节略一番，因此我们大家所得到的经验都是一开始就是偏移（slanting）的。既然我们不能不从自己的观点出发来看这个世界，我们就要明白自己所看到的是多么有限。发现自己的偏见是智慧的开端，摆脱自己的偏见是自由的源泉。我们只要能够领悟到某些字词或某些事实会引起何种有利和不利的感觉，那么，就实用目的而言，我们就能达到足够公正的地步。\n\n## 第四章 前后文\n\n字词的含义要通过参考前后文生成。字典的编纂者是历史学家，而不是制定法律的人。字典上的字词定义只承载了这个字词的历史含义，而没发包含它未来可能生发出的新的含义。我们学习字词的意思，必定是在实际的实用场景中习得的。在讨论字义时需要区分外向意义，也叫本义（denotation）以及内向意义，也叫转义或含义（connotation）。外向意义就是指字所代表的东西，内向意义则是指它在我们脑海里所引起的一切。倘若一句话有外向意义，我们便可通过实证的方式平息争论，达成一致；倘若一句话只有内向意义，则可能会引起不断的争论。人类对内向意义的理解偏差，往往会造成悲剧性的后果，也就是说语言可能是悲剧后果的根源之一。如维特根斯坦所说：\n> Whereof all for one cannot speak, thereof one must be silence.\n字义本身也是在不断流动的，没有一个字能有两次意义完全相同，这也是现代语言思潮的基本理论之一。因为一、字义是被其前后文决定的，而没有两个前后文会一模一样；二、每个人的对字的内向意义构成不会完全一样；三、事物本身的流变决定其外向意义并不固定。基于此，养成自动考查前后文的习惯，才能更好的理解别人说的话。最后，作者指出尽管如上所言，字典上的定义仍是一个无价的指南，因为它给出了一个字义区（areas of meaning），世界上没有一个字只有一种正确的意义，却都能分有字义区里的意义。\n\n## 第五章 有助于社会团结的语言\n\n这一章作者探讨是前象征（presymbolic）语言的意义，所谓前象征用法指的是将言辞当成有声音的、表达情感的姿势运用。我们有理由相信，人类将语言用作纯粹的陈述说理工具，在语言发展史上是较新近的事。即使在我们现在的日常语言中，前象征用法也占据相当大的比例。孩子们会对语言的前象征部分保持敏感，比如我对姐姐大发雷霆斥责时，并不懂意思的弟弟也会跟着哭。从交换知识的观点来看，前象征语言多半毫无价值，但是从社交礼节、建立情感、维持交情上它是必需的，因为打破沉默本身就是说话的一个重要功能，作者在此举了在珍珠港事件后他作为日裔在美国坐地铁的例子，用前象征语言来打破沉默，赢得信任，缓解自己的孤立。除此之外，仪式中的前象征语言也具有重大意义，它能加强我们的社会团结，靠大家对一套固定的言辞刺激的共同反应，人类社会才得以维持完整，不致崩溃。当语言变成一种仪式，它所引起的效果，在相当限度内会和它的词句原有性意义变得毫无关系，甚至可以不合文法。因此，我们应警惕自己是否将象征语言的标准套到前象征的言辞上去，而错误的产生许多对世界、人类和民主的悲观看法。\n\n## 第六章 语言的双重任务\n\n除了声调和节奏，语言的感动性来源还有其内向含义，而内向意义可分为两种：说明性（informative）和感动性（affective）。许多字词能够流传，源于其感动性价值多于说明性价值，而有些字词的情感含义又会成为其实际应用的障碍。这里作者举了很多容易理解例子来说明，还是需要阅读原文来加深理解。这种障碍的来源在作者看来可能源于人内心的心理变态而非内心纯洁。\n\n正是因为字词能同时引起说明性含义和情感性含义，所以一起讨论有关宗教，种族，国家和政治团体等题目时，事情就会变得特别复杂。我们要想增进自身理解语言和运用语言的能力，就不能专靠加强我们对语言的说明性含义的认识，而是还要依靠社会经验，在不同的情形里与不同的人打交道和阅读文学作品等方法，使自己对语言的情感性成分能有更加深切的了解。\n\n## 第七章 控制社会的语言\n\n用言语来控制、指导并影响别人未来行动的努力，可以称为语言的指示性用法（directive ueses of language），语言的这一工具属性也是将人类与其他物种深刻区别开来的特性之一。政客、学者、商人都在使用指示性语言来影响受众，除语言外，人们还会加上许多非语言的感动来加强指示性语言的效果，如仪式、服装等视觉、听觉效果。仪式等伴随指示性语言而来的活动，以及指示性语言中的情感成分，其目的都是为了在人们的记忆中留下深刻的印象。每一个用指示性语言作出或明或暗允诺的人，都负有道义上的责任，因为人类之所以能够相互合作，聚集成一个社会，靠的就是相互间的信心。没有协定，没有社会契约人类只能回到洞穴中居住，指示性言辞就可以用来规范人的行为。看上去无比复杂的法律，事实上只是将历代累积编纂起来的指示性语言加以系统化。指示性语言还有需要几点注意到地方：一、随社会发展它们可能变得不合时宜，作者说与其一味强调升旗仪式或唱国歌，不如让孩子们有更多时间去研读、实践民主反而不致使民主沦为空洞的名词；二、要有所预期，任何指示都不能以我们设想的样子出现；三、区分指示性语言和说明性语言，面对指示性语言，保持清醒，少一些幻想。\n\n##  第八章传达感情的语言\n\n本章作者探讨了用传达情感的几种方法，包括文学与演讲中的韵律、节奏，隐喻和直喻，典故，讥讽、感伤和幽默以及在报告文中通过通过事实陈述达到感动人的效果（关于隐喻，作者谈到的不多，另外一本专讲隐喻的书_metaphors we live by_值得读）。作者提到每一种文化里的青年人都得研究他们自己的文学和历史，因为只有这样他们才能去理解哦并参与自己群体内的思想和情感的交流。而文化作品也是分等级的，越高级的作品越会倾向于提供更多的事实给读者，让读者自己思考从而作下判断。文学虽没有科学那般精准的一般化的特点，却也有其无法替代的功能，它能精妙的表达出各种感情间的差别，这是无法用科学冰冷的术语所展现的。而文学带给人的象征性体验（symbolic experience）或者间接性经验（vicarious experience），能让只有一生的人能通过阅读度过许多个、不同种的人生。在文学作品中尝试、体会、学习不同种的人生，无论是悲苦、幸福抑或是平平的人生，那都能带给人以知识，经验，以获得成熟，成为文明人。\n\n## 第九章 艺术和激荡的情绪\n\n表达情感的文学作品具备“生存价值”，原因在于根据学者和批评家深刻的见解，以及近代心理学和精神分析学的研究结果，情感性语言最重要的功用就是缓和激荡的情绪。通过象征策略（symbolic strategies）——即用种种方法将我们的经验重新分类，将情绪包围起来，使其变得的容易为我们所忍受。文学也成为了我们适应环境的方法之一，它们能为一种运用符号的动物完成一种必须的生理作用，也就是帮助我们维持精神健康和心理平衡。然而对于文学的价值批判并没有多少合用的科学知识，尤其是关于其艺术和美学价值时。在作者看来，把自己的经验用适当的符号表达出来，再将其整理成一个首位一贯的整体，是一种综合性行动。一个伟大的小说家、戏剧家或诗人，就是一个将许多广泛的人生经验完美地综合起来使它们有一种秩序的人。艺术就是一种秩序，而不论是人生经验（需要整理的材料）还是写作技巧（整理的方法），都是永远学不完的。艺术的目的，便在于这种秩序化的整理帮助其受众肃清其内心的混乱。\n\n##  第十章 我们是怎样得到知识的\n\n我们经验里的物体并不是东西本身，而是我们的神经系统（有诸多限制）与神经系统以外的东西互相起的作用（类似康德的物自体概念）。我们认识事物是通过抽象化过程进行的，作者这里提出了一个抽象化阶梯很形象的介绍了从某个具体事物的低级抽象到概念的高级抽象过程。而学习语言不仅仅是学习字词，而是要将字词与它们代表的事物正确的联系起来，这种联系就是定义。为了达到使人理解的目的，下定义时应该沿着抽象阶梯向下追溯，并且要减少定义，因为更多时候定义会造成语言的空转，成为一种同语反复（tautology），当然我个人认为定义还有一个作用在于可以炫耀自己的学识。沿着抽象阶层一层一层上升是人类特有的能力，但若一个人的陈述只停留在高阶抽象层，那么他的听众就无法明白他的意思，同样只停留在低阶抽象层只会让人抓不住重点。优秀的陈述，需要高阶抽象层和低阶抽象层、语言和现实的互相发挥作用。\n\n## 第十一章 捕风捉影\n\n这一章主要讲人们脑子中的语言概念与现实搞混之后所带来的问题，作者举了不少生动的例子。文明越进步，越能感觉到我们的神经系统自动地会略去当前事物的许多特性，倘若我们不知道有些特性已被略去，或者感觉不到抽象化过程，我们便会一看见（听见）某种事物便信以为真，从而使看见和相信成为一个过程。如书中例子，某人看见纸花也会产生花粉过敏，我们现实中的谈癌色变。因为外界的经验事物被抽象成高阶的语言，这种语言再与记忆中的观念产生联系，从而将过去的经历感觉投射到面前的经验事物之上。语言的魔力便由此产生。书中还举了坐过牢的人找不到工作最后又去犯罪成为犯人的自我实现式预言。要抵御这种人们精神中的“幼稚领域”，一个方法��意识到言辞与它们所代表的事物之间没有必然联系，另一个是深刻的认识抽象阶梯和抽象化过程。\n\n## 第十二章 分类\n\n这一章讲搅浑抽象阶层后，不同分类带来的问题。我们把事物叫做什么名字、在哪一点或哪条线上将两种不同的东西分开，会根据我们的利益和分类目的而定。倘若我们接触不同的教育拥有不同的文化，连我们的世界看起来都会不是同一个样子。这里我想到维特根斯坦所说的一种语言即一种生活形式。即使狮子会说话，我们也无法理解，他在说什么。不幸的事，多数人都不会一直注意到自己是怎样对事物进行分门别类的。要抵御这种精神上的迷津特别要注意诶长语言中的这种语用：xx毕竟是xx，同一个xx实际上是不同的分类，如生意毕竟是生意，小孩毕竟是小孩。这都是一种托辞。柯齐勃史甚至建议在使用的名次后面加上编号已示区别。大多数理论问题，归根结底，都属于分类问题和名字问题。“真理”的科学实验，就像它的社会实验一样，都是以实用为标准。\n\n## 第十三章 二元价值观点与多元价值观点\n\n本章探讨的内容个人认为非常值得阅读，它与我们当今所处的社会环境、政治环境息息相关。主要讲的是逻辑谬误之一的假两难推理（False Dilemma）。很大程度上，我觉得源于人类的思维惰性，为了不给自己的思考增加压力，很自然的人们倾向于用二元价值来判定事物。作者探讨了政治上的二元观点，以纳粹德国与苏联为例，这一两分法给人类带来的苦难。二元价值观点只能产生争斗精神，而无法提升我们准确评价世界的能力。**所有二元价值的喧噪和夸张的话语，都是一种蒙蔽大众耳目使他们不去注意更加切身问题的方法。**这不免让我想到疫情防控下的人们对不是动态清零的就使躺平的描述。接着，作者论述了多元价值的好处。民主过程中的许多特性需要以多元价值为前提。价值观点的丰富伸缩性，是民主政体发达的标志。二元价值观点差不多总是以表现情感的姿态出现，它可能仍是文明生活中的启动工具，引起人们的兴趣，但载我们到目的地的转向工具却是多元价值观点或无穷多价值观点。因此，与人交谈时，保持开放的心态，应用多元价值观点，才能获得最大的好处。最后，作者对上述观点应用例外项——逻辑，作了说明。逻辑是讨论语言的语言，并不是讨论事物或事件的语言。\n\n## 第十四章 一团糟\n\n本章主要讲言辞中的内向观点对我们造成的坏影响了。技术的进步既可以帮助也可以损害交换知识的自由，这点，作为中国人体会应该会更加深刻。一旦自由交换知识的路径收到阻碍，其产生的影响反而比没有知识更加恶劣，因为识字的人的愚妄比不识字的人更复杂。前几章分析的几种错误的评价法，一可以概括为一个词——内向观点（intensional orientation），即只根据言辞而不是根据言辞所代表的事实去采取行动。比如不注意前后文；自动反应倾向，把不能抽象阶层混为一谈；只注意相同的方向而不注意不同方向；满足与定义（即更多的字词）来解释言辞。这种内向观点就是一种脱离语言实际的观点，会造成语言的空转。它的严重结果之一是会造成一种毫无根据的、非常容易幻灭的自信心。作者用了“上教堂的人”、“开车的女人”作为例子论述。而讲话太多与内向观点形成是一个恶性循环。作者罗列了四大内向观点形成的来源：一、教育，我们的教育往往脱离实际，分不清实然与应然，讲指示性言辞与说明性言辞混为一谈从而忘记语言的真正目的；二、流行小说，为了迎合读者，让读者读起来舒服、容易同时可以方便快速的进行创作，流行小说的情节往往脱离实际追求内向观点；三、广告，作者认为广告是内向观点的最大来源，广告的目的是尽量让观众在心里造成自动反应，通过心理暗示把内向观点提升为消费者生活中最主要的原则，促进观众对言辞和别的符号的病态反应。广告可能是形成一般人日常生活习惯和文化的最大的语言力量之一；四、电视，其作为比纸媒更丰富的媒介载体对观众有更大的吸引力，但受制于视觉效果，缺少深度并且很难提升抽象阶层到更具普遍性的更高层级，为了博取眼球，许多新闻像娱乐、许多娱乐像广告、许多广告像新闻，而众多电视剧总是围绕二元价值观点打转以达到和流行小说类似的目的。由于时代的局限，作者没有提及互联网，在我看来互联网的特性包含上面四个媒介，并且比之更加复杂。短视频的流行蕴含了广告与流行小说的特点，微博评论区更是内向观点的放大器。脱离了面对面的广场式交流，配合网络放大器让脱离实际的博眼球言辞更易于传播。在流量为王，流量变现的时代，一切能吸引人注意力的方法都是被趋之若鹜的，我们被囿于自己制造的信息茧房中，舒服的躺在那张由内向观点编织的躺椅之中。\n\n##  第十五章 老鼠和人\n\n这一章作者主要讲的是社会变革中应用外向观点的重要性。开篇以 Norman Maier 的“神经病”老鼠实验为例类比人类在家庭、生活、国际争端上类似的遇到的原地打转似得“无法解决”问题。出现这种问题的基本原因，作者归咎于“制度惰性”（insititutional inertia），人们一旦对制度习以为常，最后就会觉得它是唯一正确而恰当的行事办法，从而倾向于保护自己的制度，使它们不受到挑战或者攻击。这种过时的制度、习惯和形式仍然继续存在的现象被称为“文化落伍”（cultural lag）。解决社会问题的症结在于如何使一般人在旧制度里养成习惯适应新制度。如危机时刻，战争的到来，人类制度便能做出极大改变。每一个引起多人争辩的公共问题，其内容都离不开制度适应（institutional adaptation），将社会问题当成制度适应问题看待才能慢慢将问题转向外向的，变成实际的讨论。只有外向的讨论和外向的回答得到传播，才能破除阵营之间的选择。因为内向的定义和较高的抽象问题无法解决吃饭这类实际问题，外向世界里的问题一定要用外向的手段才能解决。科学的态度便是一种外向的态度，重点是要将其用于社会领域。极少数人把社会看作一台机器，却将其视为一堆活动着的制度的总和。\n\n## 第十六章 走向内心和外界的秩序\n\n最后一章，作者对前述讨论评价的方法做了总结，同时提出了一些个人的处事准则。总结：\n1. 一张地图并不就是它所代表的地域；言辞并不就是事物（第二、十章）；\n2. 言辞的意义不在言辞中，而在我们的脑海里（第二、十一章）；\n3. 前后文决定意义（第四章）；\n4. 留心“是”字，因为它可能会代表一种错误的评价法，草是绿的（神经系统的工作，第十、十一章）、张先生是上海人（抽象阶层混淆，第十一章）、做生意毕竟是做生意（一个指示，第七章）、一样东西就是一样东西（分类法变动第十、十二、十三章）；\n5. 认清指示与说明之间的差别（第七章）；\n6. 认清“真”字至少有四种不同意义；\n7. 当你想要“以火攻火”时，记住消防员时用水的（第十三章）；\n8. 二元价值观点是启动用的机器，不是驾驶用的机器（第十三章）；\n9. 小心定义，它是用言辞解释言辞。思考时尽量用实例（第十一章）；\n10. 没有一个字能有两次意思完全相同，牛1不是牛2，牛2不是牛3。\n最后，请认识你自己，忠于你自己，少说话，多观察，少做判断，多作报告，用外向的方法研究事物。将语言视为人类合作的工具。\n","month":11,"country":"美国"},{"title":"罪与罚","author":"[俄] 陀思妥耶夫斯基","start":"2022-10-16","finish":"2022-11-14","rating":8.5,"pages":"617","doubanLink":"https://book.douban.com/subject/25887912/","cover":"https://neodb.social/m/book/2021/09/1537df3f8f-7887-463e-9790-60003ab35e5d.jpg","review":"第三本陀氏的书（前两本是白痴与地下室手记），更加能读进去了，逐渐喜欢上他的这种这种心理描写，长篇大论式的对谈。本书的哲学意涵并不复杂，套用前不久看的《语言学的邀请》中提到的言辞概念，主角拉斯科尔尼科夫的问题在于他仅仅从内向意义去理解考察拿破仑，以他自认为的超人哲学去思考那些历史名人，他一直在「设想」拿破仑会怎么做，这是没有意义的，在这点上他只能沉默而不能发言。他能做的是更多的从外向意义去理解拿破仑，即拿破仑他做过什么，他是怎么做的。回到小说结尾，也正是那个身边具体的人，给了他生活意义的救赎。","month":11,"country":"俄罗斯"},{"title":"献给阿尔吉侬的花束","author":"[美] 丹尼尔·凯斯","start":"2022-11-08","finish":"2022-11-16","rating":8.5,"pages":"288","doubanLink":"https://book.douban.com/subject/26362836/","cover":"https://neodb.social/m/book/2021/09/152a683f39-9001-4143-8685-88d82921d571.jpg","review":"献给阿尔吉侬的花束\n这应该算作软科幻吧，通过手术刺激将智障患者的智力短时间内提高到两倍多。作者也机制的没有过多的着笔在超人智力的描绘上，毕竟所有读者和作者本身并没有那般智力，而是转向情感方面。开篇引用的柏拉图洞穴隐喻非常贴切。\n\n> 眼睛的困惑有两种，也来自两种起因，不是因为走出光明，就是因为走进光明所致，不论是人体的眼睛和心灵的眼睛。\n\n全书的主线正是暗合了主角从黑暗到光明，再从光明到黑暗的过程。但有意思的是，所谓的黑暗并不是只有黑暗，身处黑暗的查理也有友情支撑生活，而在光明中的查理却也会体会到人心的黑暗。作者巧妙的用了主角的实验报告作为叙事载体，通过第一人称视角将主角的经历淋漓尽致的展现，尤其是通过语词使用的变化来体现主角智力水平的变化。\n","month":11,"country":"美国"},{"title":"宵待草夜情","author":"[日] 连城三纪彦","start":"2022-11-21","finish":"2022-11-24","rating":8.4,"pages":"214","doubanLink":"https://book.douban.com/subject/26367367/","cover":"https://neodb.social/m/book/2021/09/173bc7aed3-bd69-4b94-9815-ac07b2c8064a.jpg","review":"五个故事，五个女主，五段错位的感情。连城老师的推理，不仅在逻辑演绎上，却更在感情笔墨之中。因此，当反转来临之时，当案件揭晓之际，这种恍然大悟不仅是谜题公布后的大快人心，却更是被深刻体察后良苦用心。","month":11,"country":"日本"},{"title":"东京本屋","author":"[日] 吉井忍","start":"2022-12-20","finish":"2022-11-30","rating":8.7,"pages":"440","doubanLink":"https://book.douban.com/subject/26819477/","cover":"https://neodb.social/m/book/2021/09/1699c69ee4-5a8c-4c90-b987-6ba8afe6ac30.jpg","review":"东京本屋\n遇见这本书是今年最大的意外之喜。作者是一位嫁给中国人的日本记者，有趣的事这是她用中文写作的书。她花了六七年时间采访了十来家位于东京的独立书店（本屋），以采访式的对话体写作。口语式的对谈，辞藻并不华丽，日味中文带给我一种平静的力量。书店的经营困难，在这个时代已是显而易见的事情，更不用说规模体量都更小的独立书店。它们能存在下去，需要店主莫大的勇气与付出，平衡现实与理想，却也更能体现出一种匠心。书中BACH和Book Truck这两家店主给我印象最深，他们让我看到在逐利之外的另一种生活方式的可能。\n\n我真正与书结缘也是近两年的事情，学生时代看书并不多，去书店也只是买辅导书。这两年开始将业余时间主要投入在阅读中，但遗憾是所在小城市的当地并没有书中类似的独立书店可以参观消费，因此所有选书购书都是通过网络完成。网络虽然给图书的传播带来了便利，却也少了那份书店所能提供的身临其境感，而独立书店的存在更彰显着店主个人的品味与取向，可看作一份具象的「书单」。书店这个产业虽然不致消亡，但数量规模的萎缩亦难避免。只祝愿独立书店们能保有自身的同时能有一些其他渠道平衡现实的限制，并在可能时我能尽一点绵薄之力。\n\n另，文景出版的纸质在我读过的书里一直保持着高质量，本书有众多关于独立书店的彩色照片，非常有质感。","month":11,"country":"日本"},{"title":"快乐王子","author":"[英] 王尔德","start":"2022-12-01","finish":"2022-12-07","rating":7.5,"pages":"137","doubanLink":"https://book.douban.com/subject/25774843/","cover":"https://neodb.social/m/book/2021/12/10a749aa83-2183-4a6d-a31a-c3115c963dba.jpg","review":"凑单买的，难以欣赏","month":12,"country":"英国"},{"title":"日常生活中的自我呈现","author":"〔美〕欧文·戈夫曼（Erving Goffman）","start":"2022-11-25","finish":"2022-12-13","rating":8.1,"pages":"272","doubanLink":"https://book.douban.com/subject/35947819/","cover":"https://neodb.social/m/book/2022/10/1343bae789-2c23-45f8-b9b6-bf21b7cebb74.jpg","review":"这本书对我而言精彩的部分在于作者各种信手拈来的生活实例，反倒是理论部分得出的过程过于轻便了，以至于作者一开始说理我就开始走神。人生就是一出戏，因此，尽管打开本书对其理论不知所云，合上书本进入生活却都是它描写的生活意象。从这个角度说，本书可以是外星文明研究地球人类的日常生活呈现的上佳书籍。\n另，读此书时，想到了另一本书《有限与无限的游戏》中提到的萨特的一句话：相信是知道自己相信，而知道自己相信是不相信。","month":12,"country":"美国"},{"title":"少女的坟墓","author":"（美）迪弗","start":"2022-12-12","finish":"2022-12-30","rating":7.8,"pages":"497","doubanLink":"https://book.douban.com/subject/3610136/","cover":"https://neodb.social/m/book/2021/11/279637a528-db81-4bde-8607-48b00fc7c0df.jpg","review":"十几年前买的书，年末总算拿出来打算读完，又碰上新冠。总的来说观感一般，有种急于冲着改编成电影而写的意思，翻转也很生硬，感情戏特别尴尬。","month":12,"country":"美国"}];
+
+    // ========== 数据注入结束 ==========
+
+    // ===== 初始化 =====
+    const actualMonths = [...new Set(books.map(b => b.month))].sort((a, b) => a - b);
+    const monthMeta = {};
+    actualMonths.forEach(m => { monthMeta[m] = MONTH_COLORS[m - 1]; });
+
+    const monthLabels = actualMonths.map(m => `${m}月`);
+    const MONTH_RANGE = `${Math.min(...actualMonths)}月 – ${Math.max(...actualMonths)}月`;
+    document.getElementById('subtitle').textContent = 'Nickilism';
+
+    // ===== 统计计算 =====
+    const totalBooks = books.length;
+    const avgRating = (books.reduce((sum, b) => sum + b.rating, 0) / totalBooks).toFixed(1);
+    const totalPages = books.reduce((sum, b) => sum + (parseInt(b.pages) || 0), 0);
+
+    // 国家统计（只统计非空国家）
+    const countryCount = {};
+    books.forEach(b => {
+      if (b.country) {
+        countryCount[b.country] = (countryCount[b.country] || 0) + 1;
+      }
     });
-    const filtered = books.filter(filterMap[currentFilter]);
-    renderWall(filtered);
-    renderBooklist(getSortedList(filtered));
-    if (booklistOpen) {
-      document.getElementById('booklist-content').classList.add('open');
-      document.getElementById('booklist-toggle').classList.add('open');
-    }
-  });
-});
 
-renderWall(books);
-renderBooklist(getSortedList(books));
-// 默认展开清单
-if (booklistOpen) {
-  document.getElementById('booklist-content').classList.add('open');
-  document.getElementById('booklist-toggle').classList.add('open');
-}
+    // 每月统计
+    const monthCounts = {};
+    actualMonths.forEach(m => { monthCounts[m] = 0; });
+    books.forEach(b => { if (monthCounts[b.month] !== undefined) monthCounts[b.month]++; });
 
-// 图表
-const maxMonthlyCount = Math.max(...actualMonths.map(m => monthCounts[m]));
-new Chart(document.getElementById('monthChart'), {
-  type: 'bar',
-  data: {
-    labels: monthLabels,
-    datasets: [{
-      label: '本数',
-      data: actualMonths.map(m => monthCounts[m]),
-      backgroundColor: actualMonths.map(m => MONTH_COLORS[m - 1].bg),
-      borderColor: actualMonths.map(m => MONTH_COLORS[m - 1].color),
-      borderWidth: 1,
-      borderRadius: 6,
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-    },
-    scales: {
-      y: { beginAtZero: true, max: Math.max(maxMonthlyCount + 1, 4), ticks: { stepSize: 1, font: { family: 'Inter', size: 11 }, color: '#a39e98' }, grid: { color: 'rgba(0,0,0,0.05)' }, border: { display: false } },
-      x: { ticks: { font: { family: 'Inter', size: 12 }, color: '#615d59' }, grid: { display: false }, border: { display: false } }
+    // ===== 更新 DOM =====
+    document.getElementById('total-books').textContent = totalBooks;
+    document.getElementById('avg-rating').textContent = avgRating;
+    document.getElementById('total-pages').textContent = totalPages;
+
+    // 计算阅读天数中位数
+    const readingDays = books.map(b => {
+      const start = new Date(b.start);
+      const finish = new Date(b.finish);
+      return (finish - start) / (1000 * 60 * 60 * 24);
+    }).sort((a, b) => a - b);
+
+    const medianReadingDays = readingDays.length % 2 === 0
+      ? (readingDays[readingDays.length/2 - 1] + readingDays[readingDays.length/2]) / 2
+      : readingDays[Math.floor(readingDays.length/2)];
+    document.getElementById('avg-reading-time').textContent = medianReadingDays.toFixed(1);
+
+    // 渲染国家分布
+    const countryGrid = document.getElementById('country-grid');
+    Object.entries(countryCount).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
+      const badge = document.createElement('div');
+      badge.className = 'country-badge';
+      badge.innerHTML = `<span class="country-flag">${COUNTRY_FLAGS[country] || ''}</span>${country}<span class="country-count">×${count}</span>`;
+      countryGrid.appendChild(badge);
+    });
+
+    // ===== 星星计算 =====
+    function stars(rating) {
+      let full, half;
+      if (rating >= 9) { full = 5; half = 0; }
+      else if (rating >= 8.5) { full = 4; half = 1; }
+      else if (rating >= 8.0) { full = 4; half = 0; }
+      else if (rating >= 7.5) { full = 3; half = 1; }
+      else if (rating >= 7.0) { full = 3; half = 0; }
+      else { full = 2; half = 0; }
+      const empty = 5 - full - half;
+      return '<span class="star-filled">★</span>'.repeat(full) +
+             (half ? '<span class="star-half">★</span>' : '') +
+             '<span class="star-empty">☆</span>'.repeat(empty);
     }
-  },
-  plugins: [{
-    id: 'monthDataLabels',
-    afterDatasetsDraw(chart) {
-      const { ctx, data, scales } = chart;
-      ctx.save();
-      ctx.font = '600 11px Inter';
-      ctx.fillStyle = '#615d59';
-      ctx.textAlign = 'center';
-      data.datasets[0].data.forEach((value, index) => {
-        if (value > 0) {
-          const x = scales.x.getPixelForValue(index);
-          const y = scales.y.getPixelForValue(value) - 6;
-          ctx.fillText(value, x, y);
+
+    // ===== 筛选器 =====
+    const filterMap = {
+      all: () => true,
+      high: b => b.rating >= 8.3,
+      normal: b => b.rating > 7.9 && b.rating < 8.3,
+      low: b => b.rating <= 7.9,
+    };
+
+    const highCount = books.filter(b => b.rating >= 8.3).length;
+    const normalCount = books.filter(b => b.rating > 7.9 && b.rating < 8.3).length;
+    const lowCount = books.filter(b => b.rating <= 7.9).length;
+
+    const filterBtns = [
+      { key: 'all', label: `全部 (${totalBooks})` },
+      { key: 'high', label: `🟢 高分作品 (${highCount})` },
+      { key: 'normal', label: `🟡 普通作品 (${normalCount})` },
+      { key: 'low', label: `🔴 低分作品 (${lowCount})` },
+    ];
+
+    // 添加国家筛选按钮
+    Object.entries(countryCount).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
+      filterBtns.push({
+        key: `country-${country}`,
+        label: `${COUNTRY_FLAGS[country] || ''} ${country} (${count})`
+      });
+      filterMap[`country-${country}`] = b => b.country === country;
+    });
+
+    // 添加月份筛选按钮
+    actualMonths.forEach(m => {
+      const count = books.filter(b => b.month === m).length;
+      filterBtns.push({
+        key: `month-${m}`,
+        label: `${m}月`
+      });
+      filterMap[`month-${m}`] = b => b.month === m;
+    });
+
+    let currentFilter = 'all';
+    let currentSortField = 'finish';
+    let currentSortDir = 'desc';
+    let booklistOpen = true;
+
+    const filtersEl = document.getElementById('filters');
+    filterBtns.forEach(fb => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn' + (fb.key === 'all' ? ' active' : '');
+      btn.textContent = fb.label;
+      btn.onclick = () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = fb.key;
+        const filtered = books.filter(filterMap[fb.key]);
+        renderWall(filtered);
+        renderBooklist(getSortedList(filtered));
+        if (booklistOpen) {
+          document.getElementById('booklist-content').classList.add('open');
+          document.getElementById('booklist-toggle').classList.add('open');
+        }
+      };
+      filtersEl.appendChild(btn);
+    });
+
+    // ===== 渲染封面墙 =====
+    function renderWall(list) {
+      document.getElementById('wall-count').textContent = `${list.length} 本`;
+      const wallEl = document.getElementById('cover-wall');
+      wallEl.innerHTML = '';
+      // 按 finish 时间升序排列
+      const sorted = getSortedList(list);
+      sorted.forEach(b => {
+        const item = document.createElement('div');
+        item.className = 'cover-item';
+        item.innerHTML = `
+          <div class="cover-link" onclick="window.open('${b.doubanLink}', '_blank')" title="${b.title}">
+            <div class="cover-img-wrap">
+              <img src="${b.cover}" alt="${b.title}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 150%22><rect fill=%22%23f6f5f4%22 width=%22100%22 height=%22150%22/><text x=%2250%22 y=%2280%22 text-anchor=%22middle%22 fill=%22%23a39e98%22 font-size=%2210%22>${b.title}</text></svg>'">
+              <div class="cover-overlay">
+                <div class="cover-title">${b.title}</div>
+                <div class="cover-author">${b.author}</div>
+                <div class="cover-rating">${stars(b.rating)} ${b.rating}</div>
+              </div>
+            </div>
+          </div>`;
+        wallEl.appendChild(item);
+      });
+    }
+
+    // ===== 渲染书单列表 =====
+    function renderBooklist(list) {
+      const content = document.getElementById('booklist-content');
+      content.innerHTML = list.map((b, idx) => {
+        const m = monthMeta[b.month];
+        let reviewSection = '';
+        if (b.review) {
+          const needsTruncation = b.review.length > 60;
+          const truncatedText = needsTruncation ? b.review.substring(0, 60) + '...' : b.review;
+          reviewSection = `
+            <div class="book-review" id="review-${idx}" data-full="${encodeURIComponent(b.review)}" data-truncated="${needsTruncation}">
+              ${truncatedText.replace(/\n/g, '<br>')}
+            </div>
+            ${needsTruncation ? `<button class="review-more-btn" onclick="toggleReview(${idx}, this)">展开</button>` : ''}
+          `;
+        }
+        return `<div class="book-row">
+          <div class="book-info">
+            <div class="book-title"><a href="${b.doubanLink}" target="_blank" style="color:inherit;text-decoration:none;">${b.title}</a></div>
+            <div class="book-author">${b.author}</div>
+            <div class="book-meta">
+              <span class="month-tag" style="background:${m.bg};color:${m.color}">${m.label}</span>
+              <span class="star-rating">${stars(b.rating)}</span>
+              <span class="rating-num">${b.rating}</span>
+              ${b.pages ? `<span class="pages-tag">${b.pages}页</span>` : ''}
+            </div>
+            ${reviewSection}
+          </div>
+          <div class="book-dates">${b.start}<br>${b.finish}</div>
+        </div>`;
+      }).join('');
+    }
+
+    function toggleReview(idx, btn) {
+      const review = document.getElementById(`review-${idx}`);
+      const isCollapsed = btn.textContent === '展开';
+      const fullText = decodeURIComponent(review.dataset.full);
+
+      if (isCollapsed) {
+        review.innerHTML = fullText.replace(/\n/g, '<br>');
+        btn.textContent = '收起';
+      } else {
+        review.innerHTML = fullText.substring(0, 60) + '...';
+        btn.textContent = '展开';
+      }
+    }
+
+    // ===== 展开/收起书单 =====
+    function toggleBooklist() {
+      const toggle = document.getElementById('booklist-toggle');
+      const content = document.getElementById('booklist-content');
+      booklistOpen = !booklistOpen;
+      toggle.classList.toggle('open', booklistOpen);
+      content.classList.toggle('open', booklistOpen);
+    }
+
+    // ===== 排序函数 =====
+    function getSortedList(list) {
+      const sorted = [...list];
+      const dir = currentSortDir === 'desc' ? -1 : 1;
+      switch (currentSortField) {
+        case 'finish': return sorted.sort((a, b) => a.finish.localeCompare(b.finish) * dir);
+        case 'rating': return sorted.sort((a, b) => (a.rating - b.rating) * dir);
+        case 'pages': return sorted.sort((a, b) => ((parseInt(a.pages) || 0) - (parseInt(b.pages) || 0)) * dir);
+        default: return sorted;
+      }
+    }
+
+    // ===== 排序按钮事件 =====
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const field = btn.dataset.sort;
+        if (currentSortField === field) {
+          // 同字段点击 → 切换方向
+          currentSortDir = currentSortDir === 'desc' ? 'asc' : 'desc';
+        } else {
+          // 不同字段 → 切换到该字段，默认降序
+          currentSortField = field;
+          currentSortDir = 'desc';
+        }
+        // 更新按钮文字
+        const fieldLabels = { finish: '时间', rating: '评分', pages: '页数' };
+        document.querySelectorAll('.sort-btn').forEach(b => {
+          const f = b.dataset.sort;
+          const a = (currentSortField === f) ? currentSortDir : 'desc';
+          b.textContent = fieldLabels[f] + (a === 'desc' ? ' ↓' : ' ↑');
+          b.classList.toggle('active', currentSortField === f);
+        });
+        const filtered = books.filter(filterMap[currentFilter]);
+        renderWall(filtered);
+        renderBooklist(getSortedList(filtered));
+        if (booklistOpen) {
+          document.getElementById('booklist-content').classList.add('open');
+          document.getElementById('booklist-toggle').classList.add('open');
         }
       });
-      ctx.restore();
+    });
+
+    // ===== 初始渲染 =====
+    renderWall(books);
+    renderBooklist(getSortedList(books));
+    // 默认展开清单
+    if (booklistOpen) {
+      document.getElementById('booklist-content').classList.add('open');
+      document.getElementById('booklist-toggle').classList.add('open');
     }
-  }]
-});
-</script>
+
+    // ===== 图表 =====
+    const maxMonthlyCount = Math.max(...actualMonths.map(m => monthCounts[m]));
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const chartTextColor = isDark ? '#9e9a96' : '#615d59';
+    const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
+    new Chart(document.getElementById('monthChart'), {
+      type: 'bar',
+      data: {
+        labels: monthLabels,
+        datasets: [{
+          label: '本数',
+          data: actualMonths.map(m => monthCounts[m]),
+          backgroundColor: actualMonths.map(m => MONTH_COLORS[m - 1].bg),
+          borderColor: actualMonths.map(m => MONTH_COLORS[m - 1].color),
+          borderWidth: 1,
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: Math.max(maxMonthlyCount + 1, 4),
+            ticks: { stepSize: 1, font: { family: 'Inter', size: 11 }, color: chartTextColor },
+            grid: { color: chartGridColor },
+            border: { display: false }
+          },
+          x: {
+            ticks: { font: { family: 'Inter', size: 12 }, color: chartTextColor },
+            grid: { display: false },
+            border: { display: false }
+          }
+        }
+      },
+      plugins: [{
+        id: 'monthDataLabels',
+        afterDatasetsDraw(chart) {
+          const { ctx, data, scales } = chart;
+          ctx.save();
+          ctx.font = '600 11px Inter';
+          ctx.fillStyle = chartTextColor;
+          ctx.textAlign = 'center';
+          data.datasets[0].data.forEach((value, index) => {
+            if (value > 0) {
+              const x = scales.x.getPixelForValue(index);
+              const y = scales.y.getPixelForValue(value) - 6;
+              ctx.fillText(value, x, y);
+            }
+          });
+          ctx.restore();
+        }
+      }]
+    });
+  </script>
 </body>
 </html>
