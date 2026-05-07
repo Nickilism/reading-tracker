@@ -102,7 +102,7 @@ function generate(year, books) {
   const countryMapStr = JSON.stringify(COUNTRY_PREFIX_MAP).replace(/"/g, "'");
   let output = TEMPLATE
     .replace(/\{\{YEAR\}\}/g, String(year))
-    .replace(/\{\{GENERATED_DATE\}\}/g, new Date().toISOString().split('T')[0])
+    .replace(/\{\{GENERATED_DATE\}\}/g, new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Shanghai' }))
     .replace('{{COUNTRY_PREFIX_MAP}}', countryMapStr)
     .replace('{{BOOKS_JSON}}', JSON.stringify(books));
   return output;
