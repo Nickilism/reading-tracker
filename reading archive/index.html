@@ -184,7 +184,7 @@
 
     .card {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       padding: 1.35rem 1.3rem;
       background: var(--bg-card);
       border-radius: 14px;
@@ -194,7 +194,7 @@
       color: var(--text);
       transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
       position: relative;
-      overflow: hidden;
+      overflow: visible;
     }
 
     .card::before {
@@ -222,6 +222,33 @@
     .card:active {
       transform: scale(0.985);
       transition: all 0.1s ease;
+    }
+
+    /* Cover peek-out */
+    .card-cover-wrap {
+      position: relative;
+      width: 35%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+    }
+
+    .card-cover {
+      position: absolute;
+      height: 115%;
+      aspect-ratio: 3 / 4;
+      right: -20%;
+      border-radius: 8px;
+      object-fit: cover;
+      transform: rotate(-8deg);
+      filter: drop-shadow(2px 3px 8px rgba(0, 0, 0, 0.2));
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover .card-cover {
+      transform: rotate(0deg) scale(1.05);
     }
 
     .card-top {
@@ -323,7 +350,7 @@
     /* ── Skeleton ──────────────────── */
     .skeleton-card {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       padding: 1.35rem 1.3rem;
       background: var(--bg-card);
       border-radius: 14px;
@@ -515,34 +542,42 @@
       const isLatest = year === 2026;
 
       if (stats) {
+        const coverHTML = stats.topCover
+          ? `<div class="card-cover-wrap"><img class="card-cover" src="${stats.topCover}" alt="" loading="lazy"></div>`
+          : '';
         return `
           <a href="${href}" class="card">
-            <div class="card-top">
-              <span class="card-year">${year}</span>
-              ${isLatest ? '<span class="card-badge">Latest</span>' : ''}
-            </div>
-            <div class="card-stats">
-              <div class="stat-item">
-                <span class="stat-value">${stats.count}</span>
-                <span class="stat-label">本</span>
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0;">
+              <div class="card-top">
+                <span class="card-year">${year}</span>
+                ${isLatest ? '<span class="card-badge">Latest</span>' : ''}
               </div>
-              <span class="stat-sep">|</span>
-              <div class="stat-item">
-                <span class="stat-value">${fmt(stats.totalPages)}</span>
-                <span class="stat-label">页</span>
+              <div class="card-stats">
+                <div class="stat-item">
+                  <span class="stat-value">${stats.count}</span>
+                  <span class="stat-label">本</span>
+                </div>
+                <span class="stat-sep">|</span>
+                <div class="stat-item">
+                  <span class="stat-value">${fmt(stats.totalPages)}</span>
+                  <span class="stat-label">页</span>
+                </div>
               </div>
             </div>
+            ${coverHTML}
           </a>`;
       }
 
       return `
         <a href="${href}" class="card card-error">
-          <div class="card-top">
-            <span class="card-year">${year}</span>
-            ${isLatest ? '<span class="card-badge">Latest</span>' : ''}
-          </div>
-          <div class="card-stats">
-            <span class="error-text">加载失败</span>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0;">
+            <div class="card-top">
+              <span class="card-year">${year}</span>
+              ${isLatest ? '<span class="card-badge">Latest</span>' : ''}
+            </div>
+            <div class="card-stats">
+              <span class="error-text">加载失败</span>
+            </div>
           </div>
         </a>`;
     }
@@ -573,10 +608,13 @@
       if (!json) throw new Error('no books data');
       const books = JSON.parse(json);
       const count = books.length;
-      if (count === 0) return { count: 0, avgRating: 0, totalPages: 0 };
+      if (count === 0) return { count: 0, avgRating: 0, totalPages: 0, topCover: '' };
       const totalRating = books.reduce((s, b) => s + (b.rating || 0), 0);
       const totalPages = books.reduce((s, b) => s + (parseInt(b.pages) || 0), 0);
-      return { count, avgRating: totalRating / count, totalPages };
+      const maxRating = Math.max(...books.map(b => b.rating || 0));
+      const topBook = books.find(b => (b.rating || 0) === maxRating);
+      const topCover = (topBook && topBook.cover) || '';
+      return { count, avgRating: totalRating / count, totalPages, topCover };
     }
 
     async function init() {
