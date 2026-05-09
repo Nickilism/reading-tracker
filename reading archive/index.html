@@ -21,9 +21,18 @@
       --text: rgba(0,0,0,0.95);
       --text-secondary: #615d59;
       --text-muted: #a39e98;
-      --border: rgba(0,0,0,0.1);
+      --border: rgba(0,0,0,0.08);
+      --border-strong: rgba(0,0,0,0.12);
       --accent: #0075de;
-      --shadow-hover: 0 2px 6px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
+      --stat-num: #333333;
+      --stat-label: #888888;
+      --card-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      --card-shadow-hover: 0 3px 8px rgba(0,0,0,0.1);
+      --skeleton-base: #eae8e6;
+      --skeleton-shine: #f5f4f3;
+      --badge-bg: #0075de;
+      --badge-text: #ffffff;
+      --summary-bg: #f6f5f4;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -33,8 +42,18 @@
         --text: rgba(255,255,255,0.92);
         --text-secondary: #9e9a96;
         --text-muted: #6b6762;
-        --border: rgba(255,255,255,0.1);
-        --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
+        --border: rgba(255,255,255,0.08);
+        --border-strong: rgba(255,255,255,0.15);
+        --accent: #4da3f0;
+        --stat-num: rgba(255,255,255,0.7);
+        --stat-label: rgba(255,255,255,0.4);
+        --card-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        --card-shadow-hover: 0 3px 8px rgba(0,0,0,0.3);
+        --skeleton-base: #2a2a2e;
+        --skeleton-shine: #3a3a3e;
+        --badge-bg: #4da3f0;
+        --badge-text: #121214;
+        --summary-bg: #1c1c1f;
       }
     }
 
@@ -49,14 +68,14 @@
     }
 
     .page {
-      max-width: 600px;
+      max-width: 680px;
       margin: 0 auto;
     }
 
     header {
       border-bottom: 1px solid var(--border);
       padding-bottom: 1.25rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
 
     h1 {
@@ -76,40 +95,31 @@
       font-weight: 500;
     }
 
-    .archive-list {
+    /* Summary bar */
+    .global-summary {
+      display: flex;
+      gap: 2rem;
+      padding: 1rem 1.25rem;
+      background: var(--summary-bg);
+      border-radius: 12px;
+      margin-bottom: 1.75rem;
+      flex-wrap: wrap;
+    }
+
+    .summary-item {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 2px;
     }
 
-    .archive-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 1.25rem;
-      background: var(--bg-alt);
-      border-radius: 12px;
-      text-decoration: none;
+    .summary-value {
+      font-size: 1.25rem;
+      font-weight: 700;
       color: var(--text);
-      transition: all 0.2s ease;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      font-variant-numeric: tabular-nums;
     }
 
-    .archive-item:hover {
-      box-shadow: var(--shadow-hover);
-      transform: translateY(-1px);
-    }
-
-    .archive-item:active {
-      transform: translateY(0);
-    }
-
-    .year {
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
-    .badge {
+    .summary-label {
       font-size: 11px;
       font-weight: 500;
       color: var(--text-muted);
@@ -117,17 +127,167 @@
       text-transform: uppercase;
     }
 
-    .arrow {
+    /* Card grid */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 520px) {
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      padding: 1.25rem;
+      background: var(--bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: var(--card-shadow);
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--card-shadow-hover);
+      border-color: var(--border-strong);
+    }
+
+    .card:active {
+      transform: scale(0.99);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-year {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1;
+      letter-spacing: -0.5px;
+    }
+
+    .card-badge {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--badge-text);
+      background: var(--badge-bg);
+      padding: 2px 8px;
+      border-radius: 10px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* Stats: horizontal layout with | separator */
+    .card-stats {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: baseline;
+      gap: 0.2rem;
+    }
+
+    .stat-value {
+      font-size: 0.9375rem;
+      font-weight: 400;
+      color: var(--stat-num);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--stat-label);
+    }
+
+    .stat-sep {
+      color: var(--border-strong);
+      font-size: 14px;
+      font-weight: 200;
+      user-select: none;
+    }
+
+    /* Error state */
+    .card-error .card-stats {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+    }
+
+    .error-text {
+      font-size: 13px;
       color: var(--text-muted);
-      font-size: 1.25rem;
-      transition: transform 0.2s ease;
     }
 
-    .archive-item:hover .arrow {
-      transform: translateX(4px);
-      color: var(--accent);
+    /* Skeleton */
+    .skeleton-card {
+      display: flex;
+      flex-direction: column;
+      padding: 1.25rem;
+      background: var(--bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: var(--card-shadow);
     }
 
+    .skeleton-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .skeleton-line {
+      border-radius: 6px;
+      background: var(--skeleton-base);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .skeleton-line::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+
+    .skeleton-year {
+      width: 56px;
+      height: 24px;
+    }
+
+    .skeleton-badge {
+      width: 44px;
+      height: 18px;
+      border-radius: 10px;
+    }
+
+    .skeleton-stat {
+      height: 16px;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* Footer */
     footer {
       margin-top: 3rem;
       padding-top: 1.5rem;
@@ -150,7 +310,6 @@
 
     .project-link:hover {
       color: var(--accent);
-      background: var(--bg-alt);
     }
 
     .project-link svg {
@@ -166,43 +325,8 @@
       <p class="subtitle">Reading Tracker Archive</p>
     </header>
 
-    <div class="archive-list">
-      <a href="../2026_reading_tracker.html" class="archive-item">
-        <span class="year">2026</span>
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
-          <span class="badge">Latest</span>
-          <span class="arrow">→</span>
-        </div>
-      </a>
-      <a href="2025_reading_tracker.html" class="archive-item">
-        <span class="year">2025</span>
-        <span class="arrow">→</span>
-      </a>
-      <a href="2024_reading_tracker.html" class="archive-item">
-        <span class="year">2024</span>
-        <span class="arrow">→</span>
-      </a>
-      <a href="2023_reading_tracker.html" class="archive-item">
-        <span class="year">2023</span>
-        <span class="arrow">→</span>
-      </a>
-      <a href="2022_reading_tracker.html" class="archive-item">
-        <span class="year">2022</span>
-        <span class="arrow">→</span>
-      </a>
-      <a href="2021_reading_tracker.html" class="archive-item">
-        <span class="year">2021</span>
-        <span class="arrow">→</span>
-      </a>
-      <a href="2020_reading_tracker.html" class="archive-item">
-        <span class="year">2020</span>
-        <span class="arrow">→</span>
-      </a>
-      <a href="2019_reading_tracker.html" class="archive-item">
-        <span class="year">2019</span>
-        <span class="arrow">→</span>
-      </a>
-    </div>
+    <div class="global-summary" id="globalSummary"></div>
+    <div class="card-grid" id="cardGrid"></div>
 
     <footer>
       <a href="https://github.com/Nickilism/reading-tracker" class="project-link" target="_blank">
@@ -213,5 +337,159 @@
       </a>
     </footer>
   </div>
+
+  <script>
+    const YEARS = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019];
+
+    function extractBooksJson(html) {
+      const marker = 'const books = ';
+      const idx = html.indexOf(marker);
+      if (idx === -1) return null;
+      const start = html.indexOf('[', idx);
+      if (start === -1) return null;
+      let depth = 0;
+      for (let i = start; i < html.length; i++) {
+        if (html[i] === '[') depth++;
+        else if (html[i] === ']') { depth--; if (depth === 0) return html.slice(start, i + 1); }
+      }
+      return null;
+    }
+
+    function fmt(n) {
+      return n.toLocaleString('zh-CN');
+    }
+
+    function skeletonHTML(hasBadge) {
+      return `
+        <div class="skeleton-top">
+          <div class="skeleton-line skeleton-year"></div>
+          ${hasBadge ? '<div class="skeleton-line skeleton-badge"></div>' : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div class="skeleton-line skeleton-stat" style="width:40px;"></div>
+          <div class="skeleton-line skeleton-stat" style="width:32px;"></div>
+          <div class="skeleton-line skeleton-stat" style="width:52px;"></div>
+        </div>`;
+    }
+
+    function renderCard(year, stats) {
+      const href = year === 2026 ? '../2026_reading_tracker.html' : year + '_reading_tracker.html';
+      const isLatest = year === 2026;
+
+      if (stats) {
+        return `
+          <a href="${href}" class="card">
+            <div class="card-top">
+              <span class="card-year">${year}</span>
+              ${isLatest ? '<span class="card-badge">Latest</span>' : ''}
+            </div>
+            <div class="card-stats">
+              <div class="stat-item">
+                <span class="stat-value">${stats.count}</span>
+                <span class="stat-label">本</span>
+              </div>
+              <span class="stat-sep">|</span>
+              <div class="stat-item">
+                <span class="stat-value">${stats.avgRating.toFixed(1)}</span>
+                <span class="stat-label">分</span>
+              </div>
+              <span class="stat-sep">|</span>
+              <div class="stat-item">
+                <span class="stat-value">${fmt(stats.totalPages)}</span>
+                <span class="stat-label">页</span>
+              </div>
+            </div>
+          </a>`;
+      }
+
+      return `
+        <a href="${href}" class="card card-error">
+          <div class="card-top">
+            <span class="card-year">${year}</span>
+            ${isLatest ? '<span class="card-badge">Latest</span>' : ''}
+          </div>
+          <div class="card-stats">
+            <span class="error-text">加载失败</span>
+          </div>
+        </a>`;
+    }
+
+    function renderGlobalSummary(totals) {
+      const el = document.getElementById('globalSummary');
+      el.innerHTML = `
+        <div class="summary-item">
+          <span class="summary-value">${totals.totalBooks}</span>
+          <span class="summary-label">累计本数</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-value">${totals.years} 年</span>
+          <span class="summary-label">持续阅读</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-value">${fmt(totals.totalPages)}</span>
+          <span class="summary-label">累计页数</span>
+        </div>`;
+    }
+
+    async function loadYear(year) {
+      const path = year === 2026 ? '../2026_reading_tracker.html' : year + '_reading_tracker.html';
+      const resp = await fetch(path);
+      if (!resp.ok) throw new Error(resp.status);
+      const html = await resp.text();
+      const json = extractBooksJson(html);
+      if (!json) throw new Error('no books data');
+      const books = JSON.parse(json);
+      const count = books.length;
+      if (count === 0) return { count: 0, avgRating: 0, totalPages: 0 };
+      const totalRating = books.reduce((s, b) => s + (b.rating || 0), 0);
+      const totalPages = books.reduce((s, b) => s + (parseInt(b.pages) || 0), 0);
+      return { count, avgRating: totalRating / count, totalPages };
+    }
+
+    async function init() {
+      const grid = document.getElementById('cardGrid');
+      const summaryEl = document.getElementById('globalSummary');
+
+      grid.innerHTML = YEARS.map((y, i) =>
+        `<div class="skeleton-card" id="slot-${y}">${skeletonHTML(i === 0)}</div>`
+      ).join('');
+      summaryEl.innerHTML = `
+        <div class="summary-item">
+          <div class="skeleton-line" style="width:48px;height:20px;border-radius:6px"></div>
+          <span class="summary-label">累计本数</span>
+        </div>
+        <div class="summary-item">
+          <div class="skeleton-line" style="width:56px;height:20px;border-radius:6px"></div>
+          <span class="summary-label">持续阅读</span>
+        </div>
+        <div class="summary-item">
+          <div class="skeleton-line" style="width:72px;height:20px;border-radius:6px"></div>
+          <span class="summary-label">累计页数</span>
+        </div>`;
+
+      const totals = { totalBooks: 0, years: 0, totalPages: 0 };
+
+      const tasks = YEARS.map(async (year) => {
+        let stats = null;
+        try {
+          stats = await loadYear(year);
+          totals.totalBooks += stats.count;
+          totals.years++;
+          totals.totalPages += stats.totalPages;
+        } catch (e) { /* stats stays null */ }
+
+        const slot = document.getElementById('slot-' + year);
+        if (slot) {
+          slot.outerHTML = renderCard(year, stats);
+        }
+
+        renderGlobalSummary(totals);
+      });
+
+      await Promise.all(tasks);
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
 </html>
