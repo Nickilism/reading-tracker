@@ -113,8 +113,8 @@
     }
 
     .summary-value {
-      font-size: 1.25rem;
-      font-weight: 700;
+      font-size: 1.5rem;
+      font-weight: 600;
       color: var(--text);
       font-variant-numeric: tabular-nums;
     }
@@ -367,7 +367,6 @@
         </div>
         <div style="display:flex;align-items:center;gap:0.5rem;">
           <div class="skeleton-line skeleton-stat" style="width:40px;"></div>
-          <div class="skeleton-line skeleton-stat" style="width:32px;"></div>
           <div class="skeleton-line skeleton-stat" style="width:52px;"></div>
         </div>`;
     }
@@ -387,11 +386,6 @@
               <div class="stat-item">
                 <span class="stat-value">${stats.count}</span>
                 <span class="stat-label">本</span>
-              </div>
-              <span class="stat-sep">|</span>
-              <div class="stat-item">
-                <span class="stat-value">${stats.avgRating.toFixed(1)}</span>
-                <span class="stat-label">分</span>
               </div>
               <span class="stat-sep">|</span>
               <div class="stat-item">
@@ -434,7 +428,7 @@
     async function loadYear(year) {
       const path = year === 2026 ? '../2026_reading_tracker.html' : year + '_reading_tracker.html';
       const resp = await fetch(path);
-      if (!resp.ok) throw new Error(resp.status);
+      if (!resp.ok && resp.status !== 0) throw new Error(resp.status);
       const html = await resp.text();
       const json = extractBooksJson(html);
       if (!json) throw new Error('no books data');
@@ -455,15 +449,15 @@
       ).join('');
       summaryEl.innerHTML = `
         <div class="summary-item">
-          <div class="skeleton-line" style="width:48px;height:20px;border-radius:6px"></div>
+          <div class="skeleton-line" style="width:48px;height:24px;border-radius:6px"></div>
           <span class="summary-label">累计本数</span>
         </div>
         <div class="summary-item">
-          <div class="skeleton-line" style="width:56px;height:20px;border-radius:6px"></div>
+          <div class="skeleton-line" style="width:56px;height:24px;border-radius:6px"></div>
           <span class="summary-label">持续阅读</span>
         </div>
         <div class="summary-item">
-          <div class="skeleton-line" style="width:72px;height:20px;border-radius:6px"></div>
+          <div class="skeleton-line" style="width:72px;height:24px;border-radius:6px"></div>
           <span class="summary-label">累计页数</span>
         </div>`;
 
