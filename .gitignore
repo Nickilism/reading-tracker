@@ -24,4 +24,5 @@ node_modules/
 
 # Claude Code guidance
 CLAUDE.md
+.claude/settings.local.json
 !reading archive/*.html
