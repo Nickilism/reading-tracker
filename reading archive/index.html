@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1f1f22">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafaf9">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f0f11">
   <title>阅读记录归档</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after {
       box-sizing: border-box;
@@ -16,44 +16,58 @@
     }
 
     :root {
-      --bg: #ffffff;
-      --bg-alt: #f6f5f4;
-      --text: rgba(0,0,0,0.95);
-      --text-secondary: #615d59;
-      --text-muted: #a39e98;
-      --border: rgba(0,0,0,0.08);
-      --border-strong: rgba(0,0,0,0.12);
-      --accent: #0075de;
-      --stat-num: #333333;
-      --stat-label: #888888;
-      --card-shadow: 0 1px 3px rgba(0,0,0,0.06);
-      --card-shadow-hover: 0 3px 8px rgba(0,0,0,0.1);
-      --skeleton-base: #eae8e6;
-      --skeleton-shine: #f5f4f3;
+      --bg: #fafaf9;
+      --bg-alt: #f2f0ee;
+      --bg-card: #ffffff;
+      --text: #1a1817;
+      --text-secondary: #5c5855;
+      --text-muted: #9c9793;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.10);
+      --border-card: rgba(0, 0, 0, 0.05);
+      --accent: #0066cc;
+      --accent-soft: #e8f2fb;
+      --stat-num: #1a1817;
+      --stat-label: #8a8580;
+      --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 2px 6px rgba(0, 0, 0, 0.04);
+      --card-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.08);
+      --skeleton-base: #e8e5e2;
+      --skeleton-shine: #f5f3f1;
       --badge-bg: #0075de;
       --badge-text: #ffffff;
-      --summary-bg: #f6f5f4;
+      --summary-bg: #ffffff;
+      --summary-border: rgba(0, 0, 0, 0.05);
+      --summary-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.04);
+      --divider: rgba(0, 0, 0, 0.08);
+      --header-dot: #0066cc;
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #121214;
-        --bg-alt: #1c1c1f;
-        --text: rgba(255,255,255,0.92);
-        --text-secondary: #9e9a96;
-        --text-muted: #6b6762;
-        --border: rgba(255,255,255,0.08);
-        --border-strong: rgba(255,255,255,0.15);
-        --accent: #4da3f0;
-        --stat-num: rgba(255,255,255,0.7);
-        --stat-label: rgba(255,255,255,0.4);
-        --card-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        --card-shadow-hover: 0 3px 8px rgba(0,0,0,0.3);
-        --skeleton-base: #2a2a2e;
-        --skeleton-shine: #3a3a3e;
+        --bg: #0f0f11;
+        --bg-alt: #1a1a1d;
+        --bg-card: #161618;
+        --text: rgba(255, 255, 255, 0.91);
+        --text-secondary: #a19d98;
+        --text-muted: #6e6a65;
+        --border: rgba(255, 255, 255, 0.06);
+        --border-strong: rgba(255, 255, 255, 0.12);
+        --border-card: rgba(255, 255, 255, 0.05);
+        --accent: #5ba4f0;
+        --accent-soft: rgba(91, 164, 240, 0.10);
+        --stat-num: rgba(255, 255, 255, 0.88);
+        --stat-label: rgba(255, 255, 255, 0.38);
+        --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.2), 0 8px 20px rgba(0, 0, 0, 0.35);
+        --skeleton-base: #252528;
+        --skeleton-shine: #323236;
         --badge-bg: #4da3f0;
         --badge-text: #121214;
-        --summary-bg: #1c1c1f;
+        --summary-bg: #161618;
+        --summary-border: rgba(255, 255, 255, 0.06);
+        --summary-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 6px 16px rgba(0, 0, 0, 0.3);
+        --divider: rgba(255, 255, 255, 0.08);
+        --header-dot: #5ba4f0;
       }
     }
 
@@ -62,9 +76,11 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 2rem 1rem;
+      padding: 2.5rem 1rem 2rem;
       line-height: 1.5;
-      transition: background 0.2s ease, color 0.2s ease;
+      transition: background 0.25s ease, color 0.25s ease;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     .page {
@@ -72,62 +88,87 @@
       margin: 0 auto;
     }
 
+    /* ── Header ─────────────────────── */
     header {
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1.25rem;
-      margin-bottom: 1.5rem;
-    }
-
-    h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      letter-spacing: -0.625px;
-      color: var(--text);
-      line-height: 1.1;
-    }
-
-    .subtitle {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 4px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-weight: 500;
-    }
-
-    /* Summary bar */
-    .global-summary {
-      display: flex;
-      gap: 2rem;
-      padding: 1rem 1.25rem;
-      background: var(--summary-bg);
-      border-radius: 12px;
+      padding-bottom: 1.5rem;
       margin-bottom: 1.75rem;
+      border-bottom: 2px solid var(--border);
+      position: relative;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
       flex-wrap: wrap;
     }
 
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-top: 0.3rem;
+    }
+
+    /* ── Global Summary ────────────── */
+    .global-summary {
+      display: flex;
+      gap: 0;
+      padding: 0;
+      background: var(--summary-bg);
+      border-radius: 14px;
+      border: 1px solid var(--summary-border);
+      box-shadow: var(--summary-shadow);
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+
     .summary-item {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      align-items: center;
+      justify-content: center;
+      padding: 1.35rem 0.75rem 1.25rem;
+      position: relative;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .summary-item + .summary-item {
+      border-left: 1px solid var(--divider);
     }
 
     .summary-value {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--text);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--stat-num);
       font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 0.35rem;
     }
 
     .summary-label {
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 500;
-      color: var(--text-muted);
-      letter-spacing: 0.05em;
+      color: var(--stat-label);
+      letter-spacing: 0.06em;
       text-transform: uppercase;
+      white-space: nowrap;
     }
 
-    /* Card grid */
+    /* ── Card Grid ─────────────────── */
     .card-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -137,44 +178,67 @@
     @media (max-width: 520px) {
       .card-grid {
         grid-template-columns: 1fr;
+        gap: 0.75rem;
       }
     }
 
     .card {
       display: flex;
       flex-direction: column;
-      padding: 1.25rem;
-      background: var(--bg);
-      border-radius: 12px;
-      border: 1px solid var(--border);
+      padding: 1.35rem 1.3rem;
+      background: var(--bg-card);
+      border-radius: 14px;
+      border: 1px solid var(--border-card);
       box-shadow: var(--card-shadow);
       text-decoration: none;
       color: var(--text);
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      pointer-events: none;
+      border: 1px solid transparent;
+      transition: border-color 0.25s ease;
+      z-index: 1;
     }
 
     .card:hover {
       box-shadow: var(--card-shadow-hover);
       border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    .card:hover::before {
+      border-color: var(--accent);
+      opacity: 0.25;
     }
 
     .card:active {
-      transform: scale(0.99);
+      transform: scale(0.985);
+      transition: all 0.1s ease;
     }
 
     .card-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.85rem;
+      position: relative;
+      z-index: 2;
     }
 
     .card-year {
-      font-size: 1.5rem;
-      font-weight: 600;
+      font-size: 1.65rem;
+      font-weight: 700;
       color: var(--text);
       line-height: 1;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.03em;
     }
 
     .card-badge {
@@ -182,74 +246,93 @@
       font-weight: 600;
       color: var(--badge-text);
       background: var(--badge-bg);
-      padding: 2px 8px;
-      border-radius: 10px;
-      letter-spacing: 0.04em;
+      padding: 3px 10px;
+      border-radius: 12px;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
+      line-height: 1;
     }
 
-    /* Stats: horizontal layout with | separator */
     .card-stats {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.55rem;
       flex-wrap: wrap;
+      position: relative;
+      z-index: 2;
     }
 
     .stat-item {
       display: flex;
       align-items: baseline;
-      gap: 0.2rem;
+      gap: 0.18rem;
     }
 
     .stat-value {
-      font-size: 0.9375rem;
-      font-weight: 400;
+      font-size: 1rem;
+      font-weight: 500;
       color: var(--stat-num);
       font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
     }
 
     .stat-label {
       font-size: 11px;
       color: var(--stat-label);
+      font-weight: 400;
     }
 
     .stat-sep {
       color: var(--border-strong);
-      font-size: 14px;
-      font-weight: 200;
+      font-size: 13px;
+      font-weight: 300;
       user-select: none;
+      opacity: 0.7;
     }
 
     /* Error state */
+    .card-error {
+      cursor: default;
+      opacity: 0.7;
+    }
+    .card-error:hover {
+      transform: none;
+      box-shadow: var(--card-shadow);
+      border-color: var(--border-card);
+    }
+    .card-error:hover::before {
+      border-color: transparent;
+      opacity: 0;
+    }
     .card-error .card-stats {
       display: flex;
       align-items: center;
-      justify-content: center;
-      min-height: 32px;
+      justify-content: flex-start;
+      min-height: 28px;
     }
-
     .error-text {
-      font-size: 13px;
+      font-size: 12.5px;
       color: var(--text-muted);
+      font-style: italic;
     }
 
-    /* Skeleton */
+    /* ── Skeleton ──────────────────── */
     .skeleton-card {
       display: flex;
       flex-direction: column;
-      padding: 1.25rem;
-      background: var(--bg);
-      border-radius: 12px;
-      border: 1px solid var(--border);
+      padding: 1.35rem 1.3rem;
+      background: var(--bg-card);
+      border-radius: 14px;
+      border: 1px solid var(--border-card);
       box-shadow: var(--card-shadow);
+      pointer-events: none;
     }
 
     .skeleton-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.85rem;
     }
 
     .skeleton-line {
@@ -263,31 +346,64 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
-      animation: shimmer 1.5s infinite;
+      background: linear-gradient(100deg,
+        transparent 0%,
+        transparent 35%,
+        var(--skeleton-shine) 50%,
+        transparent 65%,
+        transparent 100%);
+      animation: shimmer 1.8s ease-in-out infinite;
     }
 
     .skeleton-year {
-      width: 56px;
-      height: 24px;
+      width: 58px;
+      height: 26px;
+      border-radius: 7px;
     }
 
     .skeleton-badge {
-      width: 44px;
-      height: 18px;
-      border-radius: 10px;
+      width: 48px;
+      height: 20px;
+      border-radius: 11px;
     }
 
     .skeleton-stat {
-      height: 16px;
+      height: 17px;
+      border-radius: 5px;
     }
 
     @keyframes shimmer {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(120%); }
     }
 
-    /* Footer */
+    /* ── Entrance animation ────────── */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card,
+    .skeleton-card {
+      animation: fadeInUp 0.4s ease backwards;
+    }
+
+    .card:nth-child(1), .skeleton-card:nth-child(1) { animation-delay: 0.02s; }
+    .card:nth-child(2), .skeleton-card:nth-child(2) { animation-delay: 0.06s; }
+    .card:nth-child(3), .skeleton-card:nth-child(3) { animation-delay: 0.10s; }
+    .card:nth-child(4), .skeleton-card:nth-child(4) { animation-delay: 0.14s; }
+    .card:nth-child(5), .skeleton-card:nth-child(5) { animation-delay: 0.18s; }
+    .card:nth-child(6), .skeleton-card:nth-child(6) { animation-delay: 0.22s; }
+    .card:nth-child(7), .skeleton-card:nth-child(7) { animation-delay: 0.26s; }
+    .card:nth-child(8), .skeleton-card:nth-child(8) { animation-delay: 0.30s; }
+
+    /* ── Footer ────────────────────── */
     footer {
       margin-top: 3rem;
       padding-top: 1.5rem;
@@ -302,26 +418,67 @@
       color: var(--text-secondary);
       text-decoration: none;
       font-size: 13px;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
+      padding: 0.55rem 1.15rem;
+      border-radius: 22px;
       background: var(--bg-alt);
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
+      font-weight: 500;
+      letter-spacing: 0.01em;
     }
 
     .project-link:hover {
       color: var(--accent);
+      background: var(--accent-soft);
     }
 
     .project-link svg {
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      opacity: 0.7;
+      transition: opacity 0.25s ease;
+    }
+
+    .project-link:hover svg {
+      opacity: 1;
+    }
+
+    /* ── Responsive ────────────────── */
+    @media (max-width: 480px) {
+      body {
+        padding: 1.5rem 0.75rem 1.5rem;
+      }
+      .global-summary {
+        flex-wrap: wrap;
+        border-radius: 12px;
+      }
+      .summary-item {
+        flex: 1 1 auto;
+        min-width: 80px;
+        padding: 1rem 0.5rem;
+      }
+      .summary-item + .summary-item {
+        border-left: 1px solid var(--divider);
+      }
+      .summary-value {
+        font-size: 1.55rem;
+      }
+      .summary-label {
+        font-size: 9.5px;
+        letter-spacing: 0.04em;
+      }
+      h1 {
+        font-size: 1.55rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="page">
     <header>
-      <h1>阅读记录归档</h1>
+      <div class="header-row">
+        <h1>阅读记录归档</h1>
+      </div>
       <p class="subtitle">Reading Tracker Archive</p>
     </header>
 
@@ -329,8 +486,8 @@
     <div class="card-grid" id="cardGrid"></div>
 
     <footer>
-      <a href="https://github.com/Nickilism/reading-tracker" class="project-link" target="_blank">
-        <svg viewBox="0 0 24 24" fill="currentColor">
+      <a href="https://github.com/Nickilism/reading-tracker" class="project-link" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
         </svg>
         GitHub 项目地址
@@ -365,9 +522,9 @@
           <div class="skeleton-line skeleton-year"></div>
           ${hasBadge ? '<div class="skeleton-line skeleton-badge"></div>' : ''}
         </div>
-        <div style="display:flex;align-items:center;gap:0.5rem;">
-          <div class="skeleton-line skeleton-stat" style="width:40px;"></div>
-          <div class="skeleton-line skeleton-stat" style="width:52px;"></div>
+        <div style="display:flex;align-items:center;gap:0.55rem;">
+          <div class="skeleton-line skeleton-stat" style="width:44px;"></div>
+          <div class="skeleton-line skeleton-stat" style="width:56px;"></div>
         </div>`;
     }
 
@@ -449,16 +606,16 @@
       ).join('');
       summaryEl.innerHTML = `
         <div class="summary-item">
-          <div class="skeleton-line" style="width:48px;height:24px;border-radius:6px"></div>
-          <span class="summary-label">累计本数</span>
+          <div class="skeleton-line" style="width:52px;height:28px;border-radius:7px;display:inline-block;"></div>
+          <span class="summary-label" style="margin-top:0.35rem;">累计本数</span>
         </div>
         <div class="summary-item">
-          <div class="skeleton-line" style="width:56px;height:24px;border-radius:6px"></div>
-          <span class="summary-label">持续阅读</span>
+          <div class="skeleton-line" style="width:60px;height:28px;border-radius:7px;display:inline-block;"></div>
+          <span class="summary-label" style="margin-top:0.35rem;">持续阅读</span>
         </div>
         <div class="summary-item">
-          <div class="skeleton-line" style="width:72px;height:24px;border-radius:6px"></div>
-          <span class="summary-label">累计页数</span>
+          <div class="skeleton-line" style="width:76px;height:28px;border-radius:7px;display:inline-block;"></div>
+          <span class="summary-label" style="margin-top:0.35rem;">累计页数</span>
         </div>`;
 
       const totals = { totalBooks: 0, years: 0, totalPages: 0 };
