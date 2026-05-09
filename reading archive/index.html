@@ -225,9 +225,10 @@
     }
 
     /* Cover peek-out */
+    /* Cover stack peek-out */
     .card-cover-wrap {
       position: relative;
-      width: 35%;
+      width: 55%;
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -239,15 +240,27 @@
       position: absolute;
       height: 115%;
       aspect-ratio: 3 / 4;
-      right: -20%;
       border-radius: 8px;
       object-fit: cover;
-      transform: rotate(-8deg);
-      filter: drop-shadow(2px 3px 8px rgba(0, 0, 0, 0.2));
+      filter: drop-shadow(2px 3px 6px rgba(0, 0, 0, 0.15));
       transition: transform 0.3s ease;
     }
 
-    .card:hover .card-cover {
+    /* Back covers: fan left, each showing ~30% */
+    .card-cover:nth-child(1) { right: 60%; z-index: 1; transform: rotate(-8deg); }
+    .card-cover:nth-child(2) { right: 45%; z-index: 2; transform: rotate(-6deg); }
+    .card-cover:nth-child(3) { right: 30%; z-index: 3; transform: rotate(-4deg); }
+    .card-cover:nth-child(4) { right: 15%; z-index: 4; transform: rotate(-2deg); }
+
+    /* Front cover: always the last (highest-rated), fully visible */
+    .card-cover:last-child {
+      right: -5%;
+      z-index: 10;
+      transform: rotate(-8deg);
+      filter: drop-shadow(2px 3px 8px rgba(0, 0, 0, 0.2));
+    }
+
+    .card:hover .card-cover:last-child {
       transform: rotate(0deg) scale(1.05);
     }
 
@@ -269,19 +282,19 @@
     }
 
     .card-badge {
-      font-size: 10px;
+      font-size: 8px;
       font-weight: 600;
       color: var(--badge-text);
       background: var(--badge-bg);
-      padding: 4px 10px 2px 12px;
-      border-radius: 12px;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+      padding: 1.5px 5px;
+      border-radius: 4px;
+      letter-spacing: 0.06em;
+      text-transform: none;
       line-height: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 20px;
+      position: relative;
+      top: -0.6em;
+      margin-left: 3px;
+      vertical-align: super;
     }
 
     .card-stats {
@@ -542,15 +555,14 @@
       const isLatest = year === 2026;
 
       if (stats) {
-        const coverHTML = stats.topCover
-          ? `<div class="card-cover-wrap"><img class="card-cover" src="${stats.topCover}" alt="" loading="lazy"></div>`
+        const coverHTML = stats.topCovers?.length
+          ? `<div class="card-cover-wrap">${stats.topCovers.map(url => `<img class="card-cover" src="${url}" alt="" loading="lazy">`).join('')}</div>`
           : '';
         return `
           <a href="${href}" class="card">
             <div style="flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0;">
               <div class="card-top">
-                <span class="card-year">${year}</span>
-                ${isLatest ? '<span class="card-badge">Latest</span>' : ''}
+                <span class="card-year">${year}${isLatest ? '<span class="card-badge">Reading</span>' : ''}</span>
               </div>
               <div class="card-stats">
                 <div class="stat-item">
@@ -572,8 +584,7 @@
         <a href="${href}" class="card card-error">
           <div style="flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0;">
             <div class="card-top">
-              <span class="card-year">${year}</span>
-              ${isLatest ? '<span class="card-badge">Latest</span>' : ''}
+              <span class="card-year">${year}${isLatest ? '<span class="card-badge">Reading</span>' : ''}</span>
             </div>
             <div class="card-stats">
               <span class="error-text">加载失败</span>
@@ -608,13 +619,12 @@
       if (!json) throw new Error('no books data');
       const books = JSON.parse(json);
       const count = books.length;
-      if (count === 0) return { count: 0, avgRating: 0, totalPages: 0, topCover: '' };
+      if (count === 0) return { count: 0, avgRating: 0, totalPages: 0, topCovers: [] };
       const totalRating = books.reduce((s, b) => s + (b.rating || 0), 0);
       const totalPages = books.reduce((s, b) => s + (parseInt(b.pages) || 0), 0);
-      const maxRating = Math.max(...books.map(b => b.rating || 0));
-      const topBook = books.find(b => (b.rating || 0) === maxRating);
-      const topCover = (topBook && topBook.cover) || '';
-      return { count, avgRating: totalRating / count, totalPages, topCover };
+      const sorted = [...books].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      const topCovers = sorted.slice(0, 5).reverse().map(b => b.cover || '').filter(Boolean);
+      return { count, avgRating: totalRating / count, totalPages, topCovers };
     }
 
     async function init() {
