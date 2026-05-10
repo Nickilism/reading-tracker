@@ -8,6 +8,7 @@ on:
       - 'template.js'
       - 'reading-tracker-github.js'
       - 'reading-tracker-year-github.js'
+      - 'reading archive/index.html'
 
   # Airtable Automation 触发
   repository_dispatch:
