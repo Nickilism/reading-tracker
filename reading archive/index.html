@@ -518,7 +518,12 @@
   </div>
 
   <script>
-    const YEARS = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019];
+    const CURRENT_YEAR = new Date().getFullYear();
+    const START_YEAR = 2019;
+    const YEARS = [];
+    for (let y = CURRENT_YEAR; y >= START_YEAR; y--) {
+      YEARS.push(y);
+    }
 
     function extractBooksJson(html) {
       const marker = 'const books = ';
@@ -552,7 +557,7 @@
 
     function renderCard(year, stats) {
       const href = year === 2026 ? '../2026_reading_tracker.html' : year + '_reading_tracker.html';
-      const isLatest = year === 2026;
+      const isLatest = year === CURRENT_YEAR;
 
       if (stats) {
         const coverHTML = stats.topCovers?.length
@@ -611,7 +616,9 @@
     }
 
     async function loadYear(year) {
-      const path = year === 2026 ? '../2026_reading_tracker.html' : year + '_reading_tracker.html';
+      const path = year === CURRENT_YEAR
+        ? `../${CURRENT_YEAR}_reading_tracker.html`
+        : year + '_reading_tracker.html';
       const resp = await fetch(path);
       if (!resp.ok && resp.status !== 0) throw new Error(resp.status);
       const html = await resp.text();
