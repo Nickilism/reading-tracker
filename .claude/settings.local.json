@@ -4,7 +4,10 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:sspai.com)",
       "WebSearch",
-      "Bash(curl -s \"https://sspai.com/\")"
+      "Bash(curl -s \"https://sspai.com/\")",
+      "mcp__plugin_telegram_telegram__reply",
+      "WebFetch(domain:www.weather.com.cn)",
+      "WebFetch(domain:tianqi.com)"
     ],
     "defaultMode": "acceptEdits"
   }
