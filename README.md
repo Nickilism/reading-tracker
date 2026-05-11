@@ -4,7 +4,7 @@
 
 演示地址：
 
-https://nickilism.github.io/reading-tracker/2026_reading_tracker.html
+https://nickilism.github.io/reading-tracker/reading%20archive/index.html
 
 ## 功能
 
@@ -162,7 +162,7 @@ git push -u origin main
 
 ### 第九步：验证
 
-访问 `https://你的用户名.github.io/reading-tracker/2026_reading_tracker.html`
+访问 `https://你的用户名.github.io/reading-tracker/reading%20archive/index.html`
 
 ## 触发方式
 
