@@ -25,3 +25,4 @@ node_modules/
 # Claude Code guidance
 .claude/settings.local.json
 !reading archive/*.html
+.gstack/
