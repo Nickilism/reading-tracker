@@ -7,7 +7,12 @@
       "Bash(curl -s \"https://sspai.com/\")",
       "mcp__plugin_telegram_telegram__reply",
       "WebFetch(domain:www.weather.com.cn)",
-      "WebFetch(domain:tianqi.com)"
+      "WebFetch(domain:tianqi.com)",
+      "Bash(./setup --quiet)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'perf: optimize Google Fonts loading and fix date alignment *)",
+      "Bash(git push *)",
+      "Bash(claude mcp *)"
     ],
     "defaultMode": "acceptEdits"
   }
