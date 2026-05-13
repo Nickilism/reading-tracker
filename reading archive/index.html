@@ -484,12 +484,22 @@
     }
 
     .search-hidden {
-      opacity: 0;
-      height: 0;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      pointer-events: none;
+      display: none;
+    }
+
+    .card-enter {
+      animation: cardEnter 0.35s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    }
+
+    @keyframes cardEnter {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -497,11 +507,15 @@
         animation: none;
         background: var(--skeleton-base);
       }
+      .card-enter {
+        animation: none;
+        opacity: 1;
+      }
     }
 
     .card {
       transition: box-shadow 0.25s cubic-bezier(0.25, 0.1, 0.25, 1), border-color 0.25s ease,
-        opacity 0.3s ease, height 0.35s ease, margin 0.35s ease, padding 0.35s ease;
+        opacity 0.25s ease;
     }
 
     /* ── Footer ────────────────────── */
@@ -774,37 +788,65 @@
     const searchInput = document.getElementById('searchInput');
     const searchClear = document.getElementById('searchClear');
     let searchDebounce = null;
-
-    function updateCardVisibility(year, visible) {
-      const card = document.querySelector(`#card-${year}`);
-      if (!card) return;
-      if (visible) {
-        card.classList.remove('search-hidden');
-      } else {
-        card.classList.add('search-hidden');
-      }
-    }
+    let originalCardOrder = null;
 
     function applySearch(query) {
       const q = query.toLowerCase().trim();
       const clearBtn = document.getElementById('searchClear');
+      const cardGrid = document.getElementById('cardGrid');
+
       if (q) {
         clearBtn.classList.add('visible');
       } else {
         clearBtn.classList.remove('visible');
       }
 
+      if (!q) {
+        // Restore original order and show all
+        if (originalCardOrder) {
+          originalCardOrder.forEach(card => {
+            card.classList.remove('search-hidden');
+            card.classList.remove('card-enter');
+            cardGrid.appendChild(card);
+          });
+          originalCardOrder = null;
+        }
+        return;
+      }
+
+      // Save original order on first search
+      if (!originalCardOrder) {
+        originalCardOrder = Array.from(cardGrid.querySelectorAll('.card'));
+      }
+
+      // Find matching years
+      const matchingYears = [];
       YEARS.forEach(year => {
         const books = yearBooks[year] || [];
-        if (!q) {
-          updateCardVisibility(year, true);
-          return;
-        }
         const matches = books.some(b =>
           (b.title && b.title.toLowerCase().includes(q)) ||
           (b.author && b.author.toLowerCase().includes(q))
         );
-        updateCardVisibility(year, matches);
+        matchingYears.push({ year, matches });
+      });
+
+      // Reorder: matching cards first (with animation), non-matching hidden
+      let enterDelay = 0;
+      matchingYears.forEach(({ year, matches }) => {
+        const card = document.querySelector(`#card-${year}`);
+        if (!card) return;
+        if (matches) {
+          card.classList.remove('search-hidden');
+          card.style.animationDelay = `${enterDelay * 40}ms`;
+          card.classList.remove('card-enter');
+          void card.offsetWidth; // trigger reflow to restart animation
+          card.classList.add('card-enter');
+          cardGrid.prepend(card);
+          enterDelay++;
+        } else {
+          card.classList.add('search-hidden');
+          card.classList.remove('card-enter');
+        }
       });
     }
 
