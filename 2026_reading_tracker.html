@@ -102,17 +102,68 @@
       letter-spacing: -1.5px;
     }
 
-    .filtered-indicator {
-      display: none;
-      align-items: center;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-      font-size: 13px;
-      color: var(--text-secondary);
+    /* ── Search Input ───────────────── */
+    .search-wrap {
+      position: relative;
+      margin-top: 0.75rem;
     }
 
-    .filtered-indicator.visible {
-      display: flex;
+    .search-input {
+      width: 100%;
+      padding: 0.7rem 2.6rem 0.7rem 2.6rem;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--bg-alt);
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      box-shadow: none;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      font-size: 16px;
+      line-height: 1;
+      display: none;
+    }
+
+    .search-clear.visible {
+      display: block;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
     }
 
     .filtered-query {
@@ -562,10 +613,10 @@
       <div class="title-block">
         <h1>阅读记录</h1>
         <p id="subtitle">{{MONTH_RANGE}} 2026</p>
-        <div class="filtered-indicator" id="filteredIndicator">
-          <span>筛选:</span>
-          <span class="filtered-query" id="filteredQuery"></span>
-          <button class="clear-filter" id="clearFilter">清除</button>
+        <div class="search-wrap" id="searchWrap">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" id="searchInput" placeholder="搜索书名或作者..." autocomplete="off">
+          <button class="search-clear" id="searchClear" aria-label="清除搜索">✕</button>
         </div>
       </div>
       <div class="year-badge">2026</div>
@@ -726,31 +777,13 @@
 
     // 书籍数据（由生成脚本注入）
     const books = [{"title":"鱼不存在","author":"[美] 露露·米勒","start":"2025-12-28","finish":"2026-01-04","rating":8.2,"pages":"234","doubanLink":"https://book.douban.com/subject/36096300/","cover":"https://neodb.social/m/item/book/2025/12/14/a2427baf-db2e-4614-907f-f39ba4d9498f.jpg","review":"通过《无人知晓》播客介绍知道的这本书。观点并非新鲜，但很好读，尤其是通过首任斯坦福大学校长的人物故事来引入，融合了传记、科学史、穿插作者个人回忆录，层层递进，探讨了认知框架工具对于人们对事物的认识带来的影响，揭露校长的阴暗面，驳斥了优生学，引导读者重新思考秩序与混乱，意义与虚无。","month":1,"country":"美国"},{"title":"变调二人羽织","author":"[日] 连城三纪彦","start":"2026-01-05","finish":"2026-01-13","rating":8.5,"pages":"212","doubanLink":"https://book.douban.com/subject/26638267/","cover":"https://neodb.social/m/item/book/2026/01/01/f0fcddd7-dd8b-4d4a-b650-ebd415af0a04.jpg","review":"已成为连城老师迷弟。","month":1,"country":"日本"},{"title":"昨天的云","author":"王鼎钧","start":"2026-01-15","finish":"2026-01-26","rating":8.3,"pages":"224","doubanLink":"https://book.douban.com/subject/20433556/","cover":"https://neodb.social/m/book/2021/09/1599891e55-8a41-4087-90b7-157c85ed8d08.jpg","review":"前半部看的意兴阑珊，抗战开始后内容逐渐有意思起来，文笔简洁，思想深刻，情感丰沛。\n虽只有区区200页，但如果将此书的段落数量做一个统计，可能是我近年来读过所有书中最多的一本。","month":1,"country":"中国"},{"title":"总统是靠不住的","author":"林达","start":"2026-01-04","finish":"2026-01-27","rating":8.5,"pages":"428","doubanLink":"https://book.douban.com/subject/34451077/","cover":"https://neodb.social/m/book/2021/11/01e13f4d70-b583-4a13-9f78-805da39a1fdb.jpg","review":"身处2026年的现在阅读这本近30年前，某种程度上说有点歌颂美国制度的书，不免觉得作者有些想法还是过于理想了。但不可否认，仍然有很多关于制度细节、权力结构的细节是值得被阅读的。阅读过程中让我回想起前两年读的《美国宪政历程》，相比本书更多从司法角度阐述宪政效能，也值得阅读。","month":1,"country":"中国"},{"title":"北方的河","author":"张承志","start":"2026-02-03","finish":"2026-02-10","rating":8.5,"pages":"208","doubanLink":"https://neodb.social/book/7m8zzZ1QgTyErrbCHWafiH","cover":"https://neodb.social/m/book/2021/10/2279883ad5-f651-41f0-a09a-91e9d0bce34a.jpg","review":"超过预期的一本小说，喜欢作者的文笔，喜欢北方的河","month":2,"country":"中国"},{"title":"历史深处的忧虑","author":"林达","start":"2026-01-26","finish":"2026-02-12","rating":8.5,"pages":"314","doubanLink":"https://neodb.social/book/0N9ynsjY8b2XxaongU0aRD","cover":"https://neodb.social/m/book/2021/09/1745bf3d56-493e-4498-abf9-d158c1e0e387.jpg","review":"先看的第二本《总统是靠不住的》，再看的第一本。感觉第一本的可读性更强，尤其是关于辛普森案件的讲述，很精彩。对于权利法案的用例和设计原则也做了很好的分析，是了解美国宪政的入门佳作。","month":2,"country":"中国"},{"title":"双身记","author":"[塞尔维亚] 米洛拉德·帕维奇","start":"2026-01-18","finish":"2026-02-27","rating":8.2,"pages":"328","doubanLink":"https://book.douban.com/subject/27036314/","cover":"https://neodb.social/m/book/2021/09/177549998a-a0b7-4ab0-8ef8-265c2d5c3b0b.jpg","review":"在图书馆随手翻到的一本书，被装帧吸引，读来也的确是一本不一般的书。异域风情扑鼻，对话情节诡谲，除了第四部，其他都挺喜欢。","month":2,"country":"塞尔维亚"},{"title":"白日尽头","author":"[德] 燕妮·埃彭贝克","start":"2026-02-11","finish":"2026-03-04","rating":7.5,"pages":"312","doubanLink":"https://neodb.social/book/1FNWILwjuqdNG44Q31xEnN","cover":"https://neodb.social/m/item/doubanbook/2023/10/12/3a31a5f9-b087-4fbf-ae20-ddba936c9f79.jpg","review":"浑浑噩噩的内容，读得浑浑噩噩，我不太适合这种写作风格。","month":3,"country":"德国"},{"title":"鬼笑石","author":"呼延云","start":"2026-03-01","finish":"2026-03-19","rating":8.1,"pages":"764","doubanLink":"https://book.douban.com/subject/37268610/","cover":"https://neodb.social/m/item/book/2025/08/21/80c14e0d-49dc-470d-80f8-883789faf126.jpg","review":"书很厚，看得并不累，人物很鲜明，推理也挺出彩（尽管占比并不大），反转完全没想到。同时拓展了我对北大荒的认识，缺点是部分剧情还是略带狗血。","month":3,"country":"中国"},{"title":"我也有一个梦想","author":"林达","start":"2026-03-05","finish":"2026-03-27","rating":8.1,"pages":"466","doubanLink":"https://neodb.social/book/5pYSypkMskdtacxu37Ba7y","cover":"https://neodb.social/m/book/2021/11/2841a20631-5979-4871-92b7-cca47747d9d9.jpg","review":"对于一本出版已久的书，有些观点虽然并不一定经得起时间检验，但一如既往，喜欢作者这套书的事实部分描写。","month":3,"country":"中国"},{"title":"死了七次的男人","author":"[日] 西泽保彦","start":"2026-03-22","finish":"2026-03-29","rating":8.4,"pages":"290","doubanLink":"https://book.douban.com/subject/6719724/","cover":"https://neodb.social/m/book/2021/09/17d9c6d828-f218-4001-9b1c-f7ac2a7f94bf.jpg","review":"2017 年 9 月第一次记录\n2026年3月29日\n第二次读这本书了，相距近十年，于内容的记忆消散的所剩无几，所以再一次读得津津有味😬","month":3,"country":"日本"},{"title":"金色梦乡","author":"[日] 伊坂幸太郎","start":"2026-03-09","finish":"2026-04-09","rating":8.5,"pages":"512","doubanLink":"https://book.douban.com/subject/26864984/","cover":"https://neodb.social/m/book/2021/09/15332f0e17-a510-4c6b-9bf5-d007ec3c15eb.jpg","review":"大约十年前在微信读书上看过电子版，前阵子在少儿图书馆意外廖到这本书，想借来给孩子看，结果自己「不小心」又再看了一遍。不长记性的我已经全然忘记当初阅读时书中的内容细节，但隐隐只是觉得是一场酣畅淋漓的阅读体验，重读之下，「听着来自森林的声音，这真摇滚！」","month":4,"country":"日本"},{"title":"学会提问（原书第11版）","author":"[美]尼尔·布朗 (Neil Browne), [英] 斯图尔特·霍尔","start":"2026-04-12","finish":"2026-04-16","rating":7.5,"pages":"292","doubanLink":"https://book.douban.com/subject/33378880/","cover":"https://neodb.social/m/book/2021/09/16c7d2a478-bac6-48bc-bafc-294981c7190a.jpg","review":"与其取名\"学会提问\"不如叫\"如何做阅读理解\"，但认真经过国内高中阅读训练的读者读此书的意义不太大。","month":4,"country":"美国"},{"title":"如彗星划过夜空","author":"林达","start":"2026-03-30","finish":"2026-04-18","rating":8.4,"pages":"389","doubanLink":"https://book.douban.com/subject/25708708/","cover":"https://neodb.social/m/book/2021/11/2824908119-1c12-4922-b9c3-16306e114d2d.jpg","review":"终于读完了这套近距离看美国的四本书，这一本依旧好看、易读，尤其是五角大楼泄密事件，兼具故事性、启发性。\n\n结尾处，作者提到：假如制度完善的速度，远远落在政府的能力强化的速度后面，也就可能约束不住，政府就可能成为一匹脱缰野马，擅行其道。一些制度转型较晚的国家，面临的就是类似的危险。政府的发展先行一步，待开始制度转型，政府本身的规模已经是巨无霸了。制度转型需要漫长的时间，可是，在新制度完善之前，政府能力却已经非常强大、制约很困难了。也就是说，社会失去了一个制度生长、政府生长、民间社会生长，三者同步生长和磨合的过程。\n\n这让我联想到之前看过的一篇[文章](https://aeon.co/essays/why-chinese-minds-still-bear-the-long-shadow-of-keju)，文章中提到西方（尤其是美国）的官僚体系是在法治、问责和政治制衡已高度成熟的前提下“后发”建立的，而我们的官僚体系则是在这些政治约束尚未成形时“先行”扩张的，这种制度形成的时间顺序差异，深刻塑造了两者的国家形态。","month":4,"country":"中国"},{"title":"步履不停","author":"[日] 是枝裕和","start":"2026-04-20","finish":"2026-04-25","rating":8.3,"pages":"236","doubanLink":"https://neodb.social/book/5SOfNly7karJiK9cg68Xm2","cover":"https://neodb.social/m/book/2021/09/15bb14adb2-d1d6-4930-a2fe-4b46ca1b2c66.jpg","review":"难以捉摸的人生，总会有那么一点来不及。\n可能会哭，也可能会笑吧。","month":4,"country":"日本"},{"title":"自指引擎","author":"[日]圆城塔","start":"2026-04-27","finish":"2026-05-12","rating":7.5,"pages":"328","doubanLink":"https://book.douban.com/subject/33437511/","cover":"https://neodb.social/m/book/2021/09/15b0972b2e-0b24-4a87-b1b5-dd58868d5e51.jpg","review":"图书馆的书架上随手翻到，被名字吸引的书。有那么一两个瞬间感受到了博尔赫斯，但大多时候感觉到的还是作者难以言明的呓语。与其搞懂它，我可能会更愿意多读几遍哥德尔不完备定理的证明吧。","month":5,"country":"日本"}];
-
-    // ===== 搜索过滤 =====
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchQuery = urlParams.get('search') || '';
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      const filtered = books.filter(b =>
-        (b.title && b.title.toLowerCase().includes(q)) ||
-        (b.author && b.author.toLowerCase().includes(q))
-      );
-      books.length = 0;
-      filtered.forEach(b => books.push(b));
-    }
+    const allBooks = books.slice(); // preserve original for repeated filtering
+    let searchQuery = '';
+    let searchDebounce = null;
 
     // ========== 数据注入结束 ==========
 
     // ===== 初始化 =====
-    if (searchQuery) {
-      document.getElementById('filteredIndicator').classList.add('visible');
-      document.getElementById('filteredQuery').textContent = searchQuery;
-      document.getElementById('clearFilter').onclick = () => {
-        const baseUrl = window.location.href.split('?')[0];
-        window.location.href = baseUrl;
-      };
-    }
     const actualMonths = [...new Set(books.map(b => b.month))].sort((a, b) => a - b);
     const monthMeta = {};
     actualMonths.forEach(m => { monthMeta[m] = MONTH_COLORS[m - 1]; });
@@ -826,9 +859,9 @@
       low: b => b.rating <= 7.9,
     };
 
-    const highCount = books.filter(b => b.rating >= 8.3).length;
-    const normalCount = books.filter(b => b.rating > 7.9 && b.rating < 8.3).length;
-    const lowCount = books.filter(b => b.rating <= 7.9).length;
+    const highCount = allBooks.filter(b => b.rating >= 8.3).length;
+    const normalCount = allBooks.filter(b => b.rating > 7.9 && b.rating < 8.3).length;
+    const lowCount = allBooks.filter(b => b.rating <= 7.9).length;
 
     const filterBtns = [
       { key: 'all', label: `全部 (${totalBooks})` },
@@ -848,7 +881,7 @@
 
     // 添加月份筛选按钮
     actualMonths.forEach(m => {
-      const count = books.filter(b => b.month === m).length;
+      const count = allBooks.filter(b => b.month === m).length;
       filterBtns.push({
         key: `month-${m}`,
         label: `${m}月`
@@ -861,22 +894,144 @@
     let currentSortDir = 'desc';
     let booklistOpen = true;
 
-    const filtersEl = document.getElementById('filters');
-    filterBtns.forEach(fb => {
-      const btn = document.createElement('button');
-      btn.className = 'filter-btn' + (fb.key === 'all' ? ' active' : '');
-      btn.textContent = fb.label;
-      btn.onclick = () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentFilter = fb.key;
-        const filtered = books.filter(filterMap[fb.key]);
+    // ===== 搜索 + 筛选组合逻辑 =====
+    function getFilteredBooks() {
+      let result = allBooks;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        result = result.filter(b =>
+          (b.title && b.title.toLowerCase().includes(q)) ||
+          (b.author && b.author.toLowerCase().includes(q))
+        );
+      }
+      if (currentFilter !== 'all') {
+        result = result.filter(filterMap[currentFilter]);
+      }
+      return result;
+    }
+
+    function updateFilterCounts(list) {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        const key = btn.dataset.filterKey;
+        if (!key) return;
+        if (key === 'all') {
+          btn.textContent = `全部 (${list.length})`;
+        } else if (filterMap[key]) {
+          btn.textContent = btn.dataset.baseLabel + ` (${list.filter(filterMap[key]).length})`;
+        }
+      });
+    }
+
+    function updateStats(list) {
+      const n = list.length;
+      document.getElementById('total-books').textContent = n;
+      document.getElementById('avg-rating').textContent =
+        n ? (list.reduce((s, b) => s + b.rating, 0) / n).toFixed(1) : '0';
+      document.getElementById('total-pages').textContent =
+        list.reduce((s, b) => s + (parseInt(b.pages) || 0), 0).toLocaleString();
+      if (n) {
+        const days = list.map(b => {
+          const s = new Date(b.start), f = new Date(b.finish);
+          return (f - s) / (1000 * 60 * 60 * 24);
+        }).sort((a, b) => a - b);
+        const median = days.length % 2 === 0
+          ? (days[days.length/2 - 1] + days[days.length/2]) / 2
+          : days[Math.floor(days.length/2)];
+        document.getElementById('avg-reading-time').textContent = median.toFixed(1);
+      } else {
+        document.getElementById('avg-reading-time').textContent = '0';
+      }
+      // Country badges
+      const cc = {};
+      list.forEach(b => { if (b.country) cc[b.country] = (cc[b.country] || 0) + 1; });
+      const cg = document.getElementById('country-grid');
+      cg.innerHTML = '';
+      Object.entries(cc).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
+        const badge = document.createElement('div');
+        badge.className = 'country-badge';
+        badge.innerHTML = `<span class="country-flag">${COUNTRY_FLAGS[country] || ''}</span>${country}<span class="country-count">×${count}</span>`;
+        cg.appendChild(badge);
+      });
+      updateFilterCounts(list);
+    }
+
+    function updateChart(list) {
+      const counts = {};
+      actualMonths.forEach(m => { counts[m] = 0; });
+      list.forEach(b => { if (counts[b.month] !== undefined) counts[b.month]++; });
+      monthChart.data.datasets[0].data = actualMonths.map(m => counts[m]);
+      monthChart.options.scales.y.max = Math.max(Math.max(...actualMonths.map(m => counts[m])) + 1, 4);
+      monthChart.update();
+    }
+
+    function applySearchAndFilter() {
+      const filtered = getFilteredBooks();
+      updateStats(filtered);
+      updateChart(filtered);
+      if (filtered.length > 0) {
         renderWall(filtered);
         renderBooklist(getSortedList(filtered));
         if (booklistOpen) {
           document.getElementById('booklist-content').classList.add('open');
           document.getElementById('booklist-toggle').classList.add('open');
         }
+      } else {
+        document.getElementById('cover-wall').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
+        document.getElementById('booklist-content').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
+        document.getElementById('wall-count').textContent = '0 本';
+      }
+    }
+
+    // ===== 搜索框事件 =====
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+
+    // 从 URL 预填
+    const urlParams = new URLSearchParams(window.location.search);
+    searchQuery = urlParams.get('search') || '';
+    searchInput.value = searchQuery;
+    if (searchQuery) searchClear.classList.add('visible');
+
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => {
+        searchQuery = e.target.value.trim();
+        const url = new URL(window.location);
+        if (searchQuery) {
+          url.searchParams.set('search', searchQuery);
+        } else {
+          url.searchParams.delete('search');
+        }
+        history.replaceState(null, '', url);
+        searchClear.classList.toggle('visible', !!searchQuery);
+        applySearchAndFilter();
+      }, 150);
+    });
+
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchQuery = '';
+      searchClear.classList.remove('visible');
+      const url = new URL(window.location);
+      url.searchParams.delete('search');
+      history.replaceState(null, '', url);
+      applySearchAndFilter();
+      searchInput.focus();
+    });
+
+    // ===== 筛选按钮 =====
+    const filtersEl = document.getElementById('filters');
+    filterBtns.forEach(fb => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn' + (fb.key === 'all' ? ' active' : '');
+      btn.textContent = fb.label;
+      btn.dataset.filterKey = fb.key;
+      btn.dataset.baseLabel = fb.label.replace(/\s*\(\d+\)\s*$/, '');
+      btn.onclick = () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = fb.key;
+        applySearchAndFilter();
       };
       filtersEl.appendChild(btn);
     });
@@ -994,31 +1149,16 @@
           b.textContent = fieldLabels[f] + (a === 'desc' ? ' ↓' : ' ↑');
           b.classList.toggle('active', currentSortField === f);
         });
-        const filtered = books.filter(filterMap[currentFilter]);
-        renderWall(filtered);
-        renderBooklist(getSortedList(filtered));
-        if (booklistOpen) {
-          document.getElementById('booklist-content').classList.add('open');
-          document.getElementById('booklist-toggle').classList.add('open');
-        }
+        applySearchAndFilter();
       });
     });
-
-    // ===== 初始渲染 =====
-    renderWall(books);
-    renderBooklist(getSortedList(books));
-    // 默认展开清单
-    if (booklistOpen) {
-      document.getElementById('booklist-content').classList.add('open');
-      document.getElementById('booklist-toggle').classList.add('open');
-    }
 
     // ===== 图表 =====
     const maxMonthlyCount = Math.max(...actualMonths.map(m => monthCounts[m]));
     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const chartTextColor = isDark ? '#9e9a96' : '#615d59';
     const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
-    new Chart(document.getElementById('monthChart'), {
+    const monthChart = new Chart(document.getElementById('monthChart'), {
       type: 'bar',
       data: {
         labels: monthLabels,
@@ -1071,6 +1211,9 @@
         }
       }]
     });
+
+    // ===== 初始渲染 =====
+    applySearchAndFilter();
   </script>
 </body>
 </html>

@@ -114,17 +114,68 @@ const template = `<!DOCTYPE html>
       letter-spacing: -1.5px;
     }
 
-    .filtered-indicator {
-      display: none;
-      align-items: center;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-      font-size: 13px;
-      color: var(--text-secondary);
+    /* ── Search Input ───────────────── */
+    .search-wrap {
+      position: relative;
+      margin-top: 0.75rem;
     }
 
-    .filtered-indicator.visible {
-      display: flex;
+    .search-input {
+      width: 100%;
+      padding: 0.7rem 2.6rem 0.7rem 2.6rem;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--bg-alt);
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      box-shadow: none;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      font-size: 16px;
+      line-height: 1;
+      display: none;
+    }
+
+    .search-clear.visible {
+      display: block;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
     }
 
     .filtered-query {
@@ -574,10 +625,10 @@ const template = `<!DOCTYPE html>
       <div class="title-block">
         <h1>阅读记录</h1>
         <p id="subtitle">{{MONTH_RANGE}} {{YEAR}}</p>
-        <div class="filtered-indicator" id="filteredIndicator">
-          <span>筛选:</span>
-          <span class="filtered-query" id="filteredQuery"></span>
-          <button class="clear-filter" id="clearFilter">清除</button>
+        <div class="search-wrap" id="searchWrap">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" id="searchInput" placeholder="搜索书名或作者..." autocomplete="off">
+          <button class="search-clear" id="searchClear" aria-label="清除搜索">✕</button>
         </div>
       </div>
       <div class="year-badge">{{YEAR}}</div>
@@ -738,31 +789,13 @@ const template = `<!DOCTYPE html>
 
     // 书籍数据（由生成脚本注入）
     const books = {{BOOKS_JSON}};
-
-    // ===== 搜索过滤 =====
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchQuery = urlParams.get('search') || '';
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      const filtered = books.filter(b =>
-        (b.title && b.title.toLowerCase().includes(q)) ||
-        (b.author && b.author.toLowerCase().includes(q))
-      );
-      books.length = 0;
-      filtered.forEach(b => books.push(b));
-    }
+    const allBooks = books.slice(); // preserve original for repeated filtering
+    let searchQuery = '';
+    let searchDebounce = null;
 
     // ========== 数据注入结束 ==========
 
     // ===== 初始化 =====
-    if (searchQuery) {
-      document.getElementById('filteredIndicator').classList.add('visible');
-      document.getElementById('filteredQuery').textContent = searchQuery;
-      document.getElementById('clearFilter').onclick = () => {
-        const baseUrl = window.location.href.split('?')[0];
-        window.location.href = baseUrl;
-      };
-    }
     const actualMonths = [...new Set(books.map(b => b.month))].sort((a, b) => a - b);
     const monthMeta = {};
     actualMonths.forEach(m => { monthMeta[m] = MONTH_COLORS[m - 1]; });
@@ -838,9 +871,9 @@ const template = `<!DOCTYPE html>
       low: b => b.rating <= 7.9,
     };
 
-    const highCount = books.filter(b => b.rating >= 8.3).length;
-    const normalCount = books.filter(b => b.rating > 7.9 && b.rating < 8.3).length;
-    const lowCount = books.filter(b => b.rating <= 7.9).length;
+    const highCount = allBooks.filter(b => b.rating >= 8.3).length;
+    const normalCount = allBooks.filter(b => b.rating > 7.9 && b.rating < 8.3).length;
+    const lowCount = allBooks.filter(b => b.rating <= 7.9).length;
 
     const filterBtns = [
       { key: 'all', label: `全部 (${totalBooks})` },
@@ -860,7 +893,7 @@ const template = `<!DOCTYPE html>
 
     // 添加月份筛选按钮
     actualMonths.forEach(m => {
-      const count = books.filter(b => b.month === m).length;
+      const count = allBooks.filter(b => b.month === m).length;
       filterBtns.push({
         key: `month-${m}`,
         label: `${m}月`
@@ -873,22 +906,144 @@ const template = `<!DOCTYPE html>
     let currentSortDir = 'desc';
     let booklistOpen = true;
 
-    const filtersEl = document.getElementById('filters');
-    filterBtns.forEach(fb => {
-      const btn = document.createElement('button');
-      btn.className = 'filter-btn' + (fb.key === 'all' ? ' active' : '');
-      btn.textContent = fb.label;
-      btn.onclick = () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentFilter = fb.key;
-        const filtered = books.filter(filterMap[fb.key]);
+    // ===== 搜索 + 筛选组合逻辑 =====
+    function getFilteredBooks() {
+      let result = allBooks;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        result = result.filter(b =>
+          (b.title && b.title.toLowerCase().includes(q)) ||
+          (b.author && b.author.toLowerCase().includes(q))
+        );
+      }
+      if (currentFilter !== 'all') {
+        result = result.filter(filterMap[currentFilter]);
+      }
+      return result;
+    }
+
+    function updateFilterCounts(list) {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        const key = btn.dataset.filterKey;
+        if (!key) return;
+        if (key === 'all') {
+          btn.textContent = `全部 (${list.length})`;
+        } else if (filterMap[key]) {
+          btn.textContent = btn.dataset.baseLabel + ` (${list.filter(filterMap[key]).length})`;
+        }
+      });
+    }
+
+    function updateStats(list) {
+      const n = list.length;
+      document.getElementById('total-books').textContent = n;
+      document.getElementById('avg-rating').textContent =
+        n ? (list.reduce((s, b) => s + b.rating, 0) / n).toFixed(1) : '0';
+      document.getElementById('total-pages').textContent =
+        list.reduce((s, b) => s + (parseInt(b.pages) || 0), 0).toLocaleString();
+      if (n) {
+        const days = list.map(b => {
+          const s = new Date(b.start), f = new Date(b.finish);
+          return (f - s) / (1000 * 60 * 60 * 24);
+        }).sort((a, b) => a - b);
+        const median = days.length % 2 === 0
+          ? (days[days.length/2 - 1] + days[days.length/2]) / 2
+          : days[Math.floor(days.length/2)];
+        document.getElementById('avg-reading-time').textContent = median.toFixed(1);
+      } else {
+        document.getElementById('avg-reading-time').textContent = '0';
+      }
+      // Country badges
+      const cc = {};
+      list.forEach(b => { if (b.country) cc[b.country] = (cc[b.country] || 0) + 1; });
+      const cg = document.getElementById('country-grid');
+      cg.innerHTML = '';
+      Object.entries(cc).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
+        const badge = document.createElement('div');
+        badge.className = 'country-badge';
+        badge.innerHTML = `<span class="country-flag">${COUNTRY_FLAGS[country] || ''}</span>${country}<span class="country-count">×${count}</span>`;
+        cg.appendChild(badge);
+      });
+      updateFilterCounts(list);
+    }
+
+    function updateChart(list) {
+      const counts = {};
+      actualMonths.forEach(m => { counts[m] = 0; });
+      list.forEach(b => { if (counts[b.month] !== undefined) counts[b.month]++; });
+      monthChart.data.datasets[0].data = actualMonths.map(m => counts[m]);
+      monthChart.options.scales.y.max = Math.max(Math.max(...actualMonths.map(m => counts[m])) + 1, 4);
+      monthChart.update();
+    }
+
+    function applySearchAndFilter() {
+      const filtered = getFilteredBooks();
+      updateStats(filtered);
+      updateChart(filtered);
+      if (filtered.length > 0) {
         renderWall(filtered);
         renderBooklist(getSortedList(filtered));
         if (booklistOpen) {
           document.getElementById('booklist-content').classList.add('open');
           document.getElementById('booklist-toggle').classList.add('open');
         }
+      } else {
+        document.getElementById('cover-wall').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
+        document.getElementById('booklist-content').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
+        document.getElementById('wall-count').textContent = '0 本';
+      }
+    }
+
+    // ===== 搜索框事件 =====
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+
+    // 从 URL 预填
+    const urlParams = new URLSearchParams(window.location.search);
+    searchQuery = urlParams.get('search') || '';
+    searchInput.value = searchQuery;
+    if (searchQuery) searchClear.classList.add('visible');
+
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => {
+        searchQuery = e.target.value.trim();
+        const url = new URL(window.location);
+        if (searchQuery) {
+          url.searchParams.set('search', searchQuery);
+        } else {
+          url.searchParams.delete('search');
+        }
+        history.replaceState(null, '', url);
+        searchClear.classList.toggle('visible', !!searchQuery);
+        applySearchAndFilter();
+      }, 150);
+    });
+
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchQuery = '';
+      searchClear.classList.remove('visible');
+      const url = new URL(window.location);
+      url.searchParams.delete('search');
+      history.replaceState(null, '', url);
+      applySearchAndFilter();
+      searchInput.focus();
+    });
+
+    // ===== 筛选按钮 =====
+    const filtersEl = document.getElementById('filters');
+    filterBtns.forEach(fb => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn' + (fb.key === 'all' ? ' active' : '');
+      btn.textContent = fb.label;
+      btn.dataset.filterKey = fb.key;
+      btn.dataset.baseLabel = fb.label.replace(/\s*\(\d+\)\s*$/, '');
+      btn.onclick = () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = fb.key;
+        applySearchAndFilter();
       };
       filtersEl.appendChild(btn);
     });
@@ -1006,31 +1161,16 @@ const template = `<!DOCTYPE html>
           b.textContent = fieldLabels[f] + (a === 'desc' ? ' ↓' : ' ↑');
           b.classList.toggle('active', currentSortField === f);
         });
-        const filtered = books.filter(filterMap[currentFilter]);
-        renderWall(filtered);
-        renderBooklist(getSortedList(filtered));
-        if (booklistOpen) {
-          document.getElementById('booklist-content').classList.add('open');
-          document.getElementById('booklist-toggle').classList.add('open');
-        }
+        applySearchAndFilter();
       });
     });
-
-    // ===== 初始渲染 =====
-    renderWall(books);
-    renderBooklist(getSortedList(books));
-    // 默认展开清单
-    if (booklistOpen) {
-      document.getElementById('booklist-content').classList.add('open');
-      document.getElementById('booklist-toggle').classList.add('open');
-    }
 
     // ===== 图表 =====
     const maxMonthlyCount = Math.max(...actualMonths.map(m => monthCounts[m]));
     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const chartTextColor = isDark ? '#9e9a96' : '#615d59';
     const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
-    new Chart(document.getElementById('monthChart'), {
+    const monthChart = new Chart(document.getElementById('monthChart'), {
       type: 'bar',
       data: {
         labels: monthLabels,
@@ -1083,6 +1223,9 @@ const template = `<!DOCTYPE html>
         }
       }]
     });
+
+    // ===== 初始渲染 =====
+    applySearchAndFilter();
   </script>
 </body>
 </html>
