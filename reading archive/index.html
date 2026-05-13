@@ -813,48 +813,18 @@
       searchInput.focus();
     });
 
-    // Update card click to pass search param
-    const originalRenderCard = renderCard;
-    renderCard = function(year, stats) {
-      const href = year === CURRENT_YEAR ? `../${CURRENT_YEAR}_reading_tracker.html` : year + '_reading_tracker.html';
-      const isLatest = year === CURRENT_YEAR;
-      if (stats) {
-        const coverHTML = stats.topCovers?.length
-          ? `<div class="card-cover-wrap">${stats.topCovers.map(url => `<img class="card-cover" src="${url}" alt="" loading="lazy">`).join('')}</div>`
-          : '';
-        return `
-          <a href="${href}" class="card" id="card-${year}">
-            <div style="flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0;">
-              <div class="card-top">
-                <span class="card-year">${year}${isLatest ? '<span class="card-badge">Reading</span>' : ''}</span>
-              </div>
-              <div class="card-stats">
-                <div class="stat-item">
-                  <span class="stat-value">${stats.count}</span>
-                  <span class="stat-label">本</span>
-                </div>
-                <span class="stat-sep">|</span>
-                <div class="stat-item">
-                  <span class="stat-value">${fmt(stats.totalPages)}</span>
-                  <span class="stat-label">页</span>
-                </div>
-              </div>
-            </div>
-            ${coverHTML}
-          </a>`;
+    // Intercept card clicks to pass search param
+    document.getElementById('cardGrid').addEventListener('click', (e) => {
+      const card = e.target.closest('.card');
+      if (!card) return;
+      const q = searchInput.value.trim();
+      if (q) {
+        e.preventDefault();
+        const baseUrl = card.href.split('?')[0];
+        card.href = baseUrl + '?search=' + encodeURIComponent(q);
+        window.location.href = card.href;
       }
-      return `
-        <a href="${href}" class="card card-error" id="card-${year}">
-          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0;">
-            <div class="card-top">
-              <span class="card-year">${year}${isLatest ? '<span class="card-badge">Reading</span>' : ''}</span>
-            </div>
-            <div class="card-stats">
-              <span class="error-text">加载失败</span>
-            </div>
-          </div>
-        </a>`;
-    };
+    });
 
     document.addEventListener('DOMContentLoaded', init);
   </script>

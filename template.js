@@ -114,6 +114,40 @@ const template = `<!DOCTYPE html>
       letter-spacing: -1.5px;
     }
 
+    .filtered-indicator {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .filtered-indicator.visible {
+      display: flex;
+    }
+
+    .filtered-query {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .clear-filter {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.15rem 0.6rem;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .clear-filter:hover {
+      background: var(--bg-alt);
+      color: var(--text);
+    }
+
     .title-block h1 {
       display: flex;
       align-items: center;
@@ -540,6 +574,11 @@ const template = `<!DOCTYPE html>
       <div class="title-block">
         <h1>阅读记录</h1>
         <p id="subtitle">{{MONTH_RANGE}} {{YEAR}}</p>
+        <div class="filtered-indicator" id="filteredIndicator">
+          <span>筛选:</span>
+          <span class="filtered-query" id="filteredQuery"></span>
+          <button class="clear-filter" id="clearFilter">清除</button>
+        </div>
       </div>
       <div class="year-badge">{{YEAR}}</div>
     </header>
@@ -700,9 +739,30 @@ const template = `<!DOCTYPE html>
     // 书籍数据（由生成脚本注入）
     const books = {{BOOKS_JSON}};
 
+    // ===== 搜索过滤 =====
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchQuery = urlParams.get('search') || '';
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const filtered = books.filter(b =>
+        (b.title && b.title.toLowerCase().includes(q)) ||
+        (b.author && b.author.toLowerCase().includes(q))
+      );
+      books.length = 0;
+      filtered.forEach(b => books.push(b));
+    }
+
     // ========== 数据注入结束 ==========
 
     // ===== 初始化 =====
+    if (searchQuery) {
+      document.getElementById('filteredIndicator').classList.add('visible');
+      document.getElementById('filteredQuery').textContent = searchQuery;
+      document.getElementById('clearFilter').onclick = () => {
+        const baseUrl = window.location.href.split('?')[0];
+        window.location.href = baseUrl;
+      };
+    }
     const actualMonths = [...new Set(books.map(b => b.month))].sort((a, b) => a - b);
     const monthMeta = {};
     actualMonths.forEach(m => { monthMeta[m] = MONTH_COLORS[m - 1]; });
