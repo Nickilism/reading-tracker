@@ -486,32 +486,14 @@
     }
 
     .search-hidden {
-      display: none;
-    }
-
-    .card-enter {
-      animation: cardEnter 0.35s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
-    }
-
-    @keyframes cardEnter {
-      from {
-        opacity: 0;
-        transform: translateY(12px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      opacity: 0;
+      pointer-events: none;
     }
 
     @media (prefers-reduced-motion: reduce) {
       .skeleton-line {
         animation: none;
         background: var(--skeleton-base);
-      }
-      .card-enter {
-        animation: none;
-        opacity: 1;
       }
     }
 
@@ -791,7 +773,6 @@
     const searchClear = document.getElementById('searchClear');
     let searchDebounce = null;
     let originalCardOrder = null;
-    let searchAnimated = false;
 
     function applySearch(query) {
       const q = query.toLowerCase().trim();
@@ -809,12 +790,9 @@
         if (originalCardOrder) {
           originalCardOrder.forEach(card => {
             card.classList.remove('search-hidden');
-            card.classList.remove('card-enter');
-            card.style.animationDelay = '';
             cardGrid.appendChild(card);
           });
           originalCardOrder = null;
-          searchAnimated = false;
         }
         return;
       }
@@ -824,49 +802,21 @@
         originalCardOrder = Array.from(cardGrid.querySelectorAll('.card'));
       }
 
-      // Find matching years
-      const matchingYears = [];
+      // Toggle visibility: matching = visible, non-matching = hidden
       YEARS.forEach(year => {
+        const card = document.getElementById('card-' + year);
+        if (!card) return;
         const books = yearBooks[year] || [];
         const matches = books.some(b =>
           (b.title && b.title.toLowerCase().includes(q)) ||
           (b.author && b.author.toLowerCase().includes(q))
         );
-        matchingYears.push({ year, matches });
+        if (matches) {
+          card.classList.remove('search-hidden');
+        } else {
+          card.classList.add('search-hidden');
+        }
       });
-
-      if (!searchAnimated) {
-        // First keystroke: animate cards into new order
-        let enterDelay = 0;
-        matchingYears.forEach(({ year, matches }) => {
-          const card = document.getElementById('card-' + year);
-          if (!card) return;
-          if (matches) {
-            card.classList.remove('search-hidden');
-            card.style.animationDelay = (enterDelay * 50) + 'ms';
-            card.classList.remove('card-enter');
-            void card.offsetWidth;
-            card.classList.add('card-enter');
-            cardGrid.prepend(card);
-            enterDelay++;
-          } else {
-            card.classList.add('search-hidden');
-            card.classList.remove('card-enter');
-          }
-        });
-        searchAnimated = true;
-      } else {
-        // Subsequent keystrokes: just toggle visibility, no reorder
-        matchingYears.forEach(({ year, matches }) => {
-          const card = document.getElementById('card-' + year);
-          if (!card) return;
-          if (matches) {
-            card.classList.remove('search-hidden');
-          } else {
-            card.classList.add('search-hidden');
-          }
-        });
-      }
     }
 
     searchInput.addEventListener('input', (e) => {
