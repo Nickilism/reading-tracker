@@ -425,6 +425,68 @@
       100% { transform: translateX(120%); }
     }
 
+    /* ── Search Input ───────────────── */
+    .search-wrap {
+      margin-bottom: 1.25rem;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.7rem 2.6rem 0.7rem 2.6rem;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--bg-alt);
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      font-size: 16px;
+      line-height: 1;
+      display: none;
+    }
+
+    .search-clear.visible {
+      display: block;
+    }
+
+    .search-card {
+      opacity: 0.3;
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .skeleton-line {
         animation: none;
@@ -516,6 +578,15 @@
     </header>
 
     <div class="global-summary" id="globalSummary"></div>
+
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索书名或作者..." autocomplete="off">
+      <button class="search-clear" id="searchClear" aria-label="清除搜索">✕</button>
+    </div>
+
     <div class="card-grid" id="cardGrid"></div>
 
     <footer>
@@ -567,7 +638,7 @@
     }
 
     function renderCard(year, stats) {
-      const href = year === 2026 ? '../2026_reading_tracker.html' : year + '_reading_tracker.html';
+      const href = year === CURRENT_YEAR ? `../${CURRENT_YEAR}_reading_tracker.html` : year + '_reading_tracker.html';
       const isLatest = year === CURRENT_YEAR;
 
       if (stats) {
@@ -575,7 +646,7 @@
           ? `<div class="card-cover-wrap">${stats.topCovers.map(url => `<img class="card-cover" src="${url}" alt="" loading="lazy">`).join('')}</div>`
           : '';
         return `
-          <a href="${href}" class="card">
+          <a href="${href}" class="card" id="card-${year}">
             <div style="flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0;">
               <div class="card-top">
                 <span class="card-year">${year}${isLatest ? '<span class="card-badge">Reading</span>' : ''}</span>
@@ -637,13 +708,15 @@
       if (!json) throw new Error('no books data');
       const books = JSON.parse(json);
       const count = books.length;
-      if (count === 0) return { count: 0, avgRating: 0, totalPages: 0, topCovers: [] };
+      if (count === 0) return { count: 0, avgRating: 0, totalPages: 0, topCovers: [], books: [] };
       const totalRating = books.reduce((s, b) => s + (b.rating || 0), 0);
       const totalPages = books.reduce((s, b) => s + (parseInt(b.pages) || 0), 0);
       const sorted = [...books].sort((a, b) => (b.rating || 0) - (a.rating || 0));
       const topCovers = sorted.slice(0, 5).reverse().map(b => b.cover || '').filter(Boolean);
-      return { count, avgRating: totalRating / count, totalPages, topCovers };
+      return { count, avgRating: totalRating / count, totalPages, topCovers, books };
     }
+
+    const yearBooks = {};
 
     async function init() {
       const grid = document.getElementById('cardGrid');
@@ -672,6 +745,7 @@
         let stats = null;
         try {
           stats = await loadYear(year);
+          yearBooks[year] = stats.books || [];
           totals.totalBooks += stats.count;
           totals.years++;
           totals.totalPages += stats.totalPages;
@@ -687,6 +761,100 @@
 
       await Promise.all(tasks);
     }
+
+    // ── Search ─────────────────────
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+    let searchDebounce = null;
+
+    function updateCardOpacity(year, matches) {
+      const card = document.querySelector(`#card-${year}`);
+      if (!card) return;
+      if (matches) {
+        card.classList.remove('search-card');
+      } else {
+        card.classList.add('search-card');
+      }
+    }
+
+    function applySearch(query) {
+      const q = query.toLowerCase().trim();
+      const clearBtn = document.getElementById('searchClear');
+      if (q) {
+        clearBtn.classList.add('visible');
+      } else {
+        clearBtn.classList.remove('visible');
+      }
+
+      YEARS.forEach(year => {
+        const books = yearBooks[year] || [];
+        if (!q) {
+          updateCardOpacity(year, true);
+          return;
+        }
+        const matches = books.some(b =>
+          (b.title && b.title.toLowerCase().includes(q)) ||
+          (b.author && b.author.toLowerCase().includes(q))
+        );
+        updateCardOpacity(year, matches);
+      });
+    }
+
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => {
+        applySearch(e.target.value);
+      }, 150);
+    });
+
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      applySearch('');
+      searchInput.focus();
+    });
+
+    // Update card click to pass search param
+    const originalRenderCard = renderCard;
+    renderCard = function(year, stats) {
+      const href = year === CURRENT_YEAR ? `../${CURRENT_YEAR}_reading_tracker.html` : year + '_reading_tracker.html';
+      const isLatest = year === CURRENT_YEAR;
+      if (stats) {
+        const coverHTML = stats.topCovers?.length
+          ? `<div class="card-cover-wrap">${stats.topCovers.map(url => `<img class="card-cover" src="${url}" alt="" loading="lazy">`).join('')}</div>`
+          : '';
+        return `
+          <a href="${href}" class="card" id="card-${year}">
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0;">
+              <div class="card-top">
+                <span class="card-year">${year}${isLatest ? '<span class="card-badge">Reading</span>' : ''}</span>
+              </div>
+              <div class="card-stats">
+                <div class="stat-item">
+                  <span class="stat-value">${stats.count}</span>
+                  <span class="stat-label">本</span>
+                </div>
+                <span class="stat-sep">|</span>
+                <div class="stat-item">
+                  <span class="stat-value">${fmt(stats.totalPages)}</span>
+                  <span class="stat-label">页</span>
+                </div>
+              </div>
+            </div>
+            ${coverHTML}
+          </a>`;
+      }
+      return `
+        <a href="${href}" class="card card-error" id="card-${year}">
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0;">
+            <div class="card-top">
+              <span class="card-year">${year}${isLatest ? '<span class="card-badge">Reading</span>' : ''}</span>
+            </div>
+            <div class="card-stats">
+              <span class="error-text">加载失败</span>
+            </div>
+          </div>
+        </a>`;
+    };
 
     document.addEventListener('DOMContentLoaded', init);
   </script>
