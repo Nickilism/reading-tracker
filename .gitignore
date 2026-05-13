@@ -26,3 +26,6 @@ node_modules/
 .claude/settings.local.json
 !reading archive/*.html
 .gstack/
+
+# Design screenshots
+.design-screenshots/
