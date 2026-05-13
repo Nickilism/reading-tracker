@@ -176,12 +176,21 @@
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
+      position: relative;
+    }
+
+    .card-grid.in-search {
+      display: block;
     }
 
     @media (max-width: 520px) {
       .card-grid {
         grid-template-columns: 1fr;
         gap: 0.75rem;
+      }
+      .card-grid.in-search {
+        display: flex;
+        flex-direction: column;
       }
     }
 
@@ -195,20 +204,43 @@
       box-shadow: var(--card-shadow);
       text-decoration: none;
       color: var(--text);
-      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
       position: relative;
-      overflow: visible;
+      transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+      will-change: transform, opacity;
     }
 
-    .card::before {
-      content: '';
+    .card.in-search {
       position: absolute;
-      inset: 0;
-      border-radius: 14px;
-      pointer-events: none;
-      border: 1px solid transparent;
-      transition: border-color 0.25s ease;
+      top: 0;
+      left: 0;
+      right: 0;
       z-index: 1;
+    }
+
+    @media (max-width: 520px) {
+      .card.in-search {
+        position: relative;
+      }
+    }
+
+    .card.in-search.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .card.search-entered {
+      animation: cardSlideIn 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    }
+
+    @keyframes cardSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .card:hover {
@@ -217,20 +249,16 @@
       transform: translateY(-2px);
     }
 
-    .card:hover::before {
-      border-color: var(--accent);
-      opacity: 0.25;
+    .card.in-search:hover {
+      transform: translateY(-2px);
     }
 
     .card:active {
       transform: scale(0.985);
-      transition: all 0.1s ease;
     }
 
-    /* Cover peek-out */
     /* Cover stack peek-out */
     .card-cover-wrap {
-      position: relative;
       width: 55%;
       flex-shrink: 0;
       display: flex;
@@ -485,15 +513,14 @@
       display: block;
     }
 
-    .search-hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
     @media (prefers-reduced-motion: reduce) {
       .skeleton-line {
         animation: none;
         background: var(--skeleton-base);
+      }
+      .search-entered {
+        animation: none;
+        opacity: 1;
       }
     }
 
@@ -787,9 +814,10 @@
 
       if (!q) {
         // Restore original order and show all
+        cardGrid.classList.remove('in-search');
         if (originalCardOrder) {
           originalCardOrder.forEach(card => {
-            card.classList.remove('search-hidden');
+            card.classList.remove('search-hidden', 'hidden');
             cardGrid.appendChild(card);
           });
           originalCardOrder = null;
@@ -802,7 +830,12 @@
         originalCardOrder = Array.from(cardGrid.querySelectorAll('.card'));
       }
 
-      // Toggle visibility: matching = visible, non-matching = hidden
+      // Enable in-search positioning
+      cardGrid.classList.add('in-search');
+
+      // Collect and sort matching cards
+      const matching = [];
+      const nonMatching = [];
       YEARS.forEach(year => {
         const card = document.getElementById('card-' + year);
         if (!card) return;
@@ -812,10 +845,27 @@
           (b.author && b.author.toLowerCase().includes(q))
         );
         if (matches) {
-          card.classList.remove('search-hidden');
+          matching.push(card);
         } else {
-          card.classList.add('search-hidden');
+          nonMatching.push(card);
         }
+      });
+
+      // Clear all states
+      matching.forEach(card => card.classList.remove('hidden', 'search-entered'));
+      nonMatching.forEach(card => card.classList.remove('search-entered'));
+
+      // Animate matching cards in with stagger
+      matching.forEach((card, i) => {
+        card.style.animationDelay = (i * 60) + 'ms';
+        card.classList.add('search-entered');
+        cardGrid.appendChild(card);
+      });
+
+      // Hide non-matching
+      nonMatching.forEach(card => {
+        card.classList.add('hidden');
+        card.style.animationDelay = '';
       });
     }
 
