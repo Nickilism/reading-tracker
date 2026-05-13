@@ -102,17 +102,68 @@
       letter-spacing: -1.5px;
     }
 
-    .filtered-indicator {
-      display: none;
-      align-items: center;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-      font-size: 13px;
-      color: var(--text-secondary);
+    /* ── Search Input ───────────────── */
+    .search-wrap {
+      position: relative;
+      margin-top: 0.75rem;
     }
 
-    .filtered-indicator.visible {
-      display: flex;
+    .search-input {
+      width: 100%;
+      padding: 0.7rem 2.6rem 0.7rem 2.6rem;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--bg-alt);
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      box-shadow: none;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      font-size: 16px;
+      line-height: 1;
+      display: none;
+    }
+
+    .search-clear.visible {
+      display: block;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
     }
 
     .filtered-query {
@@ -562,10 +613,10 @@
       <div class="title-block">
         <h1>阅读记录</h1>
         <p id="subtitle">{{MONTH_RANGE}} 2019</p>
-        <div class="filtered-indicator" id="filteredIndicator">
-          <span>筛选:</span>
-          <span class="filtered-query" id="filteredQuery"></span>
-          <button class="clear-filter" id="clearFilter">清除</button>
+        <div class="search-wrap" id="searchWrap">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" id="searchInput" placeholder="搜索书名或作者..." autocomplete="off">
+          <button class="search-clear" id="searchClear" aria-label="清除搜索">✕</button>
         </div>
       </div>
       <div class="year-badge">2019</div>
@@ -726,31 +777,13 @@
 
     // 书籍数据（由生成脚本注入）
     const books = [{"title":"刀锋","author":"[英] 毛姆","start":"2018-12-22","finish":"2019-01-28","rating":8.5,"pages":"464","doubanLink":"https://book.douban.com/subject/26896878/","cover":"https://neodb.social/m/book/2021/09/155a94b23f-6133-4cfd-9157-9e0d00c345ec.jpg","review":"读的第二本毛姆的小说，微信阅读，耗时9个多小时","month":1,"country":"英国"},{"title":"流浪地球","author":"刘慈欣","start":"2019-02-10","finish":"2019-02-12","rating":7.8,"pages":"293","doubanLink":"https://book.douban.com/subject/3266609/","cover":"https://neodb.social/m/book/2021/09/15b58fb37b-0313-46ac-b2d9-e52db5d97ca0.jpg","review":"","month":2,"country":"中国"},{"title":"局外人","author":"[法] 阿尔贝·加缪","start":"2019-01-30","finish":"2019-02-13","rating":8,"pages":"128","doubanLink":"https://book.douban.com/subject/4908885/","cover":"https://neodb.social/m/item/book/2026/02/11/b72ae794-7277-4244-a303-01b04580c004.jpeg","review":"","month":2,"country":"法国"},{"title":"献给虚无的供物","author":"（日）中井英夫","start":"2019-02-14","finish":"2019-03-09","rating":8.3,"pages":"484","doubanLink":"https://book.douban.com/subject/10515231/","cover":"https://neodb.social/m/book/2021/09/16f44650ed-a0fc-4682-9a4d-559b8aa84c43.jpg","review":"","month":3,"country":"日本"},{"title":"正面管教","author":"[美]简·尼尔森","start":"2019-05-06","finish":"2019-06-14","rating":8.3,"pages":"276","doubanLink":"https://book.douban.com/subject/3420606","cover":"https://neodb.social/m/book/2021/10/125fbc1caa-e7a7-41d3-bb37-2e5fd913dc5c.jpg","review":"","month":6,"country":"美国"},{"title":"空椅子","author":"（美）杰夫里·迪弗","start":"2019-06-29","finish":"2019-07-10","rating":8,"pages":"487","doubanLink":"https://book.douban.com/subject/3130849/","cover":"https://neodb.social/m/book/2021/09/174d98f2a2-a32f-48d9-af77-f72f0bdf0b93.jpg","review":"","month":7,"country":"美国"},{"title":"肠子","author":"[美] 恰克·帕拉尼克","start":"2019-07-13","finish":"2019-08-05","rating":7,"pages":"408","doubanLink":"https://book.douban.com/subject/5920385","cover":"https://neodb.social/m/book/2021/09/156007b797-851a-426c-bb39-c5d92aca9f69.jpg","review":"","month":8,"country":"美国"},{"title":"苏菲的世界","author":"[挪] 乔斯坦·贾德","start":"2019-06-10","finish":"2019-10-05","rating":8.8,"pages":"528","doubanLink":"https://book.douban.com/subject/2284311/","cover":"https://neodb.social/m/book/2021/09/153b4ac4f7-3931-4f95-bc29-aa27619f058e.jpg","review":"因为自己的原因，竟然花了三个多月才看完这本书。作为哲学入门书籍，作者以时间线为基础走马观花的介绍了各种哲学派别，代表人物，虽不深入却也能给我等菜鸟一个观察哲学的角度。书中也有作者的巧思，用书中书的概念去解释一些并没那么好理解的哲学概念。哲学正是一个晦涩难懂的科目，我想也正如最后作者自己说的，这本书要多读几次才行。","month":10,"country":"中国"},{"title":"长夜难明","author":"紫金陈","start":"2019-10-05","finish":"2019-10-08","rating":8.5,"pages":"288","doubanLink":"https://book.douban.com/subject/26923390","cover":"https://neodb.social/m/book/2021/09/1509ab1503-e6d1-4dcb-8b0f-e9f24e69d82d.jpg","review":"国产推理几乎没看过，这本值得推荐，光能出版就值了。","month":10,"country":"中国"},{"title":"浮生六记","author":"（清）沈复","start":"2019-10-08","finish":"2019-10-10","rating":7,"pages":"80","doubanLink":"https://book.douban.com/subject/1088581/","cover":"https://neodb.social/m/book/2021/09/159f19504e-6c0c-43e6-a814-14c3ef5c0ff1.jpg","review":"走马观花，无甚感觉","month":10,"country":"中国"},{"title":"依存","author":"[日]西泽保彦","start":"2019-04-17","finish":"2019-10-22","rating":8,"pages":"455","doubanLink":"http://m.douban.com/book/subject/11504246/","cover":"https://neodb.social/m/item/book/2026/02/10/bcf5f451-63a2-45d4-bf7a-2931d4ada07f.jpg","review":"不知道这是看的第几本西泽保彦的书，也不知道是匠千晓系列的第几本，但应该是这一系列的最后一本吧？非常喜欢这一系列的各个人设，这一本也是保质保量的延续。对于一件事情的发生，作者总能给出各种不同角度，不同逻辑的解释方法，最后再来一给脑洞大开的结论。相对于系列前作，本书在新颖的点在于选择了其中一位故事人物作为叙述载体，人物感情情节有了较大的推进，揭秘了匠仔的身世，同时在推理的主题下面加上了很多心理学层面的思考。推荐。","month":10,"country":"日本"}];
-
-    // ===== 搜索过滤 =====
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchQuery = urlParams.get('search') || '';
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      const filtered = books.filter(b =>
-        (b.title && b.title.toLowerCase().includes(q)) ||
-        (b.author && b.author.toLowerCase().includes(q))
-      );
-      books.length = 0;
-      filtered.forEach(b => books.push(b));
-    }
+    const allBooks = books.slice(); // preserve original for repeated filtering
+    let searchQuery = '';
+    let searchDebounce = null;
 
     // ========== 数据注入结束 ==========
 
     // ===== 初始化 =====
-    if (searchQuery) {
-      document.getElementById('filteredIndicator').classList.add('visible');
-      document.getElementById('filteredQuery').textContent = searchQuery;
-      document.getElementById('clearFilter').onclick = () => {
-        const baseUrl = window.location.href.split('?')[0];
-        window.location.href = baseUrl;
-      };
-    }
     const actualMonths = [...new Set(books.map(b => b.month))].sort((a, b) => a - b);
     const monthMeta = {};
     actualMonths.forEach(m => { monthMeta[m] = MONTH_COLORS[m - 1]; });
@@ -826,9 +859,9 @@
       low: b => b.rating <= 7.9,
     };
 
-    const highCount = books.filter(b => b.rating >= 8.3).length;
-    const normalCount = books.filter(b => b.rating > 7.9 && b.rating < 8.3).length;
-    const lowCount = books.filter(b => b.rating <= 7.9).length;
+    const highCount = allBooks.filter(b => b.rating >= 8.3).length;
+    const normalCount = allBooks.filter(b => b.rating > 7.9 && b.rating < 8.3).length;
+    const lowCount = allBooks.filter(b => b.rating <= 7.9).length;
 
     const filterBtns = [
       { key: 'all', label: `全部 (${totalBooks})` },
@@ -848,7 +881,7 @@
 
     // 添加月份筛选按钮
     actualMonths.forEach(m => {
-      const count = books.filter(b => b.month === m).length;
+      const count = allBooks.filter(b => b.month === m).length;
       filterBtns.push({
         key: `month-${m}`,
         label: `${m}月`
@@ -861,22 +894,144 @@
     let currentSortDir = 'desc';
     let booklistOpen = true;
 
-    const filtersEl = document.getElementById('filters');
-    filterBtns.forEach(fb => {
-      const btn = document.createElement('button');
-      btn.className = 'filter-btn' + (fb.key === 'all' ? ' active' : '');
-      btn.textContent = fb.label;
-      btn.onclick = () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentFilter = fb.key;
-        const filtered = books.filter(filterMap[fb.key]);
+    // ===== 搜索 + 筛选组合逻辑 =====
+    function getFilteredBooks() {
+      let result = allBooks;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        result = result.filter(b =>
+          (b.title && b.title.toLowerCase().includes(q)) ||
+          (b.author && b.author.toLowerCase().includes(q))
+        );
+      }
+      if (currentFilter !== 'all') {
+        result = result.filter(filterMap[currentFilter]);
+      }
+      return result;
+    }
+
+    function updateFilterCounts(list) {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        const key = btn.dataset.filterKey;
+        if (!key) return;
+        if (key === 'all') {
+          btn.textContent = `全部 (${list.length})`;
+        } else if (filterMap[key]) {
+          btn.textContent = btn.dataset.baseLabel + ` (${list.filter(filterMap[key]).length})`;
+        }
+      });
+    }
+
+    function updateStats(list) {
+      const n = list.length;
+      document.getElementById('total-books').textContent = n;
+      document.getElementById('avg-rating').textContent =
+        n ? (list.reduce((s, b) => s + b.rating, 0) / n).toFixed(1) : '0';
+      document.getElementById('total-pages').textContent =
+        list.reduce((s, b) => s + (parseInt(b.pages) || 0), 0).toLocaleString();
+      if (n) {
+        const days = list.map(b => {
+          const s = new Date(b.start), f = new Date(b.finish);
+          return (f - s) / (1000 * 60 * 60 * 24);
+        }).sort((a, b) => a - b);
+        const median = days.length % 2 === 0
+          ? (days[days.length/2 - 1] + days[days.length/2]) / 2
+          : days[Math.floor(days.length/2)];
+        document.getElementById('avg-reading-time').textContent = median.toFixed(1);
+      } else {
+        document.getElementById('avg-reading-time').textContent = '0';
+      }
+      // Country badges
+      const cc = {};
+      list.forEach(b => { if (b.country) cc[b.country] = (cc[b.country] || 0) + 1; });
+      const cg = document.getElementById('country-grid');
+      cg.innerHTML = '';
+      Object.entries(cc).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
+        const badge = document.createElement('div');
+        badge.className = 'country-badge';
+        badge.innerHTML = `<span class="country-flag">${COUNTRY_FLAGS[country] || ''}</span>${country}<span class="country-count">×${count}</span>`;
+        cg.appendChild(badge);
+      });
+      updateFilterCounts(list);
+    }
+
+    function updateChart(list) {
+      const counts = {};
+      actualMonths.forEach(m => { counts[m] = 0; });
+      list.forEach(b => { if (counts[b.month] !== undefined) counts[b.month]++; });
+      monthChart.data.datasets[0].data = actualMonths.map(m => counts[m]);
+      monthChart.options.scales.y.max = Math.max(Math.max(...actualMonths.map(m => counts[m])) + 1, 4);
+      monthChart.update();
+    }
+
+    function applySearchAndFilter() {
+      const filtered = getFilteredBooks();
+      updateStats(filtered);
+      updateChart(filtered);
+      if (filtered.length > 0) {
         renderWall(filtered);
         renderBooklist(getSortedList(filtered));
         if (booklistOpen) {
           document.getElementById('booklist-content').classList.add('open');
           document.getElementById('booklist-toggle').classList.add('open');
         }
+      } else {
+        document.getElementById('cover-wall').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
+        document.getElementById('booklist-content').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
+        document.getElementById('wall-count').textContent = '0 本';
+      }
+    }
+
+    // ===== 搜索框事件 =====
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+
+    // 从 URL 预填
+    const urlParams = new URLSearchParams(window.location.search);
+    searchQuery = urlParams.get('search') || '';
+    searchInput.value = searchQuery;
+    if (searchQuery) searchClear.classList.add('visible');
+
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => {
+        searchQuery = e.target.value.trim();
+        const url = new URL(window.location);
+        if (searchQuery) {
+          url.searchParams.set('search', searchQuery);
+        } else {
+          url.searchParams.delete('search');
+        }
+        history.replaceState(null, '', url);
+        searchClear.classList.toggle('visible', !!searchQuery);
+        applySearchAndFilter();
+      }, 150);
+    });
+
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchQuery = '';
+      searchClear.classList.remove('visible');
+      const url = new URL(window.location);
+      url.searchParams.delete('search');
+      history.replaceState(null, '', url);
+      applySearchAndFilter();
+      searchInput.focus();
+    });
+
+    // ===== 筛选按钮 =====
+    const filtersEl = document.getElementById('filters');
+    filterBtns.forEach(fb => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn' + (fb.key === 'all' ? ' active' : '');
+      btn.textContent = fb.label;
+      btn.dataset.filterKey = fb.key;
+      btn.dataset.baseLabel = fb.label.replace(/\s*\(\d+\)\s*$/, '');
+      btn.onclick = () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = fb.key;
+        applySearchAndFilter();
       };
       filtersEl.appendChild(btn);
     });
@@ -994,31 +1149,16 @@
           b.textContent = fieldLabels[f] + (a === 'desc' ? ' ↓' : ' ↑');
           b.classList.toggle('active', currentSortField === f);
         });
-        const filtered = books.filter(filterMap[currentFilter]);
-        renderWall(filtered);
-        renderBooklist(getSortedList(filtered));
-        if (booklistOpen) {
-          document.getElementById('booklist-content').classList.add('open');
-          document.getElementById('booklist-toggle').classList.add('open');
-        }
+        applySearchAndFilter();
       });
     });
-
-    // ===== 初始渲染 =====
-    renderWall(books);
-    renderBooklist(getSortedList(books));
-    // 默认展开清单
-    if (booklistOpen) {
-      document.getElementById('booklist-content').classList.add('open');
-      document.getElementById('booklist-toggle').classList.add('open');
-    }
 
     // ===== 图表 =====
     const maxMonthlyCount = Math.max(...actualMonths.map(m => monthCounts[m]));
     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const chartTextColor = isDark ? '#9e9a96' : '#615d59';
     const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
-    new Chart(document.getElementById('monthChart'), {
+    const monthChart = new Chart(document.getElementById('monthChart'), {
       type: 'bar',
       data: {
         labels: monthLabels,
@@ -1071,6 +1211,9 @@
         }
       }]
     });
+
+    // ===== 初始渲染 =====
+    applySearchAndFilter();
   </script>
 </body>
 </html>

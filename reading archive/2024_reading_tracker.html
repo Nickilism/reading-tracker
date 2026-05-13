@@ -102,17 +102,68 @@
       letter-spacing: -1.5px;
     }
 
-    .filtered-indicator {
-      display: none;
-      align-items: center;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-      font-size: 13px;
-      color: var(--text-secondary);
+    /* ── Search Input ───────────────── */
+    .search-wrap {
+      position: relative;
+      margin-top: 0.75rem;
     }
 
-    .filtered-indicator.visible {
-      display: flex;
+    .search-input {
+      width: 100%;
+      padding: 0.7rem 2.6rem 0.7rem 2.6rem;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--bg-alt);
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      box-shadow: none;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      font-size: 16px;
+      line-height: 1;
+      display: none;
+    }
+
+    .search-clear.visible {
+      display: block;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
     }
 
     .filtered-query {
@@ -562,10 +613,10 @@
       <div class="title-block">
         <h1>阅读记录</h1>
         <p id="subtitle">{{MONTH_RANGE}} 2024</p>
-        <div class="filtered-indicator" id="filteredIndicator">
-          <span>筛选:</span>
-          <span class="filtered-query" id="filteredQuery"></span>
-          <button class="clear-filter" id="clearFilter">清除</button>
+        <div class="search-wrap" id="searchWrap">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" id="searchInput" placeholder="搜索书名或作者..." autocomplete="off">
+          <button class="search-clear" id="searchClear" aria-label="清除搜索">✕</button>
         </div>
       </div>
       <div class="year-badge">2024</div>
@@ -726,31 +777,13 @@
 
     // 书籍数据（由生成脚本注入）
     const books = [{"title":"浮士德","author":"[德] 歌德","start":"2023-12-19","finish":"2024-01-03","rating":7.8,"pages":"466","doubanLink":"https://book.douban.com/subject/25901849/","cover":"https://neodb.social/m/book/2021/12/04e68d9f7c-2a8e-4b5e-b14e-dcefb9524cee.jpg","review":"以我现在的定性，这种形式的题材又碰上翻译过的古外文，真的看不进去","month":1,"country":"德国"},{"title":"理想国","author":"[古希腊]柏拉图","start":"2023-12-22","finish":"2024-01-15","rating":8.3,"pages":"488","doubanLink":"https://book.douban.com/subject/35606778/","cover":"https://neodb.social/m/book/2021/12/0953cdf157-0941-4f28-ae4a-5433eacab946.jpg","review":"最好的人啊，你说得漂亮。","month":1,"country":"古希腊"},{"title":"怦然心动","author":"[美] 文德琳·范·德拉安南","start":"2024-01-07","finish":"2024-01-17","rating":8.5,"pages":"240","doubanLink":"https://book.douban.com/subject/35200678/","cover":"https://neodb.social/m/book/2021/10/25345a7597-f900-424e-a956-b2287cc444c1.jpg","review":"还在读书的时候看了电影，令人怦然心动的电影，十多年后的现在又看了原著小说，非常轻松愉悦的阅读，等娃们再大几岁，我想会推荐给他们也看看。","month":1,"country":"美国"},{"title":"意识的河流","author":"[英国] 奥利弗·萨克斯","start":"2024-01-30","finish":"2024-01-30","rating":8.3,"pages":"256","doubanLink":"https://book.douban.com/subject/36343263/","cover":"https://neodb.social/m/item/doubanbook/2023/07/25/cdba0840-d8fa-4327-8fa2-3357eb9f077d.jpg","review":"挺有意思的小书，易读，收获一些有关意识方面的奇怪病症以及达尔文的历史，最喜欢最后一篇关于科学史上的遗忘与忽视。","month":1,"country":"英国"},{"title":"知识","author":"[加] 詹妮弗·内格尔","start":"2024-01-31","finish":"2024-02-20","rating":8.2,"pages":"280","doubanLink":"https://book.douban.com/subject/35689614/","cover":"https://neodb.social/m/book/2022/04/22c5442f6f-082a-4bfd-89ff-a197d17383fa.jpg","review":"抱着津津有味的期待翻开，却悻悻然离去","month":2,"country":"加拿大"},{"title":"佛祖都说了些什么?","author":"林欣浩","start":"2024-01-15","finish":"2024-02-25","rating":8.5,"pages":"352","doubanLink":"https://book.douban.com/subject/25928708/","cover":"https://neodb.social/m/book/2021/09/155154b016-a1c3-4753-84a9-203aedcbfc8f.jpg","review":"浅显易懂，有很强的故事性，也做到了各类历史事件和知识的迁移，尤其喜欢作者时不时的说「也许这里你会疑惑」，其实我本没有疑惑，倒是作者帮我指出了自己思虑不周之处。\n缺点是有一些辩证唯物主义、主观唯心主义等标签化的论述。","month":2,"country":"中国"},{"title":"学习之道（第2版）","author":"[美] 乔希·维茨金 (Josh Waitzkin)","start":"2024-02-19","finish":"2024-02-29","rating":8.1,"pages":"190","doubanLink":"https://book.douban.com/subject/2345548/","cover":"https://neodb.social/m/book/2021/09/15d6bcbe08-8f11-4184-a979-0aae8349b996.jpg","review":"本书的名字学习之道个人感觉起大了，它更像是作者在想起和太极拳上获得成功的心路历程分享。作者很厉害，他能将这两项看似相差甚远的竞技来回做知识迁移以提升自己。但就其分享的内容来看，更多能给读者传递的是「术」而非「道」，正如作者经常提及的《道德经》所言：道可道，非常道。","month":2,"country":"美国"},{"title":"哥德尔传","author":"[美] 斯蒂芬· 布迪安斯基","start":"2024-02-27","finish":"2024-03-27","rating":8.4,"pages":"408","doubanLink":"https://book.douban.com/subject/36073022/","cover":"https://neodb.social/m/book/2022/10/14010984a9-7931-413c-9930-e79601aee075.jpg","review":"与其说是哥德尔传，不如说是哥德尔时代传。作者事无巨细的描写了哥德尔的出生背景、时代、社会的方方面面，还有围绕在他身旁的人。尽管有些内容看着有些琐碎，但比起之前读的基本关于不完备定理的书，本书更能从感性的角度去理解哥德尔，也表达了哥德尔对不完备定理的哲学层面认识，仍然值得一读。","month":3,"country":"美国"},{"title":"高濑川","author":"[日]平野启一郎","start":"2024-03-05","finish":"2024-04-01","rating":8.3,"pages":"259","doubanLink":"https://book.douban.com/subject/35334617/","cover":"https://neodb.social/m/book/2021/12/093bc80f20-cffc-4daf-916b-0d575509915a.jpg","review":"很有特色和新意的几个短篇。","month":4,"country":"日本"},{"title":"西线无战事","author":"[德] 雷马克","start":"2024-04-10","finish":"2024-04-21","rating":8.5,"pages":"200","doubanLink":"https://book.douban.com/subject/26324832/","cover":"https://neodb.social/m/book/2021/09/15d3b34761-35be-4938-afbf-eabde33b6509.jpg","review":"「那么，战争到底为的是什么呢？」「我认为，那是一种疫病。」","month":4,"country":"德国"},{"title":"点与线·零的焦点","author":"（日）松本清张","start":"2024-04-16","finish":"2024-05-04","rating":7.8,"pages":"377","doubanLink":"https://book.douban.com/subject/2335749/","cover":"https://neodb.social/m/book/2021/12/0701de2349-abef-4ada-9484-fd512f7107f7.jpg","review":"60多年前的本格推理","month":5,"country":"日本"},{"title":"末日愚者","author":"[日] 伊坂幸太郎","start":"2024-05-19","finish":"2024-05-28","rating":7.8,"pages":"312","doubanLink":"https://book.douban.com/subject/26909777/","cover":"https://neodb.social/m/book/2021/12/04c5bc6efc-f528-4901-8d9b-a2ad79cc7b62.jpg","review":"末日背景下的八个短篇故事，告诉我们要拼尽全力而活着。","month":5,"country":"日本"},{"title":"名侦探的献祭","author":"[日] 白井智之","start":"2024-05-16","finish":"2024-06-13","rating":7.8,"pages":"343","doubanLink":"https://book.douban.com/subject/36512989/","cover":"https://neodb.social/m/item/book/2026/02/11/307f3efd-6dee-46cc-a93e-e39018bafa28.jpg","review":"多重推理的设定、结尾动机与故事开头的呼应、以及根据真实故事改编等是加分点，推理部分略显牵强。","month":6,"country":"日本"},{"title":"监视","author":"[日]松本清张","start":"2024-06-09","finish":"2024-06-23","rating":8.2,"pages":"408","doubanLink":"https://book.douban.com/subject/27189928/","cover":"https://neodb.social/m/book/2021/10/2377ca33b3-dcc9-4103-9cef-449273538fce.jpg","review":"精彩的几个短篇，尤其是《监视》之后的几个。","month":6,"country":"日本"},{"title":"鳗鱼的旅行","author":"[瑞典] 帕特里克•斯文松","start":"2024-07-11","finish":"2024-07-21","rating":8.3,"pages":"234","doubanLink":"https://book.douban.com/subject/35167939/","cover":"https://neodb.social/m/book/2021/09/15c7d5f4c6-a614-4a6b-ac58-4cd2a2733faa.jpg","review":"鳗鱼在向我们诉说人类的好奇心，诉说我们对探寻真相、试图理解一切从哪里来又意味着什么的难以抑制的永恒渴求。而同时它们也诉说着我们对于神秘事物的渴求。","month":7,"country":"瑞典"},{"title":"为什么","author":"[美]朱迪亚·珀尔(Judea Pearl), [美]达纳·麦肯齐(Dana Mackenzie)","start":"2024-06-13","finish":"2024-07-30","rating":7.8,"pages":"374","doubanLink":"https://book.douban.com/subject/33438811/","cover":"https://neodb.social/m/book/2021/09/1644da8edf-44d3-4fb6-a13a-b76f021a7f17.jpg","review":"对我等门外汉而言，了解一些因果论历史、统计学悖论示例、因果图的大致运用，就是这本书的全部功能了。","month":7,"country":"美国"},{"title":"世界尽头与冷酷仙境","author":"[日]村上春树","start":"2024-08-07","finish":"2024-08-31","rating":7.9,"pages":"455","doubanLink":"https://book.douban.com/subject/30144097/","cover":"https://neodb.social/m/book/2021/09/15b0f193d7-506f-46b3-b8ed-f9a17429a914.jpg","review":"两个世界单拎出来差点意思，合在一起却还不错","month":8,"country":"日本"},{"title":"棋局","author":"不不","start":"2024-08-25","finish":"2024-09-05","rating":8.4,"pages":"200","doubanLink":"https://book.douban.com/subject/35386821/","cover":"https://neodb.social/m/book/2021/12/0920a8918c-a6c3-4f03-b181-4f4b266b0354.jpg","review":"非常有意思的一本围棋简史，虽不懂围棋，却也看得津津有味。","month":9,"country":"中国"},{"title":"罗素哲学三书","author":"[英]伯特兰·罗素","start":"2024-09-06","finish":"2024-09-23","rating":7.5,"pages":"504","doubanLink":"https://book.douban.com/subject/35695569/","cover":"https://neodb.social/m/book/2022/11/067b95abc4-e7ef-49f6-a72d-f9944f2b9f1b.jpg","review":"主要关于认识论与逻辑学，也需要极大的热爱才能读下去","month":9,"country":"英国"},{"title":"微暗的火","author":"[美] 弗拉基米尔·纳博科夫","start":"2024-09-09","finish":"2024-09-25","rating":7.5,"pages":"378","doubanLink":"https://book.douban.com/subject/33372564/","cover":"https://neodb.social/m/book/2021/09/16c99002c1-befd-41a6-9607-0537bcf418a8.jpg","review":"若非这新颖的文体，可能这微暗的火在一百页之前就被我浇灭了，实在读的很枯燥，无缘。","month":9,"country":"美国"},{"title":"观念的力量","author":"[英] 以赛亚·伯林","start":"2024-09-25","finish":"2024-10-22","rating":8,"pages":"444","doubanLink":"https://book.douban.com/subject/27060620/","cover":"https://neodb.social/m/book/2021/09/16906dc5d5-b562-4642-95fd-c3f0b04b8bf6.jpg","review":"读的第三本柏林的书，没有前两本《浪漫主义的根源》、《自由及其背叛》那么喜欢。以短篇文章为主，犹太人相关的几篇都跳读了，倒是阿维赛的前言挺值得一读，对柏林多了一分了解。","month":10,"country":"英国"},{"title":"从字体开始","author":"[中]The Type","start":"2024-09-01","finish":"2024-10-27","rating":8.5,"pages":"408","doubanLink":"https://book.douban.com/subject/36140138/","cover":"https://neodb.social/m/book/2022/11/028caa9462-01b5-4e39-9c08-427812f126a8.jpg","review":"从字体开始，在一个小切口里看到设计、政治、历史、科技与人文，兼具美感与深度，值得一读。","month":10,"country":"中国"},{"title":"剪刀男","author":"[日] 殊能将之","start":"2024-07-29","finish":"2024-10-28","rating":8.1,"pages":"414","doubanLink":"https://book.douban.com/subject/34922235/","cover":"https://neodb.social/m/book/2021/09/17c609903a-0d51-4b93-986f-9e288921d9b0.jpg","review":"断续看完，读前未了解文本，叙述性诡计令人猝不及防，一开始还以为电子书排版出错了 😂","month":10,"country":"日本"},{"title":"进步知识分子的死与生","author":"[英]大卫·埃德蒙兹","start":"2024-10-29","finish":"2024-11-17","rating":8.1,"pages":"408","doubanLink":"https://book.douban.com/subject/36168828/","cover":"https://neodb.social/m/item/doubanbook/2023/03/20/12905850-5bd7-4867-8acb-17c4612b5f5d.jpg","review":"群像写作，好处在于阅读起来没有太大理解上的难度，坏处在于很难有思想上的即刻收获。","month":11,"country":"英国"},{"title":"英语魔法师之语法俱乐部","author":"旋元佑","start":"2024-09-13","finish":"2024-11-19","rating":8.4,"pages":"440","doubanLink":"https://book.douban.com/subject/1014914/","cover":"https://neodb.social/m/book/2021/09/1520b385b0-a979-4f46-9d8c-bef6e94fad0b.jpg","review":"本打算买来给孩子学习基本文法的，自己读过之后才发现难度并不适合小学生。作者对于语法的理解还是值得学习的，能够用理性和思辨的方法去拆解溯源语法，摒弃一味的死记硬背，有助于提升语言的逻辑性。适合有一定英文基础的人阅读。","month":11,"country":"中国"},{"title":"法国大革命","author":"[英国]威廉·多伊尔","start":"2024-11-18","finish":"2024-11-25","rating":7,"pages":"276","doubanLink":"https://book.douban.com/subject/26832570/","cover":"https://neodb.social/m/book/2021/12/04290c428f-da4b-4c36-a7eb-65c186d691c9.jpg","review":"也许是文化背景使然，这本通识读本并没有那么通识，且中文翻译也难言流畅。","month":11,"country":"英国"},{"title":"世上为什么要有图书馆","author":"杨素秋","start":"2024-12-10","finish":"2024-12-10","rating":8.3,"pages":"298","doubanLink":"https://book.douban.com/subject/36593622/","cover":"https://neodb.social/m/item/doubanbook/2023/12/26/9e4d5cb9-8b97-4462-8c03-98d74ecbe4c0.jpg","review":"经历过前面挂职部分的描述，本书变得越发有意思起来。喜欢以书目为由的一个个人物小传，虽然并没有很好的回答世界上为什么要有图书馆这个书名问题，但字里行间能感受到爱书之人的情感，对于作者体制内的遭遇也心有戚戚焉。","month":12,"country":"中国"},{"title":"读库2104","author":"张立宪 主编","start":"2024-12-08","finish":"2024-12-19","rating":8.5,"pages":"352","doubanLink":"https://book.douban.com/subject/35479692/","cover":"https://neodb.social/m/book/2021/12/071934fb35-0f1a-44bf-b104-d1643539dfd6.jpg","review":"因为读过不不的《棋局》，在图书馆看到这本读库里又有他的作品，遂借阅之，果然没有失望。惊喜的是另外几篇文章也很出彩，尤其喜欢莫言访谈中关于悲悯的那段描述，推荐。","month":12,"country":"中国"},{"title":"吉卜力的天才们","author":"[日] 铃木敏夫","start":"2024-07-07","finish":"2024-12-29","rating":8.3,"pages":"304","doubanLink":"https://book.douban.com/subject/36065794/","cover":"https://neodb.social/m/book/2022/11/13cfb0ac24-b3c4-4d55-a6df-6ff36a173ff9.jpg","review":"完整看过的吉卜力电影不多，更多的是片段式的，这本书按时间顺序记叙了吉卜力出品电影的背后故事，从制作人的角度出发在选题、宣发、故事性、拖延、导演画师的沟通到配音选择等等方面讲述一部吉卜力电影是如何诞生的。当然最重要的是让读者更深入的了解到大师宫崎骏和高畑勋。除电影外，我最喜欢书中提到的吉卜力幼儿园。","month":12,"country":"日本"},{"title":"血字的研究·四签名","author":"[英] 阿瑟·柯南·道尔","start":"2024-12-19","finish":"2024-12-31","rating":8.3,"pages":"280","doubanLink":"https://book.douban.com/subject/34805607/","cover":"https://neodb.social/m/book/2022/05/07ee0124ac-45c8-4a64-ba14-06507a58cab3.jpg","review":"重温儿时经典","month":12,"country":"英国"}];
-
-    // ===== 搜索过滤 =====
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchQuery = urlParams.get('search') || '';
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      const filtered = books.filter(b =>
-        (b.title && b.title.toLowerCase().includes(q)) ||
-        (b.author && b.author.toLowerCase().includes(q))
-      );
-      books.length = 0;
-      filtered.forEach(b => books.push(b));
-    }
+    const allBooks = books.slice(); // preserve original for repeated filtering
+    let searchQuery = '';
+    let searchDebounce = null;
 
     // ========== 数据注入结束 ==========
 
     // ===== 初始化 =====
-    if (searchQuery) {
-      document.getElementById('filteredIndicator').classList.add('visible');
-      document.getElementById('filteredQuery').textContent = searchQuery;
-      document.getElementById('clearFilter').onclick = () => {
-        const baseUrl = window.location.href.split('?')[0];
-        window.location.href = baseUrl;
-      };
-    }
     const actualMonths = [...new Set(books.map(b => b.month))].sort((a, b) => a - b);
     const monthMeta = {};
     actualMonths.forEach(m => { monthMeta[m] = MONTH_COLORS[m - 1]; });
@@ -826,9 +859,9 @@
       low: b => b.rating <= 7.9,
     };
 
-    const highCount = books.filter(b => b.rating >= 8.3).length;
-    const normalCount = books.filter(b => b.rating > 7.9 && b.rating < 8.3).length;
-    const lowCount = books.filter(b => b.rating <= 7.9).length;
+    const highCount = allBooks.filter(b => b.rating >= 8.3).length;
+    const normalCount = allBooks.filter(b => b.rating > 7.9 && b.rating < 8.3).length;
+    const lowCount = allBooks.filter(b => b.rating <= 7.9).length;
 
     const filterBtns = [
       { key: 'all', label: `全部 (${totalBooks})` },
@@ -848,7 +881,7 @@
 
     // 添加月份筛选按钮
     actualMonths.forEach(m => {
-      const count = books.filter(b => b.month === m).length;
+      const count = allBooks.filter(b => b.month === m).length;
       filterBtns.push({
         key: `month-${m}`,
         label: `${m}月`
@@ -861,22 +894,144 @@
     let currentSortDir = 'desc';
     let booklistOpen = true;
 
-    const filtersEl = document.getElementById('filters');
-    filterBtns.forEach(fb => {
-      const btn = document.createElement('button');
-      btn.className = 'filter-btn' + (fb.key === 'all' ? ' active' : '');
-      btn.textContent = fb.label;
-      btn.onclick = () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentFilter = fb.key;
-        const filtered = books.filter(filterMap[fb.key]);
+    // ===== 搜索 + 筛选组合逻辑 =====
+    function getFilteredBooks() {
+      let result = allBooks;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        result = result.filter(b =>
+          (b.title && b.title.toLowerCase().includes(q)) ||
+          (b.author && b.author.toLowerCase().includes(q))
+        );
+      }
+      if (currentFilter !== 'all') {
+        result = result.filter(filterMap[currentFilter]);
+      }
+      return result;
+    }
+
+    function updateFilterCounts(list) {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        const key = btn.dataset.filterKey;
+        if (!key) return;
+        if (key === 'all') {
+          btn.textContent = `全部 (${list.length})`;
+        } else if (filterMap[key]) {
+          btn.textContent = btn.dataset.baseLabel + ` (${list.filter(filterMap[key]).length})`;
+        }
+      });
+    }
+
+    function updateStats(list) {
+      const n = list.length;
+      document.getElementById('total-books').textContent = n;
+      document.getElementById('avg-rating').textContent =
+        n ? (list.reduce((s, b) => s + b.rating, 0) / n).toFixed(1) : '0';
+      document.getElementById('total-pages').textContent =
+        list.reduce((s, b) => s + (parseInt(b.pages) || 0), 0).toLocaleString();
+      if (n) {
+        const days = list.map(b => {
+          const s = new Date(b.start), f = new Date(b.finish);
+          return (f - s) / (1000 * 60 * 60 * 24);
+        }).sort((a, b) => a - b);
+        const median = days.length % 2 === 0
+          ? (days[days.length/2 - 1] + days[days.length/2]) / 2
+          : days[Math.floor(days.length/2)];
+        document.getElementById('avg-reading-time').textContent = median.toFixed(1);
+      } else {
+        document.getElementById('avg-reading-time').textContent = '0';
+      }
+      // Country badges
+      const cc = {};
+      list.forEach(b => { if (b.country) cc[b.country] = (cc[b.country] || 0) + 1; });
+      const cg = document.getElementById('country-grid');
+      cg.innerHTML = '';
+      Object.entries(cc).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
+        const badge = document.createElement('div');
+        badge.className = 'country-badge';
+        badge.innerHTML = `<span class="country-flag">${COUNTRY_FLAGS[country] || ''}</span>${country}<span class="country-count">×${count}</span>`;
+        cg.appendChild(badge);
+      });
+      updateFilterCounts(list);
+    }
+
+    function updateChart(list) {
+      const counts = {};
+      actualMonths.forEach(m => { counts[m] = 0; });
+      list.forEach(b => { if (counts[b.month] !== undefined) counts[b.month]++; });
+      monthChart.data.datasets[0].data = actualMonths.map(m => counts[m]);
+      monthChart.options.scales.y.max = Math.max(Math.max(...actualMonths.map(m => counts[m])) + 1, 4);
+      monthChart.update();
+    }
+
+    function applySearchAndFilter() {
+      const filtered = getFilteredBooks();
+      updateStats(filtered);
+      updateChart(filtered);
+      if (filtered.length > 0) {
         renderWall(filtered);
         renderBooklist(getSortedList(filtered));
         if (booklistOpen) {
           document.getElementById('booklist-content').classList.add('open');
           document.getElementById('booklist-toggle').classList.add('open');
         }
+      } else {
+        document.getElementById('cover-wall').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
+        document.getElementById('booklist-content').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
+        document.getElementById('wall-count').textContent = '0 本';
+      }
+    }
+
+    // ===== 搜索框事件 =====
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+
+    // 从 URL 预填
+    const urlParams = new URLSearchParams(window.location.search);
+    searchQuery = urlParams.get('search') || '';
+    searchInput.value = searchQuery;
+    if (searchQuery) searchClear.classList.add('visible');
+
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => {
+        searchQuery = e.target.value.trim();
+        const url = new URL(window.location);
+        if (searchQuery) {
+          url.searchParams.set('search', searchQuery);
+        } else {
+          url.searchParams.delete('search');
+        }
+        history.replaceState(null, '', url);
+        searchClear.classList.toggle('visible', !!searchQuery);
+        applySearchAndFilter();
+      }, 150);
+    });
+
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchQuery = '';
+      searchClear.classList.remove('visible');
+      const url = new URL(window.location);
+      url.searchParams.delete('search');
+      history.replaceState(null, '', url);
+      applySearchAndFilter();
+      searchInput.focus();
+    });
+
+    // ===== 筛选按钮 =====
+    const filtersEl = document.getElementById('filters');
+    filterBtns.forEach(fb => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn' + (fb.key === 'all' ? ' active' : '');
+      btn.textContent = fb.label;
+      btn.dataset.filterKey = fb.key;
+      btn.dataset.baseLabel = fb.label.replace(/\s*\(\d+\)\s*$/, '');
+      btn.onclick = () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = fb.key;
+        applySearchAndFilter();
       };
       filtersEl.appendChild(btn);
     });
@@ -994,31 +1149,16 @@
           b.textContent = fieldLabels[f] + (a === 'desc' ? ' ↓' : ' ↑');
           b.classList.toggle('active', currentSortField === f);
         });
-        const filtered = books.filter(filterMap[currentFilter]);
-        renderWall(filtered);
-        renderBooklist(getSortedList(filtered));
-        if (booklistOpen) {
-          document.getElementById('booklist-content').classList.add('open');
-          document.getElementById('booklist-toggle').classList.add('open');
-        }
+        applySearchAndFilter();
       });
     });
-
-    // ===== 初始渲染 =====
-    renderWall(books);
-    renderBooklist(getSortedList(books));
-    // 默认展开清单
-    if (booklistOpen) {
-      document.getElementById('booklist-content').classList.add('open');
-      document.getElementById('booklist-toggle').classList.add('open');
-    }
 
     // ===== 图表 =====
     const maxMonthlyCount = Math.max(...actualMonths.map(m => monthCounts[m]));
     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const chartTextColor = isDark ? '#9e9a96' : '#615d59';
     const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
-    new Chart(document.getElementById('monthChart'), {
+    const monthChart = new Chart(document.getElementById('monthChart'), {
       type: 'bar',
       data: {
         labels: monthLabels,
@@ -1071,6 +1211,9 @@
         }
       }]
     });
+
+    // ===== 初始渲染 =====
+    applySearchAndFilter();
   </script>
 </body>
 </html>
