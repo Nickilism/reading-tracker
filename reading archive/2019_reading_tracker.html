@@ -6,8 +6,10 @@
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1f1f22">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <title>2019 阅读记录</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=Noto+Sans+SC:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <style>
     /* ===== Reset & Variables ===== */
@@ -98,6 +100,40 @@
       line-height: 1;
       user-select: none;
       letter-spacing: -1.5px;
+    }
+
+    .filtered-indicator {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .filtered-indicator.visible {
+      display: flex;
+    }
+
+    .filtered-query {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .clear-filter {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.15rem 0.6rem;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .clear-filter:hover {
+      background: var(--bg-alt);
+      color: var(--text);
     }
 
     .title-block h1 {
@@ -493,6 +529,7 @@
       line-height: 1.7;
       white-space: nowrap;
       font-weight: 500;
+      font-variant-numeric: tabular-nums;
     }
 
     /* ===== Footer ===== */
@@ -525,6 +562,11 @@
       <div class="title-block">
         <h1>阅读记录</h1>
         <p id="subtitle">{{MONTH_RANGE}} 2019</p>
+        <div class="filtered-indicator" id="filteredIndicator">
+          <span>筛选:</span>
+          <span class="filtered-query" id="filteredQuery"></span>
+          <button class="clear-filter" id="clearFilter">清除</button>
+        </div>
       </div>
       <div class="year-badge">2019</div>
     </header>
@@ -592,13 +634,13 @@
     </div>
 
     <!-- ===== Footer ===== -->
-<footer id="footer" style="display: flex; align-items: center; justify-content: center; gap: 0;">导出于 2026-05-07 · <a href="https://github.com/Nickilism/reading-tracker" target="_blank" style="color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; margin-left: 0.25em; line-height: 1; margin-bottom: 2px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="display: block;"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a></footer>
+<footer id="footer" style="display: flex; align-items: center; justify-content: center; gap: 0;">导出于 2026-05-13 · <a href="https://github.com/Nickilism/reading-tracker" target="_blank" style="color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; margin-left: 0.25em; line-height: 1; margin-bottom: 2px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="display: block;"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a></footer>
   <script>
     // ========== 数据注入开始 ==========
     // 以下变量由生成脚本注入
 
     const YEAR = 2019;
-    const GENERATED_DATE = "2026-05-07";
+    const GENERATED_DATE = "2026-05-13";
 
     // 12个月颜色配置
     const MONTH_COLORS = [
@@ -685,9 +727,30 @@
     // 书籍数据（由生成脚本注入）
     const books = [{"title":"刀锋","author":"[英] 毛姆","start":"2018-12-22","finish":"2019-01-28","rating":8.5,"pages":"464","doubanLink":"https://book.douban.com/subject/26896878/","cover":"https://neodb.social/m/book/2021/09/155a94b23f-6133-4cfd-9157-9e0d00c345ec.jpg","review":"读的第二本毛姆的小说，微信阅读，耗时9个多小时","month":1,"country":"英国"},{"title":"流浪地球","author":"刘慈欣","start":"2019-02-10","finish":"2019-02-12","rating":7.8,"pages":"293","doubanLink":"https://book.douban.com/subject/3266609/","cover":"https://neodb.social/m/book/2021/09/15b58fb37b-0313-46ac-b2d9-e52db5d97ca0.jpg","review":"","month":2,"country":"中国"},{"title":"局外人","author":"[法] 阿尔贝·加缪","start":"2019-01-30","finish":"2019-02-13","rating":8,"pages":"128","doubanLink":"https://book.douban.com/subject/4908885/","cover":"https://neodb.social/m/item/book/2026/02/11/b72ae794-7277-4244-a303-01b04580c004.jpeg","review":"","month":2,"country":"法国"},{"title":"献给虚无的供物","author":"（日）中井英夫","start":"2019-02-14","finish":"2019-03-09","rating":8.3,"pages":"484","doubanLink":"https://book.douban.com/subject/10515231/","cover":"https://neodb.social/m/book/2021/09/16f44650ed-a0fc-4682-9a4d-559b8aa84c43.jpg","review":"","month":3,"country":"日本"},{"title":"正面管教","author":"[美]简·尼尔森","start":"2019-05-06","finish":"2019-06-14","rating":8.3,"pages":"276","doubanLink":"https://book.douban.com/subject/3420606","cover":"https://neodb.social/m/book/2021/10/125fbc1caa-e7a7-41d3-bb37-2e5fd913dc5c.jpg","review":"","month":6,"country":"美国"},{"title":"空椅子","author":"（美）杰夫里·迪弗","start":"2019-06-29","finish":"2019-07-10","rating":8,"pages":"487","doubanLink":"https://book.douban.com/subject/3130849/","cover":"https://neodb.social/m/book/2021/09/174d98f2a2-a32f-48d9-af77-f72f0bdf0b93.jpg","review":"","month":7,"country":"美国"},{"title":"肠子","author":"[美] 恰克·帕拉尼克","start":"2019-07-13","finish":"2019-08-05","rating":7,"pages":"408","doubanLink":"https://book.douban.com/subject/5920385","cover":"https://neodb.social/m/book/2021/09/156007b797-851a-426c-bb39-c5d92aca9f69.jpg","review":"","month":8,"country":"美国"},{"title":"苏菲的世界","author":"[挪] 乔斯坦·贾德","start":"2019-06-10","finish":"2019-10-05","rating":8.8,"pages":"528","doubanLink":"https://book.douban.com/subject/2284311/","cover":"https://neodb.social/m/book/2021/09/153b4ac4f7-3931-4f95-bc29-aa27619f058e.jpg","review":"因为自己的原因，竟然花了三个多月才看完这本书。作为哲学入门书籍，作者以时间线为基础走马观花的介绍了各种哲学派别，代表人物，虽不深入却也能给我等菜鸟一个观察哲学的角度。书中也有作者的巧思，用书中书的概念去解释一些并没那么好理解的哲学概念。哲学正是一个晦涩难懂的科目，我想也正如最后作者自己说的，这本书要多读几次才行。","month":10,"country":"中国"},{"title":"长夜难明","author":"紫金陈","start":"2019-10-05","finish":"2019-10-08","rating":8.5,"pages":"288","doubanLink":"https://book.douban.com/subject/26923390","cover":"https://neodb.social/m/book/2021/09/1509ab1503-e6d1-4dcb-8b0f-e9f24e69d82d.jpg","review":"国产推理几乎没看过，这本值得推荐，光能出版就值了。","month":10,"country":"中国"},{"title":"浮生六记","author":"（清）沈复","start":"2019-10-08","finish":"2019-10-10","rating":7,"pages":"80","doubanLink":"https://book.douban.com/subject/1088581/","cover":"https://neodb.social/m/book/2021/09/159f19504e-6c0c-43e6-a814-14c3ef5c0ff1.jpg","review":"走马观花，无甚感觉","month":10,"country":"中国"},{"title":"依存","author":"[日]西泽保彦","start":"2019-04-17","finish":"2019-10-22","rating":8,"pages":"455","doubanLink":"http://m.douban.com/book/subject/11504246/","cover":"https://neodb.social/m/item/book/2026/02/10/bcf5f451-63a2-45d4-bf7a-2931d4ada07f.jpg","review":"不知道这是看的第几本西泽保彦的书，也不知道是匠千晓系列的第几本，但应该是这一系列的最后一本吧？非常喜欢这一系列的各个人设，这一本也是保质保量的延续。对于一件事情的发生，作者总能给出各种不同角度，不同逻辑的解释方法，最后再来一给脑洞大开的结论。相对于系列前作，本书在新颖的点在于选择了其中一位故事人物作为叙述载体，人物感情情节有了较大的推进，揭秘了匠仔的身世，同时在推理的主题下面加上了很多心理学层面的思考。推荐。","month":10,"country":"日本"}];
 
+    // ===== 搜索过滤 =====
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchQuery = urlParams.get('search') || '';
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const filtered = books.filter(b =>
+        (b.title && b.title.toLowerCase().includes(q)) ||
+        (b.author && b.author.toLowerCase().includes(q))
+      );
+      books.length = 0;
+      filtered.forEach(b => books.push(b));
+    }
+
     // ========== 数据注入结束 ==========
 
     // ===== 初始化 =====
+    if (searchQuery) {
+      document.getElementById('filteredIndicator').classList.add('visible');
+      document.getElementById('filteredQuery').textContent = searchQuery;
+      document.getElementById('clearFilter').onclick = () => {
+        const baseUrl = window.location.href.split('?')[0];
+        window.location.href = baseUrl;
+      };
+    }
     const actualMonths = [...new Set(books.map(b => b.month))].sort((a, b) => a - b);
     const monthMeta = {};
     actualMonths.forEach(m => { monthMeta[m] = MONTH_COLORS[m - 1]; });
