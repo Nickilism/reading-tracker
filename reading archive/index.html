@@ -638,7 +638,9 @@
     }
 
     function renderCard(year, stats) {
-      const href = year === CURRENT_YEAR ? `../${CURRENT_YEAR}_reading_tracker.html` : year + '_reading_tracker.html';
+      const href = year === CURRENT_YEAR
+        ? `../${CURRENT_YEAR}_reading_tracker.html`
+        : `./${year}_reading_tracker.html`;
       const isLatest = year === CURRENT_YEAR;
 
       if (stats) {
