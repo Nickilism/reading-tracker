@@ -531,14 +531,11 @@
       background: var(--bg);
       border-top: 1px solid var(--border);
       padding: 14px 18px;
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
     }
 
     .book-row:first-child { border-top: none; }
 
-    .book-info { flex: 1; min-width: 0; }
+    .book-info { /* block layout; dates float right inside */ }
 
     .book-title {
       font-size: 14px;
@@ -562,6 +559,7 @@
       margin-top: 8px;
       word-break: break-word;
       overflow-wrap: break-word;
+      clear: right;
     }
 
     .review-more-btn {
@@ -610,7 +608,9 @@
     .pages-tag { font-size: 10px; color: var(--text-muted); }
 
     .book-dates {
-      text-align: right;
+      float: right;
+      margin-left: 12px;
+      margin-bottom: 4px;
       font-size: 10px;
       color: var(--text-muted);
       line-height: 1.7;
@@ -634,7 +634,6 @@
 
     /* ===== Responsive ===== */
     @media (max-width: 480px) {
-      .book-row { gap: 8px; }
       .stat-value { font-size: 1.55rem; }
       .stat { padding: 1rem 0.5rem; }
       .stat-label { font-size: 9.5px; letter-spacing: 0.04em; }
@@ -1118,6 +1117,7 @@
         }
         return `<div class="book-row">
           <div class="book-info">
+            <div class="book-dates">${b.start}<br>${b.finish}</div>
             <div class="book-title"><a href="${b.doubanLink}" target="_blank" style="color:inherit;text-decoration:none;">${b.title}</a></div>
             <div class="book-author">${b.author}</div>
             <div class="book-meta">
@@ -1128,7 +1128,6 @@
             </div>
             ${reviewSection}
           </div>
-          <div class="book-dates">${b.start}<br>${b.finish}</div>
         </div>`;
       }).join('');
     }
