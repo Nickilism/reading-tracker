@@ -16,12 +16,12 @@ const template = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1f1f22">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafaf9">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f0f11">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <title>{{YEAR}} 阅读记录</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=Noto+Sans+SC:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <style>
     /* ===== Reset & Variables ===== */
@@ -32,28 +32,60 @@ const template = `<!DOCTYPE html>
     }
 
     :root {
-      --bg: #ffffff;
-      --bg-alt: #f6f5f4;
-      --text: rgba(0,0,0,0.95);
-      --text-secondary: #615d59;
-      --text-muted: #a39e98;
-      --border: rgba(0,0,0,0.1);
-      --accent: #0075de;
-      --shadow-hover: 0 2px 6px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
-      --star-empty: rgba(0,0,0,0.15);
+      --bg: #fafaf9;
+      --bg-alt: #f2f0ee;
+      --bg-card: #ffffff;
+      --text: #1a1817;
+      --text-secondary: #5c5855;
+      --text-muted: #9c9793;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.10);
+      --border-card: rgba(0, 0, 0, 0.05);
+      --accent: #0066cc;
+      --accent-soft: #e8f2fb;
+      --stat-num: #1a1817;
+      --stat-label: #8a8580;
+      --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 2px 6px rgba(0, 0, 0, 0.04);
+      --card-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.08);
+      --skeleton-base: #e8e5e2;
+      --skeleton-shine: #f5f3f1;
+      --badge-bg: #0075de;
+      --badge-text: #ffffff;
+      --summary-bg: #ffffff;
+      --summary-border: rgba(0, 0, 0, 0.05);
+      --summary-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.04);
+      --divider: rgba(0, 0, 0, 0.08);
+      --header-dot: #0066cc;
+      --star-empty: rgba(0, 0, 0, 0.15);
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #121214;
-        --bg-alt: #1c1c1f;
-        --text: rgba(255,255,255,0.92);
-        --text-secondary: #9e9a96;
-        --text-muted: #6b6762;
-        --border: rgba(255,255,255,0.1);
-        --accent: #0075de;
-        --shadow-hover: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
-        --star-empty: rgba(255,255,255,0.15);
+        --bg: #0f0f11;
+        --bg-alt: #1a1a1d;
+        --bg-card: #161618;
+        --text: rgba(255, 255, 255, 0.91);
+        --text-secondary: #a19d98;
+        --text-muted: #6e6a65;
+        --border: rgba(255, 255, 255, 0.06);
+        --border-strong: rgba(255, 255, 255, 0.12);
+        --border-card: rgba(255, 255, 255, 0.05);
+        --accent: #5ba4f0;
+        --accent-soft: rgba(91, 164, 240, 0.10);
+        --stat-num: rgba(255, 255, 255, 0.88);
+        --stat-label: rgba(255, 255, 255, 0.38);
+        --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.2), 0 8px 20px rgba(0, 0, 0, 0.35);
+        --skeleton-base: #252528;
+        --skeleton-shine: #323236;
+        --badge-bg: #4da3f0;
+        --badge-text: #121214;
+        --summary-bg: #161618;
+        --summary-border: rgba(255, 255, 255, 0.06);
+        --summary-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 6px 16px rgba(0, 0, 0, 0.3);
+        --divider: rgba(255, 255, 255, 0.08);
+        --header-dot: #5ba4f0;
+        --star-empty: rgba(255, 255, 255, 0.15);
       }
     }
 
@@ -63,17 +95,15 @@ const template = `<!DOCTYPE html>
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 1rem;
+      padding: 2.5rem 1rem 2rem;
       line-height: 1.5;
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    @media (min-width: 768px) {
-      body { padding: 2rem; }
+      transition: background 0.25s ease, color 0.25s ease;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     .page {
-      max-width: 1000px;
+      max-width: 780px;
       margin: 0 auto;
     }
 
@@ -81,7 +111,7 @@ const template = `<!DOCTYPE html>
     header {
       border-bottom: 1px solid var(--border);
       padding-bottom: 1.25rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.25rem;
       display: flex;
       align-items: baseline;
       justify-content: space-between;
@@ -117,7 +147,7 @@ const template = `<!DOCTYPE html>
     /* ── Search Input ───────────────── */
     .search-wrap {
       position: relative;
-      margin-top: 0.75rem;
+      margin-bottom: 1.5rem;
     }
 
     .search-input {
@@ -239,7 +269,7 @@ const template = `<!DOCTYPE html>
     }
 
     .stat:hover {
-      box-shadow: var(--shadow-hover);
+      box-shadow: var(--card-shadow-hover);
     }
 
     .stat-label {
@@ -299,7 +329,7 @@ const template = `<!DOCTYPE html>
     }
 
     .country-badge:hover {
-      box-shadow: var(--shadow-hover);
+      box-shadow: var(--card-shadow-hover);
       transform: translateY(-1px);
     }
 
@@ -416,7 +446,7 @@ const template = `<!DOCTYPE html>
 
     .cover-link:hover {
       transform: scale(1.03);
-      box-shadow: var(--shadow-hover);
+      box-shadow: var(--card-shadow-hover);
     }
 
     .cover-img-wrap { position: relative; }
@@ -625,14 +655,15 @@ const template = `<!DOCTYPE html>
       <div class="title-block">
         <h1>阅读记录</h1>
         <p id="subtitle">{{MONTH_RANGE}} {{YEAR}}</p>
-        <div class="search-wrap" id="searchWrap">
-          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" class="search-input" id="searchInput" placeholder="搜索书名或作者..." autocomplete="off">
-          <button class="search-clear" id="searchClear" aria-label="清除搜索">✕</button>
-        </div>
       </div>
       <div class="year-badge">{{YEAR}}</div>
     </header>
+
+    <div class="search-wrap" id="searchWrap">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索书名或作者..." autocomplete="off">
+      <button class="search-clear" id="searchClear" aria-label="清除搜索">✕</button>
+    </div>
 
     <!-- ===== Stats Grid ===== -->
     <div class="stats-grid">
@@ -922,6 +953,15 @@ const template = `<!DOCTYPE html>
       return result;
     }
 
+    function getSearchOnlyBooks() {
+      if (!searchQuery) return allBooks;
+      const q = searchQuery.toLowerCase();
+      return allBooks.filter(b =>
+        (b.title && b.title.toLowerCase().includes(q)) ||
+        (b.author && b.author.toLowerCase().includes(q))
+      );
+    }
+
     function updateFilterCounts(list) {
       document.querySelectorAll('.filter-btn').forEach(btn => {
         const key = btn.dataset.filterKey;
@@ -964,7 +1004,7 @@ const template = `<!DOCTYPE html>
         badge.innerHTML = `<span class="country-flag">${COUNTRY_FLAGS[country] || ''}</span>${country}<span class="country-count">×${count}</span>`;
         cg.appendChild(badge);
       });
-      updateFilterCounts(list);
+      updateFilterCounts(getSearchOnlyBooks());
     }
 
     function updateChart(list) {
