@@ -113,6 +113,7 @@ const template = `<!DOCTYPE html>
       padding-bottom: 1.25rem;
       margin-bottom: 1.25rem;
       display: flex;
+      flex-wrap: wrap;
       align-items: baseline;
       justify-content: space-between;
       gap: 1rem;
@@ -142,6 +143,7 @@ const template = `<!DOCTYPE html>
       line-height: 1;
       user-select: none;
       letter-spacing: -1.5px;
+      margin-left: auto;
     }
 
     /* ── Search Input ───────────────── */
@@ -242,50 +244,54 @@ const template = `<!DOCTYPE html>
 
     /* ===== Stats Grid ===== */
     .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      display: flex;
+      gap: 0;
+      padding: 0;
+      background: var(--summary-bg);
+      border-radius: 14px;
+      border: 1px solid var(--summary-border);
+      box-shadow: var(--summary-shadow);
       margin-bottom: 1.5rem;
-    }
-
-    @media (max-width: 600px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    }
-
-    @media (min-width: 600px) {
-      .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    }
-
-    @media (min-width: 900px) {
-      .stats-grid { gap: 12px; }
+      overflow: hidden;
     }
 
     .stat {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px 16px;
-      transition: box-shadow 0.2s, background 0.2s ease, border-color 0.2s ease;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.35rem 0.75rem 1.25rem;
+      position: relative;
+      text-align: center;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      transition: none;
     }
 
-    .stat:hover {
-      box-shadow: var(--card-shadow-hover);
-    }
-
-    .stat-label {
-      font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-weight: 600;
-      margin-bottom: 6px;
+    .stat + .stat {
+      border-left: 1px solid var(--divider);
     }
 
     .stat-value {
-      font-size: 1.75rem;
+      font-size: 2rem;
       font-weight: 700;
-      letter-spacing: -0.5px;
-      color: var(--text);
+      color: var(--stat-num);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-label {
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--stat-label);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
     }
 
     /* ===== Country Stats ===== */
@@ -642,8 +648,10 @@ const template = `<!DOCTYPE html>
     @media (max-width: 480px) {
       .book-row { flex-direction: column; gap: 8px; }
       .book-dates { text-align: left; }
-      .stat-value { font-size: 1.5rem; }
-      .stats-grid { gap: 8px; }
+      .stat-value { font-size: 1.55rem; }
+      .stat { padding: 1rem 0.5rem; }
+      .stat-label { font-size: 9.5px; letter-spacing: 0.04em; }
+      .stats-grid { flex-wrap: wrap; border-radius: 12px; }
     }
   </style>
 </head>
@@ -668,20 +676,20 @@ const template = `<!DOCTYPE html>
     <!-- ===== Stats Grid ===== -->
     <div class="stats-grid">
       <div class="stat">
-        <div class="stat-label">已读书目</div>
         <div class="stat-value" id="total-books">—</div>
+        <div class="stat-label">已读书目</div>
       </div>
       <div class="stat">
-        <div class="stat-label">平均评分</div>
         <div class="stat-value" id="avg-rating">—</div>
+        <div class="stat-label">平均评分</div>
       </div>
       <div class="stat">
-        <div class="stat-label">总页数</div>
         <div class="stat-value" id="total-pages">—</div>
+        <div class="stat-label">总页数</div>
       </div>
       <div class="stat">
-        <div class="stat-label">阅读天数中位数</div>
         <div class="stat-value" id="avg-reading-time">—</div>
+        <div class="stat-label">阅读天数中位数</div>
       </div>
     </div>
 
@@ -908,9 +916,9 @@ const template = `<!DOCTYPE html>
 
     const filterBtns = [
       { key: 'all', label: `全部 (${totalBooks})` },
-      { key: 'high', label: `🟢 高分作品 (${highCount})` },
-      { key: 'normal', label: `🟡 普通作品 (${normalCount})` },
-      { key: 'low', label: `🔴 低分作品 (${lowCount})` },
+      { key: 'high', label: `🟢 高分 (${highCount})` },
+      { key: 'normal', label: `🟡 普通 (${normalCount})` },
+      { key: 'low', label: `🔴 低分 (${lowCount})` },
     ];
 
     // 添加国家筛选按钮
