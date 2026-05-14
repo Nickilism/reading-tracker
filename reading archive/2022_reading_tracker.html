@@ -668,10 +668,6 @@
         <div class="stat-label">已读书目</div>
       </div>
       <div class="stat">
-        <div class="stat-value" id="avg-rating">—</div>
-        <div class="stat-label">平均评分</div>
-      </div>
-      <div class="stat">
         <div class="stat-value" id="total-pages">—</div>
         <div class="stat-label">总页数</div>
       </div>
@@ -833,7 +829,6 @@
 
     // ===== 统计计算 =====
     const totalBooks = books.length;
-    const avgRating = (books.reduce((sum, b) => sum + b.rating, 0) / totalBooks).toFixed(1);
     const totalPages = books.reduce((sum, b) => sum + (parseInt(b.pages) || 0), 0);
 
     // 国家统计（只统计非空国家）
@@ -851,7 +846,6 @@
 
     // ===== 更新 DOM =====
     document.getElementById('total-books').textContent = totalBooks;
-    document.getElementById('avg-rating').textContent = avgRating;
     document.getElementById('total-pages').textContent = totalPages;
 
     // 计算阅读天数中位数
@@ -973,8 +967,6 @@
     function updateStats(list) {
       const n = list.length;
       document.getElementById('total-books').textContent = n;
-      document.getElementById('avg-rating').textContent =
-        n ? (list.reduce((s, b) => s + b.rating, 0) / n).toFixed(1) : '0';
       document.getElementById('total-pages').textContent =
         list.reduce((s, b) => s + (parseInt(b.pages) || 0), 0).toLocaleString();
       if (n) {
