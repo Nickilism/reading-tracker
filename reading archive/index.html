@@ -589,9 +589,9 @@
     <header>
       <div class="title-block">
         <h1>阅读记录归档</h1>
-        <p class="subtitle">Reading Tracker Archive</p>
+        <p class="subtitle">READING ARCHIVE</p>
       </div>
-      <div class="year-badge">2019-2026</div>
+      <div class="year-badge" id="yearBadge"></div>
     </header>
 
     <div class="search-wrap">
@@ -618,6 +618,7 @@
 
   <script>
     const CURRENT_YEAR = new Date().getFullYear();
+    document.getElementById('yearBadge').textContent = `2019-${CURRENT_YEAR}`;
     const START_YEAR = 2019;
     const YEARS = [];
     for (let y = CURRENT_YEAR; y >= START_YEAR; y--) {
