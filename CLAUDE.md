@@ -82,3 +82,56 @@ Key routing rules:
 - Ship/deploy/PR → invoke /ship or /land-and-deploy
 - Save progress → invoke /context-save
 - Resume context → invoke /context-restore
+
+## Design System
+
+所有页面（index 和各年度 tracker）必须共享同一套视觉规范。以 `reading archive/index.html` 为 Single Source of Truth。
+
+### Design Tokens
+
+所有颜色从 CSS 变量取值，禁止硬编码 hex/rgba。变量定义见 `index.html` 的 `:root` 和 `@media (prefers-color-scheme: dark)` 块。
+
+关键变量：
+- `--bg: #fafaf9` (light) / `#0f0f11` (dark) — 页面底色
+- `--bg-alt: #f2f0ee` / `#1a1a1d` — 次级底色
+- `--text: #1a1817` / `rgba(255,255,255,0.91)` — 主文字
+- `--border: rgba(0,0,0,0.06)` / `rgba(255,255,255,0.06)` — 分割线
+
+### Layout
+
+```css
+.page { max-width: 780px; margin: 0 auto; }
+body { padding: 2.5rem 1rem 2rem; }
+```
+
+### Header
+
+```html
+<header>
+  <div class="title-block"><h1>...</h1><p>...</p></div>
+  <div class="year-badge">YYYY</div>
+</header>
+```
+
+header 使用 `display: flex; align-items: baseline; justify-content: space-between;`
+`border-bottom: 1px solid var(--border); padding-bottom: 1.25rem; margin-bottom: 1.25rem;`
+
+搜索框在 header 外部，`margin-bottom: 1.5rem;`
+
+### Typography
+
+字体 URL: `Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700`
+h1 基础 1.75rem，>=768px 时 2.25rem，<=480px 时 1.55rem
+
+### Meta
+
+```html
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafaf9">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f0f11">
+```
+
+### 修改流程
+
+1. 改 `reading archive/index.html`
+2. 同步改 `template.js`
+3. 重新生成年度 HTML：`node reading-tracker-github.js <year>`

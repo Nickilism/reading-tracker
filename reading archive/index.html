@@ -86,41 +86,45 @@
     }
 
     .page {
-      max-width: 680px;
+      max-width: 780px;
       margin: 0 auto;
     }
 
     /* ── Header ─────────────────────── */
     header {
-      padding-bottom: 1.5rem;
-      margin-bottom: 1.5rem;
-      border-bottom: 2px solid var(--border);
-      position: relative;
-    }
-
-    .header-row {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.25rem;
+      margin-bottom: 1.25rem;
       display: flex;
       align-items: baseline;
-      gap: 0.6rem;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem;
     }
 
-    h1 {
-      font-size: 1.85rem;
+    .title-block h1 {
+      font-size: 1.75rem;
       font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.625px;
       color: var(--text);
-      line-height: 1.15;
-      text-wrap: balance;
+      line-height: 1.1;
     }
 
-    .subtitle {
-      font-size: 11px;
+    .title-block p {
+      font-size: 12px;
       color: var(--text-muted);
-      letter-spacing: 0.1em;
+      margin-top: 4px;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       font-weight: 500;
-      margin-top: 0.3rem;
+    }
+
+    .year-badge {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--bg-alt);
+      line-height: 1;
+      user-select: none;
+      letter-spacing: -1.5px;
     }
 
     /* ── Global Summary ────────────── */
@@ -566,19 +570,26 @@
         font-size: 9.5px;
         letter-spacing: 0.04em;
       }
-      h1 {
+      .title-block h1 {
         font-size: 1.55rem;
       }
+      .year-badge { font-size: 2.5rem; }
+    }
+
+    @media (min-width: 768px) {
+      .title-block h1 { font-size: 2.25rem; letter-spacing: -1px; }
+      .year-badge { font-size: 4rem; }
     }
   </style>
 </head>
 <body>
   <div class="page">
     <header>
-      <div class="header-row">
+      <div class="title-block">
         <h1>阅读记录归档</h1>
+        <p class="subtitle">Reading Tracker Archive</p>
       </div>
-      <p class="subtitle">Reading Tracker Archive</p>
+      <div class="year-badge">2019-2026</div>
     </header>
 
     <div class="search-wrap">
