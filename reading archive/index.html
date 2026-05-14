@@ -896,6 +896,23 @@
       animateFlip(allCards, firstRects, cardGrid);
     }
 
+    // Reset search state on bfcache restore (iOS Safari back-navigation)
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) {
+        // Restore original card hrefs (may have had ?search=xxx appended by click handler)
+        YEARS.forEach(year => {
+          const card = document.getElementById('card-' + year);
+          if (card) {
+            card.href = year === CURRENT_YEAR
+              ? `../${CURRENT_YEAR}_reading_tracker.html`
+              : `./${year}_reading_tracker.html`;
+          }
+        });
+        searchInput.value = '';
+        applySearch('');
+      }
+    });
+
     searchInput.addEventListener('input', (e) => {
       clearTimeout(searchDebounce);
       searchDebounce = setTimeout(() => {
