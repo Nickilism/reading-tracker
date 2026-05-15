@@ -496,6 +496,18 @@
       pointer-events: none;
     }
 
+    .card-grid-wrap { position: relative; }
+    .no-results {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      pointer-events: none;
+      transform: translateY(-40px);
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .skeleton-line {
         animation: none;
@@ -604,7 +616,10 @@
 
     <div class="global-summary" id="globalSummary"></div>
 
-    <div class="card-grid" id="cardGrid"></div>
+    <div class="card-grid-wrap">
+      <div class="card-grid" id="cardGrid"></div>
+      <div class="no-results" id="noResults" style="display:none">没有找到匹配的书籍</div>
+    </div>
 
     <footer>
       <a href="https://github.com/Nickilism/reading-tracker" class="project-link" target="_blank" rel="noopener">
@@ -841,6 +856,7 @@
 
       // Clear search: restore original order with animation
       if (!q) {
+        document.getElementById('noResults').style.display = 'none';
         if (originalCardOrder) {
           const allCards = Array.from(cardGrid.querySelectorAll('.card'));
           const firstRects = new Map();
@@ -891,6 +907,8 @@
         card.classList.add('search-hidden');
         cardGrid.appendChild(card);
       });
+
+      document.getElementById('noResults').style.display = matching.length ? 'none' : '';
 
       // FLIP step 2-4: animate position changes
       animateFlip(allCards, firstRects, cardGrid);
