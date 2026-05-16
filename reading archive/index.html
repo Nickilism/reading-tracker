@@ -499,13 +499,15 @@
     .card-grid-wrap { position: relative; }
     .no-results {
       position: absolute;
-      inset: 0;
+      top: 0;
+      left: 0;
+      right: 0;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
+      padding-top: 2.5rem;
       color: var(--text-secondary);
       pointer-events: none;
-      transform: translateY(-40px);
     }
 
     @media (prefers-reduced-motion: reduce) {
