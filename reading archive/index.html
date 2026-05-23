@@ -706,12 +706,12 @@
               </div>
               <div class="card-stats">
                 <div class="stat-item">
-                  <span class="stat-value">${stats.count}</span>
+                  <span class="stat-value" data-stat="count">${stats.count}</span>
                   <span class="stat-label">本</span>
                 </div>
                 <span class="stat-sep">|</span>
                 <div class="stat-item">
-                  <span class="stat-value">${fmt(stats.totalPages)}</span>
+                  <span class="stat-value" data-stat="pages">${fmt(stats.totalPages)}</span>
                   <span class="stat-label">页</span>
                 </div>
               </div>
@@ -822,6 +822,20 @@
     let originalCardOrder = null;
     const originalCoverMap = new Map();
 
+    function getCardStats(books) {
+      const count = books.length;
+      const totalPages = books.reduce((s, b) => s + (parseInt(b.pages) || 0), 0);
+      return { count, totalPages };
+    }
+
+    function updateCardStats(card, stats) {
+      const countEl = card.querySelector('[data-stat="count"]');
+      const pagesEl = card.querySelector('[data-stat="pages"]');
+      if (!countEl || !pagesEl) return;
+      countEl.textContent = stats.count;
+      pagesEl.textContent = fmt(stats.totalPages);
+    }
+
     /* ── FLIP animation helper ────────── */
     function animateFlip(cards, firstRects, container) {
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -882,6 +896,13 @@
           if (wrap) wrap.innerHTML = html;
         });
         originalCoverMap.clear();
+        // Restore original stats
+        YEARS.forEach(year => {
+          const card = document.getElementById('card-' + year);
+          if (card && yearBooks[year]) {
+            updateCardStats(card, getCardStats(yearBooks[year]));
+          }
+        });
         if (originalCardOrder) {
           const allCards = Array.from(cardGrid.querySelectorAll('.card'));
           const firstRects = new Map();
@@ -961,6 +982,24 @@
             originalCoverMap.delete(card);
           }
         }
+      });
+
+      // Restore all stats to original, then override matching cards with filtered stats
+      YEARS.forEach(year => {
+        const card = document.getElementById('card-' + year);
+        if (!card || card.classList.contains('search-hidden')) return;
+        if (yearBooks[year]) {
+          updateCardStats(card, getCardStats(yearBooks[year]));
+        }
+      });
+      matching.forEach(card => {
+        const year = parseInt(card.id.replace('card-', ''), 10);
+        const books = yearBooks[year] || [];
+        const matchedBooks = books.filter(b =>
+          (b.title && b.title.toLowerCase().includes(q)) ||
+          (b.author && b.author.toLowerCase().includes(q))
+        );
+        updateCardStats(card, getCardStats(matchedBooks));
       });
 
       // FLIP step 1: record current positions
