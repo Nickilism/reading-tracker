@@ -27,7 +27,7 @@ const template = `<!DOCTYPE html>
   <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/android-chrome-192x192.png">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <style>
     /* ===== Reset & Variables ===== */
@@ -143,12 +143,13 @@ const template = `<!DOCTYPE html>
     }
 
     .year-badge {
+      font-family: 'DM Serif Display', serif;
       font-size: 3rem;
-      font-weight: 700;
+      font-weight: 900;
       color: var(--bg-alt);
       line-height: 1;
       user-select: none;
-      letter-spacing: -1.5px;
+      letter-spacing: -1px;
       margin-left: auto;
     }
 
@@ -282,6 +283,7 @@ const template = `<!DOCTYPE html>
     }
 
     .stat-value {
+      font-family: 'DM Serif Display', serif;
       font-size: 2rem;
       font-weight: 700;
       color: var(--stat-num);

@@ -15,7 +15,7 @@
   <link rel="icon" type="image/x-icon" href="../icons/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="../icons/android-chrome-192x192.png">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after {
       box-sizing: border-box;
@@ -126,12 +126,13 @@
     }
 
     .year-badge {
+      font-family: 'DM Serif Display', serif;
       font-size: 3rem;
-      font-weight: 700;
+      font-weight: 900;
       color: var(--bg-alt);
       line-height: 1;
       user-select: none;
-      letter-spacing: -1.5px;
+      letter-spacing: -1px;
       margin-left: auto;
     }
 
@@ -165,6 +166,7 @@
     }
 
     .summary-value {
+      font-family: 'DM Serif Display', serif;
       font-size: 2rem;
       font-weight: 700;
       color: var(--stat-num);
@@ -181,6 +183,12 @@
       letter-spacing: 0.06em;
       text-transform: uppercase;
       white-space: nowrap;
+    }
+
+    .value-unit {
+      font-family: 'DM Serif Display', 'Noto Serif SC', serif;
+      font-size: 0.75em;
+      font-weight: 900;
     }
 
     /* ── Card Grid ─────────────────── */
@@ -299,11 +307,12 @@
     }
 
     .card-year {
+      font-family: 'DM Serif Display', serif;
       font-size: 1.65rem;
       font-weight: 700;
       color: var(--text);
       line-height: 1;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.02em;
     }
 
     .card-badge {
@@ -741,7 +750,7 @@
           <span class="summary-label">累计本数</span>
         </div>
         <div class="summary-item">
-          <span class="summary-value">${totals.years} 年</span>
+          <span class="summary-value">${totals.years}<span class="value-unit">年</span></span>
           <span class="summary-label">持续阅读</span>
         </div>
         <div class="summary-item">
