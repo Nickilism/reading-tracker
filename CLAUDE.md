@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A reading tracker that fetches book data from Airtable and generates self-contained HTML pages deployed to GitHub Pages. Includes an archive landing page that aggregates all years. The system uses country prefix parsing in author fields to derive book origins.
+A reading tracker that fetches book data from Airtable and generates self-contained HTML pages deployed to GitHub Pages. Includes an archive landing page that aggregates all years. The system uses country prefix parsing in author fields to derive book origins. Integrates with WeRead (微信读书) to embed reading highlights, thoughts, and popular highlights into a slide-in panel.
 
 **Live site**: https://nickilism.github.io/reading-tracker/reading%20archive/index.html
 
@@ -13,6 +13,7 @@ A reading tracker that fetches book data from Airtable and generates self-contai
 ```bash
 npm install                                    # Install dependencies (dotenv, prettier)
 node reading-tracker-github.js [year]          # Generate HTML for year (CI mode, default: current year)
+node reading-tracker-github.js 2026 --no-cache # Force full WeRead data refresh (ignore cache)
 node reading-tracker-year-github.js            # Generate HTML interactively (prompts for year)
 node builder_offline.js <year>                 # Build offline HTML with inlined images & Chart.js
 ```
@@ -21,12 +22,17 @@ node builder_offline.js <year>                 # Build offline HTML with inlined
 
 ### Data Flow
 1. **Airtable** (Books table) → **reading-tracker-github.js** (Node.js, fetches via REST API) → **{year}_reading_tracker.html** (self-contained HTML)
-2. **reading archive/index.html** — Archive landing page that fetches all yearly HTML files, extracts embedded book JSON, and computes aggregate stats across years
+2. **WeRead API** (微信读书) → **reading-tracker-github.js** (fetches highlights, thoughts, popular highlights) → embedded in HTML as `{{WEREAD_JSON}}`
+3. **reading archive/index.html** — Archive landing page that fetches all yearly HTML files, extracts embedded book JSON, and computes aggregate stats across years
 
 ### Key Files
-- **reading-tracker-github.js** — Non-interactive generator for CI; fetches records from Airtable, processes books (derives country from author prefix, extracts month from finish date), generates HTML by injecting data into template
+- **reading-tracker-github.js** — Non-interactive generator for CI; fetches records from Airtable, fetches WeRead data, processes books, generates HTML by injecting data into template
 - **reading-tracker-year-github.js** — Interactive version for local use; uses readline to prompt for year input
-- **template.js** — HTML template with `{{PLACEHOLDER}}` syntax; the generator replaces `{{YEAR}}`, `{{GENERATED_DATE}}`, `{{BOOKS_JSON}}`, and `{{COUNTRY_PREFIX_MAP}}` via String.replace()
+- **template.js** — HTML template with `{{PLACEHOLDER}}` syntax; the generator replaces `{{YEAR}}`, `{{GENERATED_DATE}}`, `{{BOOKS_JSON}}`, `{{COUNTRY_PREFIX_MAP}}`, and `{{WEREAD_JSON}}` via String.replace()
+- **weread-api.js** — WeRead API client; calls `/shelf/sync`, `/book/info`, `/book/bookmarklist`, `/review/list/mine`, `/book/bestbookmarks`, `/user/notebooks`, `/store/search` via gateway endpoint
+- **weread-match.js** — Fuzzy matching logic; maps Airtable books to WeRead books by normalized title+author comparison
+- **weread-cache.js** — Cache management; reads/writes `weread-cache.json` for incremental WeRead data persistence
+- **weread-cache.json** — Cached WeRead data (keyed by bookId); committed to git so CI can reuse it
 - **builder_offline.js** — Offline HTML builder; downloads Chart.js and cover images, converts to base64 data URIs, outputs fully self-contained `_offline.html` files
 - **reading archive/index.html** — Archive landing page; dynamically generates year cards (2019–current year) with aggregated stats and top-5 book cover fans per card
 - **.github/workflows/deploy.yml** — GitHub Actions workflow; triggers on push to `main` (when source files change), `repository_dispatch` (`airtable-update`), manual (`workflow_dispatch`), or schedule (Mon/Thu 06:00 UTC)
@@ -38,7 +44,7 @@ The generator extracts the template string via regex:
 const templateContent = fs.readFileSync('./template.js', 'utf8');
 const TEMPLATE = templateContent.match(/const template = `([\s\S]*)`;/)[1];
 ```
-Then replaces placeholders and writes the output HTML file.
+Then replaces placeholders and writes the output HTML file. Placeholders: `{{YEAR}}`, `{{GENERATED_DATE}}`, `{{BOOKS_JSON}}`, `{{COUNTRY_PREFIX_MAP}}`, `{{WEREAD_JSON}}`.
 
 ### Country Derivation
 Authors are prefixed with country markers in brackets/parentheses (e.g., `[日]`, `(美)`, `〔德〕`). The script strips these to display author names while mapping prefixes to countries. Unmarked Chinese names default to China; unmarked non-Chinese names default to USA.
@@ -48,9 +54,24 @@ The output HTML embeds all CSS/JS inline. It includes:
 - Dark mode via CSS `prefers-color-scheme` media query (no JS toggle)
 - Chart.js bar chart for monthly reading counts
 - Cover wall grid with hover overlays
+- **Book notes panel** — click any cover to open a slide-in panel (desktop: right side, mobile: bottom sheet) showing WeRead highlights, thoughts, popular highlights, and Airtable review
 - Collapsible book list with sort/filter controls (by date, rating, pages; filters by rating tier, country, month)
 - Country distribution badges with flag emojis
-- All book data serialized as JSON and embedded at generation time
+- All book data serialized as JSON and embedded at generation time (`{{BOOKS_JSON}}` + `{{WEREAD_JSON}}`)
+
+### WeRead Integration
+
+构建时通过微信读书 API 获取笔记数据，嵌入 HTML。使用增量缓存避免重复拉取。
+
+**匹配流程**（`fetchWeReadData()` in `reading-tracker-github.js`）:
+1. 调 `/shelf/sync` 获取书架 → 模糊匹配 Airtable 书籍（`matchBooks()` in `weread-match.js`）
+2. 对未匹配的书，调 `/user/notebooks` 获取所有有笔记的书 → 再次匹配（覆盖已从书架删除的书）
+3. 对匹配成功的书，调 `/book/bookmarklist`（划线）、`/review/list/mine`（想法，过滤 type=4）、`/book/bestbookmarks`（热门划线）
+4. 导入书籍热门划线为空时，调 `/store/search` 搜索官方版本获取
+
+**缓存机制**: `weread-cache.json` 以 bookId 为 key 缓存数据，每次构建只对新增书调 API。`--no-cache` 强制全量刷新。
+
+**API 网关**: `POST https://i.weread.qq.com/api/agent/gateway`，Bearer token 认证，参数平铺在 body 顶层。
 
 ## Automation
 
@@ -63,6 +84,7 @@ GitHub Actions deploys to the `gh-pages` branch. To trigger a deploy:
 ## Environment Variables
 
 - `AIRTABLE_API_KEY` — Required; set via GitHub Secrets. Airtable personal access token with `data.records:read` scope.
+- `WEAREAD_API_KEY` — Optional; set via GitHub Secrets or local `.env`. WeRead API key (format `wrk-xxxxxxxx`). Without this, WeRead data fetching is skipped and panels show no notes.
 - `BASE_ID` — Hardcoded in script as `appJJmTgbDFTEnJxz`; change here to switch Airtable bases.
 
 ## Skill routing
