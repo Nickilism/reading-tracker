@@ -755,6 +755,7 @@ const template = `<!DOCTYPE html>
       flex: 1;
       overflow-y: auto;
       overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
       scrollbar-gutter: stable;
       padding: 0 24px 24px;
     }
@@ -917,7 +918,8 @@ const template = `<!DOCTYPE html>
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 90vh;
+        height: 85dvh;
+        max-height: 85vh;
         border-radius: 16px 16px 0 0;
         transform: translateY(100%);
       }
@@ -1567,32 +1569,26 @@ const template = `<!DOCTYPE html>
       if (!b) return;
       const weread = b.wereadId ? wereadData[b.wereadId] : null;
       renderPanelContent(b, weread);
-      // 补偿滚动条宽度，防止背景抖动
+      // 锁定背景滚动
       const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      document.body.dataset.scrollTop = scrollTop;
-      document.body.style.position = 'fixed';
-      document.body.style.top = '-' + scrollTop + 'px';
-      document.body.style.left = '0';
-      document.body.style.right = '0';
+      document.documentElement.style.overflow = 'hidden';
+      document.documentElement.style.overscrollBehavior = 'contain';
+      document.body.style.overflow = 'hidden';
+      document.body.style.overscrollBehavior = 'contain';
       document.body.style.paddingRight = scrollbarW + 'px';
       panelOverlay.classList.add('active');
       bookPanel.classList.add('active');
-      // 面板内容滚到顶部
       panelBody.scrollTop = 0;
     }
 
     function closeBookPanel() {
       panelOverlay.classList.remove('active');
       bookPanel.classList.remove('active');
-      const scrollTop = parseInt(document.body.dataset.scrollTop || '0', 10);
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
+      document.documentElement.style.overflow = '';
+      document.documentElement.style.overscrollBehavior = '';
+      document.body.style.overflow = '';
+      document.body.style.overscrollBehavior = '';
       document.body.style.paddingRight = '';
-      delete document.body.dataset.scrollTop;
-      window.scrollTo(0, scrollTop);
     }
 
     panelOverlay.addEventListener('click', closeBookPanel);
