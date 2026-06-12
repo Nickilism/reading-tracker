@@ -39,6 +39,7 @@ jobs:
       - name: Generate Reading Tracker
         env:
           AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
+          WEREAD_API_KEY: ${{ secrets.WEREAD_API_KEY }}
         run: node reading-tracker-github.js
 
       - name: Deploy to GitHub Pages
