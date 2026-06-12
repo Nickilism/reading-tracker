@@ -193,14 +193,17 @@ async function fetchWeReadData(books, noCache) {
         color: h.colorStyle || 0
       }));
 
-      const thList = (thoughts.reviews || []).map(r => {
-        const rev = r.review || {};
-        return {
-          text: rev.content || '',
-          quote: rev.abstract || '',
-          chapter: rev.chapterName || ''
-        };
-      }).filter(t => t.text);
+      const thList = (thoughts.reviews || [])
+        .filter(r => (r.review && r.review.type) !== 4)  // 排除全书点评（type=4）
+        .map(r => {
+          const rev = r.review || {};
+          return {
+            text: rev.content || '',
+            quote: rev.abstract || '',
+            chapter: rev.chapterName || ''
+          };
+        })
+        .filter(t => t.text);
 
       const popChapters = {};
       (popular.chapters || []).forEach(ch => {

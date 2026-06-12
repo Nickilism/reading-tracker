@@ -822,6 +822,7 @@ const template = `<!DOCTYPE html>
     .panel-tab-content {
       display: none;
       padding: 12px 0;
+      min-height: 100px;
     }
     .panel-tab-content.active { display: block; }
 
@@ -1528,15 +1529,19 @@ const template = `<!DOCTYPE html>
       if (!b) return;
       const weread = b.wereadId ? wereadData[b.wereadId] : null;
       renderPanelContent(b, weread);
+      // 补偿滚动条宽度，防止背景抖动
+      const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = scrollbarW + 'px';
       panelOverlay.classList.add('active');
       bookPanel.classList.add('active');
-      document.body.style.overflow = 'hidden';
     }
 
     function closeBookPanel() {
       panelOverlay.classList.remove('active');
       bookPanel.classList.remove('active');
       document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
     }
 
     panelOverlay.addEventListener('click', closeBookPanel);
@@ -1676,6 +1681,8 @@ const template = `<!DOCTYPE html>
           panelBody.querySelectorAll('.panel-tab-content').forEach(function(c) { c.classList.remove('active'); });
           tab.classList.add('active');
           panelBody.querySelector('[data-tab-content="' + tab.dataset.tab + '"]').classList.add('active');
+          // 切换 tab 后重置滚动位置，防止抖动
+          panelBody.scrollTop = 0;
         });
       });
     }
