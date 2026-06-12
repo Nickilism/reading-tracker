@@ -278,8 +278,9 @@ async function fetchAirtableRecords(year) {
 async function main() {
   const noCache = process.argv.includes('--no-cache');
 
-  // 支持命令行参数指定年份，默认当前年份
-  const year = process.argv[2] || String(new Date().getFullYear());
+  // 支持命令行参数指定年份，默认当前年份（跳过 --no-cache 标志）
+  const yearArg = process.argv.slice(2).find(a => /^\d{4}$/.test(a));
+  const year = yearArg || String(new Date().getFullYear());
 
   if (!/^\d{4}$/.test(year)) {
     console.log('年份格式错误，请输入4位数字年份');
