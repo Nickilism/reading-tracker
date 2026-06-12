@@ -659,6 +659,241 @@ const template = `<!DOCTYPE html>
       .stat-label { font-size: 9.5px; letter-spacing: 0.04em; }
       .stats-grid { flex-wrap: wrap; border-radius: 12px; }
     }
+
+    /* ===== Book Notes Panel ===== */
+    .panel-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .panel-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    @media (prefers-color-scheme: dark) {
+      .panel-overlay { background: rgba(0, 0, 0, 0.5); }
+    }
+
+    .book-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(480px, 90vw);
+      height: 100vh;
+      background: var(--bg);
+      z-index: 1000;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+    }
+    .book-panel.active {
+      transform: translateX(0);
+    }
+
+    .panel-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 8px;
+      z-index: 1;
+      transition: color 0.15s;
+    }
+    .panel-close:hover { color: var(--text); }
+
+    .panel-header {
+      display: flex;
+      gap: 16px;
+      padding: 24px 24px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-cover {
+      width: 80px;
+      height: 110px;
+      border-radius: 4px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .panel-book-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+    }
+    .panel-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+    .panel-author {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .panel-rating {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .panel-rating-score {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 24px 24px;
+    }
+
+    .panel-section {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-section:last-child { border-bottom: none; }
+
+    .panel-section-title {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .panel-review-text {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .panel-review-text.collapsed {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .panel-review-toggle {
+      background: none;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      margin-top: 6px;
+      padding: 0;
+    }
+
+    .panel-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 10px 4px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      text-align: center;
+    }
+    .panel-tab:hover { color: var(--text-secondary); }
+    .panel-tab.active {
+      color: var(--text);
+      border-bottom-color: var(--text);
+    }
+
+    .panel-tab-content {
+      display: none;
+      padding: 12px 0;
+    }
+    .panel-tab-content.active { display: block; }
+
+    .panel-note-item {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-note-item:last-child { border-bottom: none; }
+    .panel-note-text {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .panel-note-chapter {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .panel-note-count {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .panel-quote {
+      border-left: 3px solid var(--border);
+      background: var(--bg-alt);
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .panel-thought-content {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+      margin-top: 6px;
+    }
+
+    .panel-empty {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* Mobile: bottom sheet */
+    @media (max-width: 599px) {
+      .book-panel {
+        top: auto;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 90vh;
+        border-radius: 16px 16px 0 0;
+        transform: translateY(100%);
+      }
+      .book-panel.active { transform: translateY(0); }
+      .panel-header { padding: 20px 20px 14px; }
+      .panel-body { padding: 0 20px 20px; }
+      .panel-cover { width: 60px; height: 82px; }
+      .panel-drag-bar {
+        width: 40px;
+        height: 4px;
+        background: var(--border-strong);
+        border-radius: 2px;
+        margin: 8px auto 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -721,6 +956,15 @@ const template = `<!DOCTYPE html>
         <span id="wall-count">— 本</span>
       </div>
       <div id="cover-wall"></div>
+    </div>
+
+    <!-- ===== Book Notes Panel ===== -->
+    <div class="panel-overlay" id="panelOverlay"></div>
+    <div class="book-panel" id="bookPanel">
+      <div class="panel-drag-bar" id="panelDragBar"></div>
+      <button class="panel-close" id="panelClose" aria-label="关闭">✕</button>
+      <div class="panel-header" id="panelHeader"></div>
+      <div class="panel-body" id="panelBody"></div>
     </div>
 
     <!-- ===== Book List ===== -->
@@ -830,6 +1074,7 @@ const template = `<!DOCTYPE html>
 
     // 书籍数据（由生成脚本注入）
     const books = {{BOOKS_JSON}};
+    const wereadData = {{WEREAD_JSON}};
     const allBooks = books.slice(); // preserve original for repeated filtering
     let searchQuery = '';
     let searchDebounce = null;
@@ -1105,7 +1350,7 @@ const template = `<!DOCTYPE html>
         const item = document.createElement('div');
         item.className = 'cover-item';
         item.innerHTML = `
-          <div class="cover-link" onclick="window.open('${b.doubanLink}', '_blank')" title="${b.title}">
+          <div class="cover-link" onclick="openBookPanel(${allBooks.indexOf(b)})" title="${b.title}">
             <div class="cover-img-wrap">
               <img src="${b.cover}" alt="${b.title}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 150%22><rect fill=%22%23f6f5f4%22 width=%22100%22 height=%22150%22/><text x=%2250%22 y=%2280%22 text-anchor=%22middle%22 fill=%22%23a39e98%22 font-size=%2210%22>${b.title}</text></svg>'">
               <div class="cover-overlay">
@@ -1269,6 +1514,188 @@ const template = `<!DOCTYPE html>
         }
       }]
     });
+
+    // ===== Book Notes Panel =====
+    const panelOverlay = document.getElementById('panelOverlay');
+    const bookPanel = document.getElementById('bookPanel');
+    const panelClose = document.getElementById('panelClose');
+    const panelHeader = document.getElementById('panelHeader');
+    const panelBody = document.getElementById('panelBody');
+    const panelDragBar = document.getElementById('panelDragBar');
+
+    function openBookPanel(bookIndex) {
+      const b = allBooks[bookIndex];
+      if (!b) return;
+      const weread = b.wereadId ? wereadData[b.wereadId] : null;
+      renderPanelContent(b, weread);
+      panelOverlay.classList.add('active');
+      bookPanel.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeBookPanel() {
+      panelOverlay.classList.remove('active');
+      bookPanel.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    panelOverlay.addEventListener('click', closeBookPanel);
+    panelClose.addEventListener('click', closeBookPanel);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && bookPanel.classList.contains('active')) {
+        closeBookPanel();
+      }
+    });
+
+    // Mobile drag-to-close
+    let dragStartY = 0;
+    let dragging = false;
+    panelDragBar.addEventListener('touchstart', (e) => {
+      dragStartY = e.touches[0].clientY;
+      dragging = true;
+    });
+    document.addEventListener('touchmove', (e) => {
+      if (!dragging) return;
+      const dy = e.touches[0].clientY - dragStartY;
+      if (dy > 0) {
+        bookPanel.style.transform = 'translateY(' + dy + 'px)';
+      }
+    });
+    document.addEventListener('touchend', (e) => {
+      if (!dragging) return;
+      dragging = false;
+      const dy = e.changedTouches[0].clientY - dragStartY;
+      bookPanel.style.transform = '';
+      if (dy > 100) {
+        closeBookPanel();
+      }
+    });
+
+    function renderPanelContent(book, weread) {
+      panelHeader.innerHTML =
+        '<img class="panel-cover" src="' + book.cover + '" alt="' + book.title + '" onerror="this.style.display=\'none\'">' +
+        '<div class="panel-book-info">' +
+          '<div class="panel-title">' + book.title + '</div>' +
+          '<div class="panel-author">' + book.author + '</div>' +
+          (weread
+            ? '<div class="panel-rating">微信读书 <span class="panel-rating-score">' +
+              (weread.rating / 10).toFixed(1) + '</span>/10 · ' +
+              formatRatingCount(weread.ratingCount) + '人评价</div>'
+            : '')
+        + '</div>';
+
+      if (!weread) {
+        panelBody.innerHTML = '<div class="panel-empty">暂无微信读书笔记</div>';
+        return;
+      }
+
+      let html = '';
+
+      // Review section
+      if (weread.review) {
+        html += '<div class="panel-section">';
+        html += '<div class="panel-section-title">📝 我的点评</div>';
+        const needsCollapse = weread.review.length > 200;
+        html += '<div class="panel-review-text' + (needsCollapse ? ' collapsed' : '') + '" id="panelReviewText">' +
+          weread.review.replace(/\n/g, '<br>') + '</div>';
+        if (needsCollapse) {
+          html += '<button class="panel-review-toggle" onclick="togglePanelReview(this)">展开全文</button>';
+        }
+        html += '</div>';
+      }
+
+      // Tabs
+      const hlCount = weread.highlights ? weread.highlights.length : 0;
+      const thCount = weread.thoughts ? weread.thoughts.length : 0;
+      const popCount = weread.popularHighlights ? weread.popularHighlights.length : 0;
+
+      html += '<div class="panel-tabs">';
+      html += '<button class="panel-tab active" data-tab="highlights">划线 (' + hlCount + ')</button>';
+      html += '<button class="panel-tab" data-tab="thoughts">想法 (' + thCount + ')</button>';
+      html += '<button class="panel-tab" data-tab="popular">热门划线 (' + popCount + ')</button>';
+      html += '</div>';
+
+      // Highlights tab
+      html += '<div class="panel-tab-content active" data-tab-content="highlights">';
+      if (hlCount > 0) {
+        weread.highlights.forEach(function(h) {
+          html += '<div class="panel-note-item">';
+          html += '<div class="panel-note-text">' + escapeHtml(h.text) + '</div>';
+          if (h.chapter) html += '<div class="panel-note-chapter">「' + escapeHtml(h.chapter) + '」</div>';
+          html += '</div>';
+        });
+      } else {
+        html += '<div class="panel-empty">暂无划线</div>';
+      }
+      html += '</div>';
+
+      // Thoughts tab
+      html += '<div class="panel-tab-content" data-tab-content="thoughts">';
+      if (thCount > 0) {
+        weread.thoughts.forEach(function(t) {
+          html += '<div class="panel-note-item">';
+          if (t.quote) {
+            html += '<div class="panel-quote">' + escapeHtml(t.quote) + '</div>';
+          }
+          html += '<div class="panel-thought-content">' + escapeHtml(t.text) + '</div>';
+          if (t.chapter) html += '<div class="panel-note-chapter">「' + escapeHtml(t.chapter) + '」</div>';
+          html += '</div>';
+        });
+      } else {
+        html += '<div class="panel-empty">暂无想法</div>';
+      }
+      html += '</div>';
+
+      // Popular highlights tab
+      html += '<div class="panel-tab-content" data-tab-content="popular">';
+      if (popCount > 0) {
+        weread.popularHighlights.forEach(function(p) {
+          html += '<div class="panel-note-item">';
+          html += '<div class="panel-note-text">' + escapeHtml(p.text) + '</div>';
+          html += '<div class="panel-note-count">' + p.count + '人划线</div>';
+          if (p.chapter) html += '<div class="panel-note-chapter">「' + escapeHtml(p.chapter) + '」</div>';
+          html += '</div>';
+        });
+      } else {
+        html += '<div class="panel-empty">暂无热门划线</div>';
+      }
+      html += '</div>';
+
+      panelBody.innerHTML = html;
+
+      // Tab click handlers
+      panelBody.querySelectorAll('.panel-tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          panelBody.querySelectorAll('.panel-tab').forEach(function(t) { t.classList.remove('active'); });
+          panelBody.querySelectorAll('.panel-tab-content').forEach(function(c) { c.classList.remove('active'); });
+          tab.classList.add('active');
+          panelBody.querySelector('[data-tab-content="' + tab.dataset.tab + '"]').classList.add('active');
+        });
+      });
+    }
+
+    function togglePanelReview(btn) {
+      var textEl = document.getElementById('panelReviewText');
+      if (textEl.classList.contains('collapsed')) {
+        textEl.classList.remove('collapsed');
+        btn.textContent = '收起';
+      } else {
+        textEl.classList.add('collapsed');
+        btn.textContent = '展开全文';
+      }
+    }
+
+    function formatRatingCount(count) {
+      if (count >= 10000) return (count / 10000).toFixed(1) + '万';
+      if (count >= 1000) return (count / 1000).toFixed(1) + 'k';
+      return String(count);
+    }
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
 
     // ===== 初始渲染 =====
     applySearchAndFilter();
