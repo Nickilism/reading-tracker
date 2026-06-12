@@ -1572,36 +1572,42 @@ const template = `<!DOCTYPE html>
     });
 
     function renderPanelContent(book, weread) {
+      const coverHtml = book.doubanLink
+        ? '<a href="' + book.doubanLink + '" target="_blank" style="display:block;flex-shrink:0;"><img class="panel-cover" src="' + book.cover + '" alt="' + book.title + '" onerror="this.style.display=\'none\'"></a>'
+        : '<img class="panel-cover" src="' + book.cover + '" alt="' + book.title + '" onerror="this.style.display=\'none\'">';
       panelHeader.innerHTML =
-        '<img class="panel-cover" src="' + book.cover + '" alt="' + book.title + '" onerror="this.style.display=\'none\'">' +
+        coverHtml +
         '<div class="panel-book-info">' +
           '<div class="panel-title">' + book.title + '</div>' +
           '<div class="panel-author">' + book.author + '</div>' +
-          (weread
+          (weread && weread.rating
             ? '<div class="panel-rating">微信读书 <span class="panel-rating-score">' +
-              (weread.rating / 10).toFixed(1) + '</span>/10 · ' +
+              (weread.rating / 10).toFixed(1) + '%</span> · ' +
               formatRatingCount(weread.ratingCount) + '人评价</div>'
             : '')
         + '</div>';
 
-      if (!weread) {
-        panelBody.innerHTML = '<div class="panel-empty">暂无微信读书笔记</div>';
-        return;
-      }
-
       let html = '';
 
-      // Review section
-      if (weread.review) {
+      // Review section — 使用 Airtable 的 Review 字段
+      if (book.review) {
         html += '<div class="panel-section">';
         html += '<div class="panel-section-title">📝 我的点评</div>';
-        const needsCollapse = weread.review.length > 200;
+        const needsCollapse = book.review.length > 200;
         html += '<div class="panel-review-text' + (needsCollapse ? ' collapsed' : '') + '" id="panelReviewText">' +
-          weread.review.replace(/\n/g, '<br>') + '</div>';
+          book.review.replace(/\n/g, '<br>') + '</div>';
         if (needsCollapse) {
           html += '<button class="panel-review-toggle" onclick="togglePanelReview(this)">展开全文</button>';
         }
         html += '</div>';
+      }
+
+      if (!weread) {
+        if (!book.review) {
+          html += '<div class="panel-empty">暂无微信读书笔记</div>';
+        }
+        panelBody.innerHTML = html;
+        return;
       }
 
       // Tabs

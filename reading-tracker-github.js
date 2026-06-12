@@ -26,7 +26,7 @@ const https = require('https');
 const fs = require('fs');
 process.env.DOTENV_CONFIG_QUIET = 'true';
 require('dotenv').config({ debug: false });
-const { fetchShelf, fetchBookInfo, fetchHighlights, fetchThoughts, fetchPopularHighlights, sleep } = require('./weread-api');
+const { fetchShelf, fetchBookInfo, fetchHighlights, fetchThoughts, fetchPopularHighlights, fetchNotebooks, searchBooks, sleep } = require('./weread-api');
 const { matchBooks } = require('./weread-match');
 const { loadCache, saveCache, isCached } = require('./weread-cache');
 
@@ -112,6 +112,7 @@ async function fetchWeReadData(books, noCache) {
   const cacheHits = [];
   const toFetch = [];
 
+  // 1. 从书架匹配
   let shelfBooks;
   try {
     shelfBooks = await fetchShelf();
@@ -121,13 +122,33 @@ async function fetchWeReadData(books, noCache) {
     return {};
   }
 
-  const { matched, unmatched } = matchBooks(books, shelfBooks);
-  console.log('  匹配成功: ' + matched.length + ' 本，未匹配: ' + unmatched.length + ' 本');
+  let { matched, unmatched } = matchBooks(books, shelfBooks);
+  console.log('  书架匹配: ' + matched.length + ' 本');
 
+  // 2. 对未匹配的书，从笔记本概览中再次匹配（覆盖已从书架删除的书）
   if (unmatched.length > 0) {
-    console.log('  未匹配的书:', unmatched.map(b => b.title).join(', '));
+    try {
+      const notebooks = await fetchNotebooks();
+      console.log('  笔记本概览获取成功，共 ' + notebooks.length + ' 本有笔记');
+      const notebookShelf = notebooks.map(nb => ({
+        bookId: nb.bookId,
+        title: (nb.book && nb.book.title) || '',
+        author: (nb.book && nb.book.author) || ''
+      }));
+      const retry = matchBooks(unmatched, notebookShelf);
+      matched = matched.concat(retry.matched);
+      unmatched = retry.unmatched;
+      console.log('  笔记本补充匹配: ' + retry.matched.length + ' 本');
+    } catch (e) {
+      console.error('  获取笔记本概览失败:', e.message);
+    }
   }
 
+  if (unmatched.length > 0) {
+    console.log('  最终未匹配: ' + unmatched.length + ' 本 (' + unmatched.map(b => b.title).join(', ') + ')');
+  }
+
+  // 3. 分流：缓存 vs 需要获取
   const wereadData = {};
   for (const { airtable, shelf } of matched) {
     airtable.wereadId = shelf.bookId;
@@ -147,6 +168,7 @@ async function fetchWeReadData(books, noCache) {
     console.log('  需要获取: ' + toFetch.length + ' 本');
   }
 
+  // 4. 逐本获取数据
   for (let i = 0; i < toFetch.length; i++) {
     const { airtable, shelf } = toFetch[i];
     const bookId = shelf.bookId;
@@ -184,16 +206,45 @@ async function fetchWeReadData(books, noCache) {
       (popular.chapters || []).forEach(ch => {
         popChapters[ch.chapterUid] = ch.title;
       });
-      const popList = (popular.items || []).map(item => ({
+      let popList = (popular.items || []).map(item => ({
         text: item.markText || '',
         count: item.totalCount || 0,
         chapter: popChapters[item.chapterUid] || ''
       }));
 
+      // 5. 导入书籍兜底：如果热门划线为空，搜索官方版本获取
+      if (popList.length === 0) {
+        try {
+          const searchResults = await searchBooks(airtable.title);
+          const official = searchResults.find(b => {
+            const sTitle = (b.title || '').toLowerCase();
+            const aTitle = airtable.title.toLowerCase();
+            return sTitle.includes(aTitle) || aTitle.includes(sTitle);
+          });
+          if (official && official.bookId !== bookId) {
+            const officialPopular = await fetchPopularHighlights(official.bookId);
+            const offChapters = {};
+            (officialPopular.chapters || []).forEach(ch => {
+              offChapters[ch.chapterUid] = ch.title;
+            });
+            popList = (officialPopular.items || []).map(item => ({
+              text: item.markText || '',
+              count: item.totalCount || 0,
+              chapter: offChapters[item.chapterUid] || ''
+            }));
+            if (popList.length > 0) {
+              console.log('    → 从官方版本获取热门划线: ' + popList.length + ' 条');
+            }
+          }
+          await sleep(200);
+        } catch (e) {
+          // 搜索失败不影响主流程
+        }
+      }
+
       wereadData[bookId] = {
         rating: info.newRating || 0,
         ratingCount: info.newRatingCount || 0,
-        review: '',
         highlights: hlList,
         thoughts: thList,
         popularHighlights: popList
@@ -207,6 +258,7 @@ async function fetchWeReadData(books, noCache) {
     }
   }
 
+  // 6. 合并写回缓存
   const updatedCache = { ...cache, ...wereadData };
   if (toFetch.length > 0 && !noCache) {
     saveCache(updatedCache);

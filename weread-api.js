@@ -70,6 +70,36 @@ async function fetchPopularHighlights(bookId) {
   return await gatewayRequest({ api_name: '/book/bestbookmarks', bookId: bookId, chapterUid: 0 });
 }
 
+/**
+ * 获取所有有笔记的书籍概览（包括已从书架删除的书）
+ * 用于扩大匹配范围
+ */
+async function fetchNotebooks() {
+  const allBooks = [];
+  let lastSort = 0;
+  let hasMore = true;
+  while (hasMore) {
+    const params = { api_name: '/user/notebooks', count: 100 };
+    if (lastSort) params.lastSort = lastSort;
+    const result = await gatewayRequest(params);
+    if (result.books) allBooks.push(...result.books);
+    hasMore = result.hasMore === 1;
+    if (hasMore && result.books && result.books.length > 0) {
+      lastSort = result.books[result.books.length - 1].sort;
+    }
+  }
+  return allBooks;
+}
+
+/**
+ * 搜索书城（用于查找导入书籍的官方版本以获取热门划线）
+ */
+async function searchBooks(keyword) {
+  const result = await gatewayRequest({ api_name: '/store/search', keyword: keyword, count: 5, scope: 10 });
+  return result.books || [];
+}
+
 module.exports = {
-  fetchShelf, fetchBookInfo, fetchHighlights, fetchThoughts, fetchPopularHighlights, sleep
+  fetchShelf, fetchBookInfo, fetchHighlights, fetchThoughts, fetchPopularHighlights,
+  fetchNotebooks, searchBooks, sleep
 };
