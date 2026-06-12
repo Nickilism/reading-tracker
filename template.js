@@ -773,6 +773,38 @@ const template = `<!DOCTYPE html>
       margin-bottom: 10px;
     }
 
+    .panel-summary-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+    .panel-summary-arrow {
+      font-size: 10px;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+    .panel-summary-text {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+    .panel-summary-text.collapsed {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .panel-review-card {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-top: 8px;
+    }
     .panel-review-text {
       font-size: 14px;
       line-height: 1.7;
@@ -1591,7 +1623,7 @@ const template = `<!DOCTYPE html>
           '<div class="panel-title">' + book.title + '</div>' +
           '<div class="panel-author">' + book.author + '</div>' +
           (weread && weread.rating
-            ? '<div class="panel-rating">微信读书 <span class="panel-rating-score">' +
+            ? '<div class="panel-rating">微信读书推荐值 <span class="panel-rating-score">' +
               (weread.rating / 10).toFixed(1) + '%</span> · ' +
               formatRatingCount(weread.ratingCount) + '人评价</div>'
             : '')
@@ -1599,10 +1631,24 @@ const template = `<!DOCTYPE html>
 
       let html = '';
 
-      // Review section — 使用 Airtable 的 Review 字段
+      // 书籍简介（可折叠）
+      if (book.summary) {
+        const needsCollapse = book.summary.length > 150;
+        html += '<div class="panel-section">';
+        html += '<div class="panel-summary-toggle" onclick="togglePanelSummary(this)">';
+        html += '<span class="panel-section-title" style="margin-bottom:0">书籍简介</span>';
+        html += '<span class="panel-summary-arrow">▼</span>';
+        html += '</div>';
+        html += '<div class="panel-summary-text' + (needsCollapse ? ' collapsed' : '') + '" id="panelSummaryText">' +
+          book.summary.replace(/\n/g, '<br>') + '</div>';
+        html += '</div>';
+      }
+
+      // 全书点评
       if (book.review) {
         html += '<div class="panel-section">';
-        html += '<div class="panel-section-title">📝 我的点评</div>';
+        html += '<div class="panel-section-title">全书点评</div>';
+        html += '<div class="panel-review-card">';
         const needsCollapse = book.review.length > 200;
         html += '<div class="panel-review-text' + (needsCollapse ? ' collapsed' : '') + '" id="panelReviewText">' +
           book.review.replace(/\n/g, '<br>') + '</div>';
@@ -1610,10 +1656,11 @@ const template = `<!DOCTYPE html>
           html += '<button class="panel-review-toggle" onclick="togglePanelReview(this)">展开全文</button>';
         }
         html += '</div>';
+        html += '</div>';
       }
 
       if (!weread) {
-        if (!book.review) {
+        if (!book.review && !book.summary) {
           html += '<div class="panel-empty">暂无微信读书笔记</div>';
         }
         panelBody.innerHTML = html;
@@ -1637,7 +1684,7 @@ const template = `<!DOCTYPE html>
         weread.highlights.forEach(function(h) {
           html += '<div class="panel-note-item">';
           html += '<div class="panel-note-text">' + escapeHtml(h.text) + '</div>';
-          if (h.chapter) html += '<div class="panel-note-chapter">「' + escapeHtml(h.chapter) + '」</div>';
+          if (h.chapter) html += '<div class="panel-note-chapter">——' + escapeHtml(h.chapter) + '</div>';
           html += '</div>';
         });
       } else {
@@ -1654,7 +1701,7 @@ const template = `<!DOCTYPE html>
             html += '<div class="panel-quote">' + escapeHtml(t.quote) + '</div>';
           }
           html += '<div class="panel-thought-content">' + escapeHtml(t.text) + '</div>';
-          if (t.chapter) html += '<div class="panel-note-chapter">「' + escapeHtml(t.chapter) + '」</div>';
+          if (t.chapter) html += '<div class="panel-note-chapter">——' + escapeHtml(t.chapter) + '</div>';
           html += '</div>';
         });
       } else {
@@ -1669,7 +1716,7 @@ const template = `<!DOCTYPE html>
           html += '<div class="panel-note-item">';
           html += '<div class="panel-note-text">' + escapeHtml(p.text) + '</div>';
           html += '<div class="panel-note-count">' + p.count + '人划线</div>';
-          if (p.chapter) html += '<div class="panel-note-chapter">「' + escapeHtml(p.chapter) + '」</div>';
+          if (p.chapter) html += '<div class="panel-note-chapter">——' + escapeHtml(p.chapter) + '</div>';
           html += '</div>';
         });
       } else {
@@ -1700,6 +1747,18 @@ const template = `<!DOCTYPE html>
       } else {
         textEl.classList.add('collapsed');
         btn.textContent = '展开全文';
+      }
+    }
+
+    function togglePanelSummary(toggleEl) {
+      var textEl = document.getElementById('panelSummaryText');
+      var arrow = toggleEl.querySelector('.panel-summary-arrow');
+      if (textEl.classList.contains('collapsed')) {
+        textEl.classList.remove('collapsed');
+        arrow.textContent = '▲';
+      } else {
+        textEl.classList.add('collapsed');
+        arrow.textContent = '▼';
       }
     }
 

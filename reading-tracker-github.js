@@ -88,7 +88,8 @@ function processBooks(records) {
       pages: b.Pages || '',
       doubanLink: b['Douban Link'] || '',
       cover: b['Douban Cover Link'] || '',
-      review: b.Review || ''
+      review: b.Review || '',
+      summary: b.Summary || ''
     };
   });
 }
@@ -183,15 +184,31 @@ async function fetchWeReadData(books, noCache) {
       ]);
 
       const chapterMap = {};
-      (highlights.chapters || []).forEach(ch => {
+      const chapterOrder = {};  // chapterUid → 章节顺序索引
+      (highlights.chapters || []).forEach((ch, idx) => {
         chapterMap[ch.chapterUid] = ch.title;
+        chapterOrder[ch.chapterUid] = idx;
       });
+
+      // 按章节顺序排序的比较函数
+      const byChapter = (a, b) => {
+        const oa = a._order !== undefined ? a._order : 9999;
+        const ob = b._order !== undefined ? b._order : 9999;
+        return oa - ob;
+      };
 
       const hlList = (highlights.updated || []).map(h => ({
         text: h.markText || '',
         chapter: chapterMap[h.chapterUid] || '',
-        color: h.colorStyle || 0
-      }));
+        color: h.colorStyle || 0,
+        _order: chapterOrder[h.chapterUid] !== undefined ? chapterOrder[h.chapterUid] : 9999
+      })).sort(byChapter);
+
+      // 章节名 → 顺序索引映射（用于想法排序）
+      const chapterNameOrder = {};
+      Object.entries(chapterMap).forEach(([uid, title]) => {
+        chapterNameOrder[title] = chapterOrder[uid];
+      });
 
       const thList = (thoughts.reviews || [])
         .filter(r => (r.review && r.review.type) !== 4)  // 排除全书点评（type=4）
@@ -200,10 +217,12 @@ async function fetchWeReadData(books, noCache) {
           return {
             text: rev.content || '',
             quote: rev.abstract || '',
-            chapter: rev.chapterName || ''
+            chapter: rev.chapterName || '',
+            _order: chapterNameOrder[rev.chapterName] !== undefined ? chapterNameOrder[rev.chapterName] : 9999
           };
         })
-        .filter(t => t.text);
+        .filter(t => t.text)
+        .sort(byChapter);
 
       const popChapters = {};
       (popular.chapters || []).forEach(ch => {
@@ -212,8 +231,9 @@ async function fetchWeReadData(books, noCache) {
       let popList = (popular.items || []).map(item => ({
         text: item.markText || '',
         count: item.totalCount || 0,
-        chapter: popChapters[item.chapterUid] || ''
-      }));
+        chapter: popChapters[item.chapterUid] || '',
+        _order: chapterOrder[item.chapterUid] !== undefined ? chapterOrder[item.chapterUid] : 9999
+      })).sort(byChapter);
 
       // 5. 导入书籍兜底：如果热门划线为空，搜索官方版本获取
       if (popList.length === 0) {
