@@ -754,6 +754,7 @@ const template = `<!DOCTYPE html>
     .panel-body {
       flex: 1;
       overflow-y: auto;
+      overscroll-behavior: contain;
       scrollbar-gutter: stable;
       padding: 0 24px 24px;
     }
@@ -1568,17 +1569,30 @@ const template = `<!DOCTYPE html>
       renderPanelContent(b, weread);
       // 补偿滚动条宽度，防止背景抖动
       const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
-      document.body.style.overflow = 'hidden';
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      document.body.dataset.scrollTop = scrollTop;
+      document.body.style.position = 'fixed';
+      document.body.style.top = '-' + scrollTop + 'px';
+      document.body.style.left = '0';
+      document.body.style.right = '0';
       document.body.style.paddingRight = scrollbarW + 'px';
       panelOverlay.classList.add('active');
       bookPanel.classList.add('active');
+      // 面板内容滚到顶部
+      panelBody.scrollTop = 0;
     }
 
     function closeBookPanel() {
       panelOverlay.classList.remove('active');
       bookPanel.classList.remove('active');
-      document.body.style.overflow = '';
+      const scrollTop = parseInt(document.body.dataset.scrollTop || '0', 10);
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
       document.body.style.paddingRight = '';
+      delete document.body.dataset.scrollTop;
+      window.scrollTo(0, scrollTop);
     }
 
     panelOverlay.addEventListener('click', closeBookPanel);
@@ -1589,26 +1603,28 @@ const template = `<!DOCTYPE html>
       }
     });
 
-    // Mobile drag-to-close
+    // Mobile drag-to-close (whole header area)
     let dragStartY = 0;
     let dragging = false;
-    panelDragBar.addEventListener('touchstart', (e) => {
+    panelHeader.addEventListener('touchstart', (e) => {
       dragStartY = e.touches[0].clientY;
       dragging = true;
-    });
+      bookPanel.style.transition = 'none';
+    }, { passive: true });
     document.addEventListener('touchmove', (e) => {
       if (!dragging) return;
       const dy = e.touches[0].clientY - dragStartY;
       if (dy > 0) {
         bookPanel.style.transform = 'translateY(' + dy + 'px)';
       }
-    });
+    }, { passive: true });
     document.addEventListener('touchend', (e) => {
       if (!dragging) return;
       dragging = false;
       const dy = e.changedTouches[0].clientY - dragStartY;
+      bookPanel.style.transition = '';
       bookPanel.style.transform = '';
-      if (dy > 100) {
+      if (dy > 80) {
         closeBookPanel();
       }
     });
