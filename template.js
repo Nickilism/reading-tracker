@@ -754,6 +754,7 @@ const template = `<!DOCTYPE html>
     .panel-body {
       flex: 1;
       overflow-y: auto;
+      scrollbar-gutter: stable;
       padding: 0 24px 24px;
     }
 
@@ -798,6 +799,10 @@ const template = `<!DOCTYPE html>
       display: flex;
       gap: 0;
       border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 1;
     }
     .panel-tab {
       flex: 1;
