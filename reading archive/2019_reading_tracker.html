@@ -9,13 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <title>2019 阅读记录</title>
-  <link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="../icons/apple-touch-icon-152x152.png">
-  <link rel="apple-touch-icon" sizes="167x167" href="../icons/apple-touch-icon-167x167.png">
-  <link rel="icon" type="image/x-icon" href="../icons/favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="../icons/android-chrome-192x192.png">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="icons/apple-touch-icon-167x167.png">
+  <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/android-chrome-192x192.png">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <style>
     /* ===== Reset & Variables ===== */
@@ -131,12 +131,13 @@
     }
 
     .year-badge {
+      font-family: 'DM Serif Display', serif;
       font-size: 3rem;
-      font-weight: 700;
+      font-weight: 900;
       color: var(--bg-alt);
       line-height: 1;
       user-select: none;
-      letter-spacing: -1.5px;
+      letter-spacing: -1px;
       margin-left: auto;
     }
 
@@ -270,6 +271,7 @@
     }
 
     .stat-value {
+      font-family: 'DM Serif Display', serif;
       font-size: 2rem;
       font-weight: 700;
       color: var(--stat-num);
@@ -645,6 +647,247 @@
       .stat-label { font-size: 9.5px; letter-spacing: 0.04em; }
       .stats-grid { flex-wrap: wrap; border-radius: 12px; }
     }
+
+    /* ===== Book Notes Panel ===== */
+    .panel-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .panel-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    @media (prefers-color-scheme: dark) {
+      .panel-overlay { background: rgba(0, 0, 0, 0.5); }
+    }
+
+    .book-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(480px, 90vw);
+      height: 100vh;
+      background: var(--bg);
+      z-index: 1000;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+    }
+    .book-panel.active {
+      transform: translateX(0);
+    }
+
+    .panel-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 8px;
+      z-index: 1;
+      transition: color 0.15s;
+    }
+    .panel-close:hover { color: var(--text); }
+
+    .panel-header {
+      display: flex;
+      gap: 16px;
+      padding: 24px 24px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-cover {
+      width: 80px;
+      height: 110px;
+      border-radius: 4px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .panel-book-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+    }
+    .panel-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+    .panel-author {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .panel-rating {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .panel-rating-score {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+      padding: 0 24px 24px;
+    }
+
+    .panel-section {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-section:last-child { border-bottom: none; }
+
+    .panel-section-title {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .panel-review-text {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .panel-review-text.collapsed {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .panel-review-toggle {
+      background: none;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      margin-top: 6px;
+      padding: 0;
+    }
+
+    .panel-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 1;
+    }
+    .panel-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 10px 4px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      text-align: center;
+    }
+    .panel-tab:hover { color: var(--text-secondary); }
+    .panel-tab.active {
+      color: var(--text);
+      border-bottom-color: var(--text);
+    }
+
+    .panel-tab-content {
+      display: none;
+      padding: 12px 0;
+      min-height: 100px;
+    }
+    .panel-tab-content.active { display: block; }
+
+    .panel-note-item {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-note-item:last-child { border-bottom: none; }
+    .panel-note-text {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .panel-note-chapter {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .panel-note-count {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .panel-quote {
+      border-left: 3px solid var(--border);
+      background: var(--bg-alt);
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .panel-thought-content {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+      margin-top: 6px;
+    }
+
+    .panel-empty {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* Mobile: bottom sheet */
+    @media (max-width: 599px) {
+      .book-panel {
+        top: auto;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 90vh;
+        border-radius: 16px 16px 0 0;
+        transform: translateY(100%);
+      }
+      .book-panel.active { transform: translateY(0); }
+      .panel-header { padding: 20px 20px 14px; }
+      .panel-body { padding: 0 20px 20px; }
+      .panel-cover { width: 60px; height: 82px; }
+      .panel-drag-bar {
+        width: 40px;
+        height: 4px;
+        background: var(--border-strong);
+        border-radius: 2px;
+        margin: 8px auto 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -709,6 +952,15 @@
       <div id="cover-wall"></div>
     </div>
 
+    <!-- ===== Book Notes Panel ===== -->
+    <div class="panel-overlay" id="panelOverlay"></div>
+    <div class="book-panel" id="bookPanel">
+      <div class="panel-drag-bar" id="panelDragBar"></div>
+      <button class="panel-close" id="panelClose" aria-label="关闭">✕</button>
+      <div class="panel-header" id="panelHeader"></div>
+      <div class="panel-body" id="panelBody"></div>
+    </div>
+
     <!-- ===== Book List ===== -->
     <div class="booklist-section">
       <button class="booklist-toggle" id="booklist-toggle" onclick="toggleBooklist()">
@@ -724,13 +976,13 @@
     </div>
 
     <!-- ===== Footer ===== -->
-<footer id="footer" style="display: flex; align-items: center; justify-content: center; gap: 0;">导出于 2026-05-14 · <a href="https://github.com/Nickilism/reading-tracker" target="_blank" style="color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; margin-left: 0.25em; line-height: 1; margin-bottom: 2px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="display: block;"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a></footer>
+<footer id="footer" style="display: flex; align-items: center; justify-content: center; gap: 0;">导出于 2026-06-12 · <a href="https://github.com/Nickilism/reading-tracker" target="_blank" style="color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; margin-left: 0.25em; line-height: 1; margin-bottom: 2px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="display: block;"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a></footer>
   <script>
     // ========== 数据注入开始 ==========
     // 以下变量由生成脚本注入
 
     const YEAR = 2019;
-    const GENERATED_DATE = "2026-05-14";
+    const GENERATED_DATE = "2026-06-12";
 
     // 12个月颜色配置
     const MONTH_COLORS = [
@@ -815,7 +1067,8 @@
     }
 
     // 书籍数据（由生成脚本注入）
-    const books = [{"title":"刀锋","author":"[英] 毛姆","start":"2018-12-22","finish":"2019-01-28","rating":8.5,"pages":"464","doubanLink":"https://book.douban.com/subject/26896878/","cover":"https://neodb.social/m/book/2021/09/155a94b23f-6133-4cfd-9157-9e0d00c345ec.jpg","review":"读的第二本毛姆的小说，微信阅读，耗时9个多小时","month":1,"country":"英国"},{"title":"流浪地球","author":"刘慈欣","start":"2019-02-10","finish":"2019-02-12","rating":7.8,"pages":"293","doubanLink":"https://book.douban.com/subject/3266609/","cover":"https://neodb.social/m/book/2021/09/15b58fb37b-0313-46ac-b2d9-e52db5d97ca0.jpg","review":"","month":2,"country":"中国"},{"title":"局外人","author":"[法] 阿尔贝·加缪","start":"2019-01-30","finish":"2019-02-13","rating":8,"pages":"128","doubanLink":"https://book.douban.com/subject/4908885/","cover":"https://neodb.social/m/item/book/2026/02/11/b72ae794-7277-4244-a303-01b04580c004.jpeg","review":"","month":2,"country":"法国"},{"title":"献给虚无的供物","author":"（日）中井英夫","start":"2019-02-14","finish":"2019-03-09","rating":8.3,"pages":"484","doubanLink":"https://book.douban.com/subject/10515231/","cover":"https://neodb.social/m/book/2021/09/16f44650ed-a0fc-4682-9a4d-559b8aa84c43.jpg","review":"","month":3,"country":"日本"},{"title":"正面管教","author":"[美]简·尼尔森","start":"2019-05-06","finish":"2019-06-14","rating":8.3,"pages":"276","doubanLink":"https://book.douban.com/subject/3420606","cover":"https://neodb.social/m/book/2021/10/125fbc1caa-e7a7-41d3-bb37-2e5fd913dc5c.jpg","review":"","month":6,"country":"美国"},{"title":"空椅子","author":"（美）杰夫里·迪弗","start":"2019-06-29","finish":"2019-07-10","rating":8,"pages":"487","doubanLink":"https://book.douban.com/subject/3130849/","cover":"https://neodb.social/m/book/2021/09/174d98f2a2-a32f-48d9-af77-f72f0bdf0b93.jpg","review":"","month":7,"country":"美国"},{"title":"肠子","author":"[美] 恰克·帕拉尼克","start":"2019-07-13","finish":"2019-08-05","rating":7,"pages":"408","doubanLink":"https://book.douban.com/subject/5920385","cover":"https://neodb.social/m/book/2021/09/156007b797-851a-426c-bb39-c5d92aca9f69.jpg","review":"","month":8,"country":"美国"},{"title":"苏菲的世界","author":"[挪] 乔斯坦·贾德","start":"2019-06-10","finish":"2019-10-05","rating":8.8,"pages":"528","doubanLink":"https://book.douban.com/subject/2284311/","cover":"https://neodb.social/m/book/2021/09/153b4ac4f7-3931-4f95-bc29-aa27619f058e.jpg","review":"因为自己的原因，竟然花了三个多月才看完这本书。作为哲学入门书籍，作者以时间线为基础走马观花的介绍了各种哲学派别，代表人物，虽不深入却也能给我等菜鸟一个观察哲学的角度。书中也有作者的巧思，用书中书的概念去解释一些并没那么好理解的哲学概念。哲学正是一个晦涩难懂的科目，我想也正如最后作者自己说的，这本书要多读几次才行。","month":10,"country":"中国"},{"title":"长夜难明","author":"紫金陈","start":"2019-10-05","finish":"2019-10-08","rating":8.5,"pages":"288","doubanLink":"https://book.douban.com/subject/26923390","cover":"https://neodb.social/m/book/2021/09/1509ab1503-e6d1-4dcb-8b0f-e9f24e69d82d.jpg","review":"国产推理几乎没看过，这本值得推荐，光能出版就值了。","month":10,"country":"中国"},{"title":"浮生六记","author":"（清）沈复","start":"2019-10-08","finish":"2019-10-10","rating":7,"pages":"80","doubanLink":"https://book.douban.com/subject/1088581/","cover":"https://neodb.social/m/book/2021/09/159f19504e-6c0c-43e6-a814-14c3ef5c0ff1.jpg","review":"走马观花，无甚感觉","month":10,"country":"中国"},{"title":"依存","author":"[日]西泽保彦","start":"2019-04-17","finish":"2019-10-22","rating":8,"pages":"455","doubanLink":"http://m.douban.com/book/subject/11504246/","cover":"https://neodb.social/m/item/book/2026/02/10/bcf5f451-63a2-45d4-bf7a-2931d4ada07f.jpg","review":"不知道这是看的第几本西泽保彦的书，也不知道是匠千晓系列的第几本，但应该是这一系列的最后一本吧？非常喜欢这一系列的各个人设，这一本也是保质保量的延续。对于一件事情的发生，作者总能给出各种不同角度，不同逻辑的解释方法，最后再来一给脑洞大开的结论。相对于系列前作，本书在新颖的点在于选择了其中一位故事人物作为叙述载体，人物感情情节有了较大的推进，揭秘了匠仔的身世，同时在推理的主题下面加上了很多心理学层面的思考。推荐。","month":10,"country":"日本"}];
+    const books = [{"title":"刀锋","author":"[英] 毛姆","start":"2018-12-22","finish":"2019-01-28","rating":8.5,"pages":"464","doubanLink":"https://book.douban.com/subject/26896878/","cover":"https://neodb.social/m/book/2021/09/155a94b23f-6133-4cfd-9157-9e0d00c345ec.jpg","review":"读的第二本毛姆的小说，微信阅读，耗时9个多小时","month":1,"country":"英国","wereadId":"853022"},{"title":"流浪地球","author":"刘慈欣","start":"2019-02-10","finish":"2019-02-12","rating":7.8,"pages":"293","doubanLink":"https://book.douban.com/subject/3266609/","cover":"https://neodb.social/m/book/2021/09/15b58fb37b-0313-46ac-b2d9-e52db5d97ca0.jpg","review":"","month":2,"country":"中国","wereadId":"597603"},{"title":"局外人","author":"[法] 阿尔贝·加缪","start":"2019-01-30","finish":"2019-02-13","rating":8,"pages":"128","doubanLink":"https://book.douban.com/subject/4908885/","cover":"https://neodb.social/m/item/book/2026/02/11/b72ae794-7277-4244-a303-01b04580c004.jpeg","review":"","month":2,"country":"法国","wereadId":"837686"},{"title":"献给虚无的供物","author":"（日）中井英夫","start":"2019-02-14","finish":"2019-03-09","rating":8.3,"pages":"484","doubanLink":"https://book.douban.com/subject/10515231/","cover":"https://neodb.social/m/book/2021/09/16f44650ed-a0fc-4682-9a4d-559b8aa84c43.jpg","review":"","month":3,"country":"日本"},{"title":"正面管教","author":"[美]简·尼尔森","start":"2019-05-06","finish":"2019-06-14","rating":8.3,"pages":"276","doubanLink":"https://book.douban.com/subject/3420606","cover":"https://neodb.social/m/book/2021/10/125fbc1caa-e7a7-41d3-bb37-2e5fd913dc5c.jpg","review":"","month":6,"country":"美国"},{"title":"空椅子","author":"（美）杰夫里·迪弗","start":"2019-06-29","finish":"2019-07-10","rating":8,"pages":"487","doubanLink":"https://book.douban.com/subject/3130849/","cover":"https://neodb.social/m/book/2021/09/174d98f2a2-a32f-48d9-af77-f72f0bdf0b93.jpg","review":"","month":7,"country":"美国"},{"title":"肠子","author":"[美] 恰克·帕拉尼克","start":"2019-07-13","finish":"2019-08-05","rating":7,"pages":"408","doubanLink":"https://book.douban.com/subject/5920385","cover":"https://neodb.social/m/book/2021/09/156007b797-851a-426c-bb39-c5d92aca9f69.jpg","review":"","month":8,"country":"美国"},{"title":"苏菲的世界","author":"[挪] 乔斯坦·贾德","start":"2019-06-10","finish":"2019-10-05","rating":8.8,"pages":"528","doubanLink":"https://book.douban.com/subject/2284311/","cover":"https://neodb.social/m/book/2021/09/153b4ac4f7-3931-4f95-bc29-aa27619f058e.jpg","review":"因为自己的原因，竟然花了三个多月才看完这本书。作为哲学入门书籍，作者以时间线为基础走马观花的介绍了各种哲学派别，代表人物，虽不深入却也能给我等菜鸟一个观察哲学的角度。书中也有作者的巧思，用书中书的概念去解释一些并没那么好理解的哲学概念。哲学正是一个晦涩难懂的科目，我想也正如最后作者自己说的，这本书要多读几次才行。","month":10,"country":"中国","wereadId":"703157"},{"title":"长夜难明","author":"紫金陈","start":"2019-10-05","finish":"2019-10-08","rating":8.5,"pages":"288","doubanLink":"https://book.douban.com/subject/26923390","cover":"https://neodb.social/m/book/2021/09/1509ab1503-e6d1-4dcb-8b0f-e9f24e69d82d.jpg","review":"国产推理几乎没看过，这本值得推荐，光能出版就值了。","month":10,"country":"中国","wereadId":"912238"},{"title":"浮生六记","author":"（清）沈复","start":"2019-10-08","finish":"2019-10-10","rating":7,"pages":"80","doubanLink":"https://book.douban.com/subject/1088581/","cover":"https://neodb.social/m/book/2021/09/159f19504e-6c0c-43e6-a814-14c3ef5c0ff1.jpg","review":"走马观花，无甚感觉","month":10,"country":"中国","wereadId":"747774"},{"title":"依存","author":"[日]西泽保彦","start":"2019-04-17","finish":"2019-10-22","rating":8,"pages":"455","doubanLink":"http://m.douban.com/book/subject/11504246/","cover":"https://neodb.social/m/item/book/2026/02/10/bcf5f451-63a2-45d4-bf7a-2931d4ada07f.jpg","review":"不知道这是看的第几本西泽保彦的书，也不知道是匠千晓系列的第几本，但应该是这一系列的最后一本吧？非常喜欢这一系列的各个人设，这一本也是保质保量的延续。对于一件事情的发生，作者总能给出各种不同角度，不同逻辑的解释方法，最后再来一给脑洞大开的结论。相对于系列前作，本书在新颖的点在于选择了其中一位故事人物作为叙述载体，人物感情情节有了较大的推进，揭秘了匠仔的身世，同时在推理的主题下面加上了很多心理学层面的思考。推荐。","month":10,"country":"日本","wereadId":"25566772"}];
+    const wereadData = {"597603":{"rating":784,"ratingCount":90647,"highlights":[],"thoughts":[],"popularHighlights":[{"text":"我没见过黑夜，我没见过星星，我没见过春天、秋天和冬天。 我出生在刹车时代结束的时候，那时地球刚刚停止转动。","count":8512,"chapter":"刹车时代"},{"text":"学校教育都集中在理工科上，艺术和哲学之类的教育已压缩到最少，人类没有这份闲心了。这是人类最忙的时代，每个人都有做不完的工作。很有意思的是，地球上所有的宗教在一夜之间消失得无影无踪，","count":6903,"chapter":"逃逸时代"},{"text":"太阳氦闪爆发了。","count":5292,"chapter":"叛乱"},{"text":"我好像看到人马座三颗金色的太阳在地平线上依次升起，万物沐浴在它温暖的光芒中。","count":4326,"chapter":"流浪时代"},{"text":"“亲爱的，痛苦呀恐惧呀这些东西，也只有在活着时才能感觉到，死了，死了什么也没有了，那边只有黑暗。还是活着好，你说呢？”","count":4158,"chapter":"逃逸时代"},{"text":"我盯着那个泡泡，看到它表面上光和色的狂澜，那狂澜以人的感觉无法把握的复杂和精细在涌动，好像那个泡泡知道自己生命的长度，疯狂地把自己渺如烟海的记忆中无数的梦幻和传奇向世界演绎。","count":4046,"chapter":"逃逸时代"},{"text":"50亿年的壮丽生涯已成为飘逝的梦幻，太阳死了。 幸运的是，还有人活着。","count":3060,"chapter":"叛乱"},{"text":"回家的路上，我们看到荒芜已久的大地上，野草在大片大片地钻出地面，各种花朵在怒放，嫩叶给枯死的森林披上绿装……所有的生命都在抓紧时间焕发着活力。","count":2814,"chapter":"逃逸时代"},{"text":"这个时代，死亡不再是黑色的，它是闪电的颜色，当那最后的闪电到来时，世界将在瞬间变成蒸汽。","count":2646,"chapter":"刹车时代"},{"text":"但对于我们这一代在北半球出生的人来说，这一切都很自然，就如同对于刹车时代以前的人们，太阳、星星和月亮那么自然。我们把那以前人类的历史都叫做前太阳时代，那真是个让人神往的黄金时代啊！","count":2574,"chapter":"刹车时代"},{"text":"在这突然出现的灿烂阳光下，海面上最后的地球派们仍稳稳地站着，仿佛五千多尊雕像。","count":2505,"chapter":"叛乱"},{"text":"真是个小天才，记忆遗传技术使这样的小娃娃成了平常人，这是人类的幸运，否则，像地球发动机这样连神都不敢想的奇迹，是不会在四个世纪内变成现实的。","count":2325,"chapter":"逃逸时代"},{"text":"整个移民过程将延续两千五百年时间，一百代人。","count":2300,"chapter":"刹车时代"},{"text":"古代曾有过一个伦理学问题：当洪水到来时，一个只能救走一个人的男人，是去救他的父亲呢，还是去救他的儿子？在这个时代的人看来，提出这个问题很不可理解。","count":2144,"chapter":"逃逸时代"},{"text":"同四个世纪前相比，太阳没有任何变化。","count":1969,"chapter":"叛乱"},{"text":"不知为什么，我没同她去，她就同阿东去了，我以后再也没见到他们。","count":1833,"chapter":"逃逸时代"},{"text":"我看到一个小女孩，举起一大块冰用尽全身力气狠命地向一个老者砸去，她那双眼睛透过面罩射出疯狂的怒火。","count":1749,"chapter":"叛乱"},{"text":"“……反正我们得上去，要不这门课会扣分的！”","count":1664,"chapter":"刹车时代"},{"text":"人类带不走月球，就在月球上也安装了行星发动机，把它推离地球轨道，以免在地球加速时相撞。","count":1649,"chapter":"刹车时代"},{"text":"由于环境的严酷，法律规定每三对新婚配偶中只有一对有生育权，抽签决定。","count":1617,"chapter":"逃逸时代"}]},"703157":{"rating":863,"ratingCount":20947,"highlights":[{"text":"所以说当我们仰望天空时，我们其实是在试图找寻回到自我的路。”","chapter":"未来的宇宙","color":0},{"text":"我想你会发现那些打着‘新时代’旗号的运动有一大部分都是骗人的玩意儿。 \n","chapter":"存在哲学","color":0},{"text":"萨特说了一句很重要的话。他说：关于存在的问题是无法一次就回答清楚的。所谓哲学问题的定义就是每一个世代，甚至每一个人，都必须要一再地问自己的一些问题。” ","chapter":"存在哲学","color":0},{"text":"    “荒谬剧场经常描绘一些非常琐碎的情境，因此我们也可以称之为一种‘超写实主义’。剧中描绘的就是人们原来的面貌。可是当你把发生在浴室的事情或一个普通家庭平日早晨的景象搬上舞台时，观众就会觉得很好笑。他们的笑声可以解释成为一种看见自己在舞台上被嘲弄时的防卫机转。” ","chapter":"存在哲学","color":0},{"text":"“你先告诉我你进来时看到什么。” \n    “我注意到的第一件事就是你不在这里。” \n    “你看到的第一件事物却是一件不在这里的事物，这不是很奇怪吗？” ","chapter":"存在哲学","color":0},{"text":"我们可以说地球生物进化的‘原料’就是同一种生物之间不断出现的个体差异，再加上子孙的数量庞大，以致只有一小部分能够存活。而进化的实际‘机转’（或驱动力）则是生存竞争中的自然淘汰作用。这种淘汰过程可以确保最强者或‘最适者’能够生存下来。” \n","chapter":"自然主义","color":0},{"text":"达尔文是一个很谨慎的人。他先提出问题，等到过了很久之后才加以回答。从这个角度来看，他用的方法正和所有真正的哲学家一样，也就是说：重要的是提出问题，而无须急着解答问题。” \n","chapter":"自然主义","color":0},{"text":"《物竞天择，适者生存之物种起源论》","chapter":"自然主义","color":0},{"text":"“有一段时期会出现新的‘阶级社会’，由无产阶级以武力镇压中产阶级。马克思称此为无产阶级专政。但在这段过渡期后，无产阶级专政会被一个‘不分阶段的社会’所取代。在这个社会当中，生产工具是由‘众人’，也就是人民所拥有。在这种社会中，国家的政策是‘各尽其才，各取所需’","chapter":"共产主义","color":0},{"text":"如果你把工人的工资和其他的生产成本从销售价值里扣除，一定还会有一些剩余价值。这个剩余价值就是马克思所称的利润。换句话说，资本主义者把事实上是由工人创造的价值放进了自己的口袋。这就叫做剥削。","chapter":"共产主义","color":0},{"text":"“思想（或理性）的历史就像这条河流。你的思考方式乃是受到宛如河水般向前推进的传统思潮与当时的物质条件的影响。因此你永远无法宣称任何一种思想永远是对的。只不过就你所置身之处而言，这种思想可能是正确的。” \n","chapter":"黑格尔","color":0},{"text":"黑格尔的哲学可说是无所不包、丰富多样，因此我们在这里只能重点式地谈一谈他的某些主要理论。事实上，我们究竟是否能说黑格尔有他自己的哲学是很有疑问的。通常所谓的‘黑格尔哲学’主要是指一种理解历史进展的方法。黑格尔的哲学所教导我们的只有生命的内在本质，不过也可以教我们如何从思考中获取结论。”","chapter":"黑格尔","color":0},{"text":"康德曾经谈过一种他称为‘物自身’的东西。虽然他否认人可以清楚认知自然最深处的秘密，但他承认世间有一种无法追求到的‘真理’。黑格尔却说‘真理是主观的’，因此他不承认在人类的理性之外有任何‘真理’存在。他说，所有的知识都是人类的知识。","chapter":"黑格尔","color":0},{"text":"不过很可能某个地方有另外一个作者正在写一本，关于一个为他的女儿席德写一本书的联合国少校艾勃特的书，而艾勃特所写的这本书则是，关于一个叫艾伯特的人突然开始寄一些讨论哲学的信函给住在苜蓿巷三号的苏菲。","chapter":"哲学宴会","color":0},{"text":"“只有在遵守一项法则的时候，我们的行为才是自由的？这不是很奇怪吗？” \n    “对于康德来说并不奇怪。你也许还记得他必须‘假定’人有自由意志。这一点很重要，因为康德也说过每一件事都服从因果律，那么我们怎么会有自由意志呢？” \n    “我怎么会知道？” \n    “在这点上，康德把人分为两部分，有点像笛卡尔说人是‘二元的受造物’一样，因为人有身体，也有心灵。康德说，作为一个由物质形成的生物，我们完全受到不变的因果律的支配。我们不能决定自己的感官经验。这些经验因为某种必要性而发生在我们身上，并对我们造成影响，不管我们乐意与否。但我们不仅是由物质形成的受造物，也是具有理性的受造物。” \n    “请你再说明一下。” \n    “作为一个由物质形成的存在者，我们完全属于自然界，因此受到因果律的支配。在这种情况下我们没有自由意志可言。可是作为一个有理性的存在者，我们在康德所谓的‘物自身’（与我们的感官印象没有关系的世界本身）中占有一席之地。只有在我们追随我们的‘实践理性’，并因此得以做道德上的抉择时，我们才有自由意志可言。因为当我们遵守道德法则时，我们也正是制定这项法则的人。” \n    “是的，从某个角度来说，这是对的。因为是我自己（或我内心的某种东西）决定不要对别人不好的。” \n    “所以当你选择不要对别人不好时——即使这样会违反你自己的利益——你就是在从事自由的行为。” \n    “而如果你只是做自己想做的事，你就不算自由或独立。” \n    “我们可能会成为各种事物的奴隶，我们甚至可能成为我们的自我中心思想的奴隶。独立与自由正是我们超脱自我的欲望与恶念的方法。” ","chapter":"因果律","color":0},{"text":"    “最后，如果我们想借理性之助证明上帝存在或不存在的话，也一定不会成功。笛卡尔等理性主义者曾试图证明上帝必然存在，理由是：我们都有一个关于‘至高存在’的概念。而亚里士多德和圣多玛斯等人之所以相信上帝存在的理由是：一切事物必然有一个最初的原因。” \n    “那康德的看法呢？” \n    “这两种理由他都不接受。他认为无论理性或经验都无法确实证明上帝的存在。对于理性而言，上帝存在与上帝不存在这两者都有可能。” \n    “可是你刚开始时说过康德想维护基督教信仰的基础。” \n    “是的，他开创了一个宗教的空间。在这个空间中，理性和经验都派不上用场，因此形成了一种真空的状况。这种真空只能用信仰来填补。” \n    “这就是他挽救基督教的方式吗？” \n    “可以这么说。值得一提的是康德是一个新教徒。自从宗教革命以来，基督新教的特色就是强调信仰的重要性。而天主教自从中世纪初期以来就倾向于相信理性乃是信仰的支柱。” \n    “原来如此。” \n    “不过康德除了认定这些大问题应该交由个人的信仰来决定之外，他还更进一步认为，为了维护道德的缘故，我们应该假定人有不朽的灵魂、上帝确实存在以及人有自由意志。” ","chapter":"因果律","color":0},{"text":"    “对。我们的知识材料是透过感官而来，但这些材料必须符合理性的特性。举例来说，理性的特性之一就是会寻求事件的原因。” \n    “譬如说看到球滚过地板的时候就会问球从哪里来。” \n    “没错。可是当我们想知道世界从何而来，并且讨论可能的答案时，我们的理性可以说‘暂时停止作用’。因为它没有感官的材料可能加以处理，也没有任何相关的经验可资利用，因为我们从未经验过我们渺小的人类所隶属的这个大宇宙。” \n    “也可以说我们是滚过地板这个球的一小部分，所以我们不知道它是从哪里来的。” \n    “可是人类理性的特色就是一定会问球从哪里来。这也是为什么我们会一问再问，全力解答这些艰深问题的原因。可是我们从来没有获得过任何确定的材料，所以我们永远不能得到满意的答案，因为我们的理性不能发挥作用。” ","chapter":"因果律","color":0},{"text":"所谓‘自然神论’是指相信上帝在万古之前创造了世界，但从此以后就没有再现身。上帝成了一个‘至高的存在’，只透过大自然与自然法则向人类显现，绝不会透过任何‘超自然’的方式现身。我们在亚里士多德的著作中也可以发现类似这种‘哲学上帝’的说法。对他而言，上帝乃是‘目的因’或‘最初的推动者’。","chapter":"真相","color":0},{"text":"亚里士多德指出，我们对于自己感官未曾经验过的事物就不可能有意识。柏拉图则会说：不先存在于理型世界中的事物就不可能出现在自然界中。亚里士多德认为柏拉图如此的主张会使“事物的数目倍增”。","chapter":"没有天生的概念","color":0},{"text":"真实启蒙之于人 \n    如同阳光之于土","chapter":"生日礼物","color":0},{"text":"    “所以，我们可以知道：一件事情跟着另外一件事情发生，并不一定表示两者之间必有关联。哲学的目的之一就是教人们不要妄下定论。因为，妄下定论可能会导致许多迷信。” ","chapter":"休谟","color":0},{"text":"斯宾诺莎指出，使我们无法获得真正的幸福与和谐的是我们内心的各种冲动。例如我们的野心和欲望。但如果我们体认到每一件事的发生都有其必然性，我们就可以凭直觉理解整个大自然。我们会很清楚地领悟到每一件事都有关联，每一件事情都是一体的。最后的目标是以一种全然接纳的观点来理解世间的事物。只有这样，我们才能获得真正的幸福与满足。","chapter":"一元论","color":0},{"text":"斯宾诺莎认为，这棵树是自由的，它有充分的自由去发展它先天的能力。但如果它是一棵苹果树，它就不可能有能力长出梨子或李子。同样的道理也适用于我们人类。我们的发展与个人的成长可能会受到政治环境等因素的阻碍，外在的环境可能限制我们，只有在我们能够‘自由’发展本身固有能力时，我们才活得像个自由的人。但无论如何，我们仍然像那个生长在石器时代莱茵河谷的男孩、那只非洲的狮子或花园里那棵苹果树一样受到内在潜能与外在机会的左右。","chapter":"一元论","color":0},{"text":"笛卡尔的意思只是说我们都是具有对于完美实体的概念，由此可见这个完美实体的本身必定存在。因为一个完美的实体如果不存在，就不算完美了，此外，如果世上没有所谓的完美实体，我们也不会具有完美实体的概念。因为我们本身是不完美的，所以完美的概念不可能来自于我们。笛卡尔认为，上帝这个概念是与生俱来的，乃是我们出生时就烙印在我们身上的，‘就像工匠在他的作品上打上记号一般’。” ","chapter":"现代的哲学之父","color":0},{"text":"可是笛卡尔却设法从这个零点开始出发。他怀疑每一件事，而这正是他唯一能够确定的事情。此时他悟出一个道理：有一件事情必定是真实的，那就是他怀疑。当他怀疑时，他必然是在思考，而由于他在思考，那么他必定是个会思考的存在者。用他自己的话来说，就是：Cogito，ergosum。","chapter":"现代的哲学之父","color":0},{"text":"在十七世纪以前，人们普遍将灵魂视为某种遍布于所有生物的‘生命原理’。事实上，灵魂（soul）与精神（spirit）这两个字原来的意思就是‘气息’与‘呼吸’。","chapter":"现代的哲学之父","color":0},{"text":"‘巴洛克’这个名词原来的意思是‘形状不规则的珍珠’。这是巴洛克艺术的典型特征。","chapter":"失控","color":0},{"text":"“自从文艺复兴时期以来，人们就不得不逐渐接受他们所居住的地球乃是浩瀚银河中一个偶然形成的星球的说法。即使到现在，我看还是不见得大家都能够完全接受这种想法。不过，即使在文艺复兴时期，也有一些人认为，随着新世界观的产生，我们每一个人所处的地位也变得比以前更加重要。”\n  “我还是不太明白。”\n  “在此之前，世界的中心是地球。但天文学家却告诉人们，宇宙根本没有绝对的中心，因此，每一个人都是中心。”\n  “是这个意思！”\n  “文艺复兴运动造成了新的宗教情��（狂热）。随着哲学与科学逐渐脱离神学的范畴，基督徒变得更加虔诚。到了文艺复兴时期，由于人类对自己有了新的看法，使得宗教生活也受到了影响。个人与上帝之间的关系变得比个人与教会组织之间的关系更加重要。”","chapter":"梦境","color":0},{"text":"“但这还不是当时人面临的最大挑战。当牛顿证明宇宙各处适用同样的法则时，有人可能会认为他破坏了人们心目中的上帝无所不能的形象，但是牛顿本人的信仰却从未动摇。他认为自然法则的存在正足以证明宇宙间确有一位伟大、万能的上帝。事实上，受到更大冲击的乃是人对自我的观念。”","chapter":"梦境","color":0},{"text":"是很奇怪，但却一点不假。孩子，我们并不只活在我们所属的时代里，我们身上也扛着历史。不要忘记你在这个房间内看到的每一样东西都曾经是崭新的。那个十六世纪的木娃娃也许是为了某个五岁女孩的生日做的，而制造的人也许就是她年老的祖母……","chapter":"梦境","color":0},{"text":"柏拉图借着这个洞穴神话，想要说明哲学家是如何从影子般的影像出发，追寻自然界所有现象背后的真实概念。这当中，他也许曾想到苏格拉底，因为后者同样是因为推翻了“穴居人”传统的观念。并试图照亮他们追寻真知的道路而遭到杀害。这个神话说明了苏格拉底的勇气与他的为人导师的责任感。","chapter":"柏拉图学院","color":0},{"text":"距离是乔安家的一倍","chapter":"你是谁","color":0}],"thoughts":[{"text":"On the Origin of Species (or, more completely, On the Origin of Species by Means of Natural Selection, or the Preservation of Favoured Races in the Struggle for Life), published on 24 November 1859, is a work of scientific literature by Charles Darwin which is considered to be the foundation of evolutionary biology.","quote":"《物竞天择，适者生存之物种起源论》","chapter":""},{"text":"资本家是逐利的，但归根结底资本家也是人，人就是逐利的，在这种无阶级社会中所谓的「各尽其才，各取所需」到底每个人是尽多少才，取多少需，谁来定呢？","quote":"“有一段时期会出现新的‘阶级社会’，由无产阶级以武力镇压中产阶级。马克思称此为无产阶级专政。但在这段过渡期后，无产阶级专政会被一个‘不分阶段的社会’所取代。在这个社会当中，生产工具是由‘众人’，也就是人民所拥有。在这种社会中，国家的政策是‘各尽其才，各取所需’","chapter":""},{"text":"苏菲在河席德在镜子的两面","quote":"哲学是世界精神的镜子’这一句吗","chapter":""},{"text":"从书中书的世界暗示到我们的现实世界","quote":"不过很可能某个地方有另外一个作者正在写一本，关于一个为他的女儿席德写一本书的联合国少校艾勃特的书，而艾勃特所写的这本书则是，关于一个叫艾伯特的人突然开始寄一些讨论哲学的信函给住在苜蓿巷三号的苏菲。","chapter":""},{"text":"已成为康德迷弟","quote":"“只有在遵守一项法则的时候，我们的行为才是自由的？这不是很奇怪吗？” \n“对于康德来说并不奇怪。你也许还记得他必须‘假定’人有自由意志。这一点很重要，因为康德也说过每一件事都服从因果律，那么我们怎么会有自由意志呢？” \n“我怎么会知道？” \n“在这点上，康德把人分为两部分，有点像笛卡尔说人是‘二元的受造物’一样，因为人有身体，也有心灵。康德说，作为一个由物质形成的生物，我们完全受到不变的因果律的支配。我们不能决定自己的感官经验。这些经验因为某种必要性而发生在我们身上，并对我们造成影响，不管我们乐意与否。但我们不仅是由物质形成的受造物，也是具有理性的受造物。” \n“请你再说明一下。” \n“作为一个由物质形成的存在者，我们完全属于自然界，因此受到因果律的支配。在这种情况下我们没有自由意志可言。可是作为一个有理性的存在者，我们在康德所谓的‘物自身’（与我们的感官印象没有关系的世界本身）中占有一席之地。只有在我们追随我们的‘实践理性’，并因此得以做道德上的抉择时，我们才有自由意志可言。因为当我们遵守道德法则时，我们也正是制定这项法则的人。” \n“是的，从某个角度来说，这是对的。因为是我自己（或我内心的某种东西）决定不要对别人不好的。” \n“所以当你选择不要对别人不好时——即使这样会违反你自己的利益——你就是在从事自由的行为。” \n“而如果你只是做自己想做的事，你就不算自由或独立。” \n“我们可能会成为各种事物的奴隶，我们甚至可能成为我们的自我中心思想的奴隶。独立与自由正是我们超脱自我的欲望与恶念的方法。”","chapter":""},{"text":"熵增不可逆","quote":"世间复合之物必然衰朽，应勤勉修持以求己身之解脱。","chapter":""},{"text":"我想正确表述应该是「距离是乔安家的两倍」或者「距离比乔安家多一倍」","quote":"距离是乔安家的一倍","chapter":""}],"popularHighlights":[{"text":"唯有清晰地意识到有一天她终将死去，她才能够体会活在世上是多么美好。","count":19558,"chapter":"你是谁"},{"text":"亲爱的苏菲，我不希望你长大之后也会成为一个把这世界视为理所当然的人。","count":9932,"chapter":"哲学是什么？"},{"text":"哲学不是一般人能够学到的，但也许我们可以学习如何以哲学的方式思考。","count":9738,"chapter":"哲学家的课题"},{"text":"她居然不知道自己是谁，这不是太奇怪了吗？她也没有一点权利选择自己的长相，这不是太不合理了吗？这些事情都是她不得不接受的。也许她可以选择交什么朋友，但却不能选择自己要成为什么人。她甚至不曾选择要做人。","count":7860,"chapter":"你是谁"},{"text":"恩培窦可里斯认为自然界有两种力量。他称之为“爱”与“恨”。爱使得事物聚合，而恨则使他们分散。","count":7040,"chapter":"哲学家的课题"},{"text":"苏格拉底认为，人如果违反自己的理性就不会快乐。而那些知道如何找到快乐的人就会遵照自己的理性行事。因此，明白是非者必然不会为恶。因为世间哪有人会想要成为一个不快乐的人？","count":6747,"chapter":"雅典的哲学"},{"text":"大多数人总是要等到生病后才了解，能够活着是何等的福气。这是多么悲哀的事！","count":6642,"chapter":"你是谁"},{"text":"伦理学中有一个至关重要的原则，叫做“黄金律”，亦即互惠原则：你想别人怎样待你，你就要怎样待人。","count":6540,"chapter":"致亲爱的中国读者"},{"text":"大人们总是将这个世界视为理所当然的存在，并且就此任自己陷入柴米油盐的生活中而浑然不觉。","count":6513,"chapter":"哲学是什么？"},{"text":"为什么人们长大后就不再玩耍了呢？","count":6448,"chapter":"原子理论"},{"text":"生命本来就是悲伤而严肃的。我们来到这个美好的世界里，彼此相逢，彼此问候，并结伴同游一段短暂的时间。然后我们就失去了对方，并且莫名其妙就消失了，就像我们突然莫名其妙地来到世上一般。","count":6370,"chapter":"梦境"},{"text":"她明白人们总是想为大自然的变迁寻求解释。这就是他们何以在科学还没有产生之前会编造出那些神话故事的原因。","count":6048,"chapter":"神话的世界观"},{"text":"亚里士多德认为，快乐有三种形式。一种是过着享乐的生活，一种是做一个自由而负责的公民，另一种则是做一个思想家与哲学家。","count":6048,"chapter":"没有天生的概念"},{"text":"如果我自己对马或宝石有兴趣，我也不能期望别人都和我一样。如果我看电视体育节目看得津津有味，就必须忍受有些人认为体育节目很无聊的事实。","count":6035,"chapter":"哲学是什么？"},{"text":"“迷信”，多么奇怪的一个名词。如果你信基督教或伊斯兰教，这就叫“信仰”，但如果你相信占星术或十三号星期五不吉利，就是迷信！谁有权利说别人相信的东西就是“迷信”呢？","count":6032,"chapter":"命运"},{"text":"她生平第一次开始觉得无论在学校或其他地方，人们关心的都只是一些芝麻琐事罢了。世上还有更重要的事有待解答，这些事比学校所上的任何科目都更重要。","count":5865,"chapter":"哲学是什么？"},{"text":"柏拉图因此得出一个结论：在“物质世界的背后，必定有一个实在存在。他称这个实在为‘理型的世界’，其中包含存在于自然界各种现象背后、永恒不变的模式”。这种独树一格的观点我们称之为“柏拉图的理型论”。","count":5852,"chapter":"柏拉图学院"},{"text":"对于孩子们而言，世上的种种都是新鲜而令人惊奇的。对于大人们则不然。大多数成人都把这世界当成一种理所当然的存在。","count":5321,"chapter":"哲学是什么？"},{"text":"宿命论的意思就是相信所有发生的事都是命中注定的。","count":5100,"chapter":"命运"},{"text":"我们最感兴趣的并不是这些早期的哲学家找出了哪些答案，而是他们问了什么问题、寻求何种答案等等。我们对他们的思考方式较感兴趣，而不是他们思考的内容。","count":5054,"chapter":"哲学家的课题"}]},"747774":{"rating":677,"ratingCount":14814,"highlights":[],"thoughts":[],"popularHighlights":[{"text":"苏东坡诗云“事如春梦了无痕”，逝去的时光，若不以笔墨记下来，便了无踪影，未免辜负苍天的厚爱。","count":11872,"chapter":"闺房记乐"},{"text":"奉劝世上的夫妇，固然不可彼此仇视，也不可以过于情爱深重。俗话说“恩爱夫妻不到头”，像我这样，就是前车之鉴啊。","count":8109,"chapter":"坎坷记愁"},{"text":"夏天荷花初放时，晚上闭合，白日盛开。芸便用小纱囊，撮少许茶叶，放在荷花心。第二天早晨取出，烹了雨水来泡茶，香韵尤其绝妙。","count":7870,"chapter":"闲情记趣"},{"text":"整个扬帮的妓女，到后来没一个不认识我，每次上了邵寡妇的艇，叫我的声音连绵不绝。我也左顾右盼，应接不暇：这种人缘，是那些在歌妓身上挥霍万金的人也得不到的呀。","count":5239,"chapter":"浪游记快"},{"text":"后来憨园还是被豪门夺去了，亲事未能成功。而芸最后，竟也因此而死。","count":3620,"chapter":"闺房记乐"},{"text":"这一走，芸与逢森母子，就算是永别了。","count":3186,"chapter":"坎坷记愁"},{"text":"伸手探她的心口，也是怦然不止，于是俯到她耳边问：“姐姐的心跳，怎么如此，像舂米似的？”芸回眸微笑。我只觉一缕情丝摇人魂魄，便将芸拥入帷帐，缠绵怜爱，不知东方之既白。","count":3164,"chapter":"闺房记乐"},{"text":"可惜我妻子芸娘不能跟我一起到此一游。回头看喜儿，月光下依稀觉得她和芸娘愈加像了，于是挽了她下台去，灭了蜡烛，睡下了。","count":2930,"chapter":"浪游记快"},{"text":"芸仅有这一个儿子，她的香火就此无法再续了！琢堂听了，也为此长叹，赠了我一个妾，让我重入春梦。从此的生活，扰扰攘攘，又不知等到什么时候，梦才能醒了。","count":2800,"chapter":"坎坷记愁"},{"text":"我镌刻了两枚“愿生生世世为夫妇”的印章，自己拿了阳文印，芸拿了阴文印，作为往来书信盖章之用。","count":2720,"chapter":"闺房记乐"},{"text":"人生坎坷都是从何而来的呢？往往是自己作孽得了报应而已。我则并非如此：多感情，重承诺，爽直不羁，结果转而成了牵累。","count":2618,"chapter":"坎坷记愁"},{"text":"如今我倒有了做这些事的余地，可是芸这唯一知己已经离世，岂不值得感叹么？","count":2387,"chapter":"闺房记乐"},{"text":"芸急忙拦住了我，道：“宁可被公公责备，不能因为这事儿让我失了婆婆那里的欢心。”到最后，她都没有给自己澄清过。","count":2385,"chapter":"坎坷记愁"},{"text":"她削肩膀长脖颈，瘦不露骨，眉弯目秀，顾盼之间，神采飞扬，唯有两齿微微露出，算是相貌上面，略微美中不足之处。情态缠绵，让人神消。","count":2340,"chapter":"闺房记乐"},{"text":"中国明清之后好文言文，妙处多不在辞藻铺排，而在文气流动、词采精炼，假设文章如酒，经了翻译，便成米饭，少了醇酽的韵致。","count":2272,"chapter":"译记[代序]"},{"text":"因为暑热，芸便停了女红，终日只伴着我研习书卷、谈论古史、品月评花。芸不擅长喝酒，强劝她，也不过能饮三杯，我就教她“射覆”这种行酒令的法子，于是夫妻饮酒作乐。我自以为人世间的欢乐，无过于此了。","count":2119,"chapter":"闺房记乐"},{"text":"我的为人，凡事喜欢独出己见，不屑于随着别人，即算是谈论诗品评画，无不都是带着“人家喜欢的我舍弃，人家舍弃的我偏捡起来”这意思。所以风景名胜，重要的还是心中有所得。","count":2002,"chapter":"浪游记快"},{"text":"以后哪年，当与郎君在这里造个房子，绕着屋买十亩菜园，招来仆人仆妇种植瓜果蔬菜，来供给日常家用。郎君画画，我来刺绣，当作品诗饮酒的资费。这样布衣菜饭，终生快乐，不必计划去远游他处啦。","count":1946,"chapter":"闺房记乐"},{"text":"秋侵人影瘦，霜染菊花肥","count":1875,"chapter":"闺房记乐"},{"text":"晚霞映照，桥被染红，夕雾笼罩，柳树幽暗，星辰将起，满江都是渔船灯火。","count":1854,"chapter":"闺房记乐"}]},"837686":{"rating":799,"ratingCount":31796,"highlights":[{"text":"可以说，人们好像是在把我完全撇开的情况下处理这桩案子。所有这一切都是在没有我参与的情况下进行的。我的命运由他们决定，而根本不征求我的意见。","chapter":"四","color":0},{"text":"她又沉默了一会儿之后，低声咕哝说我真是个怪人，她正是因为这点才爱我的，但将来有一天也许会由于同样的原因而讨厌我。","chapter":"五","color":0}],"thoughts":[],"popularHighlights":[{"text":"我想，这又是一个忙忙乱乱的星期天，妈妈已经下葬入土，而我明天又该上班了，生活仍是老样子，没有任何变化。","count":20190,"chapter":"二"},{"text":"人生在世，永远也不该演戏作假。","count":19944,"chapter":"二"},{"text":"人们永远也无法改变生活，什么样的生活都差不多，而我在这里的生活并不使我厌烦。","count":17629,"chapter":"五"},{"text":"我意识到我打破了这一天的平衡，打破了海滩上不寻常的寂静，在这种平衡与寂静中，我原本是幸福自在的。接着，我又对准那具尸体开了四枪，子弹打进去，没有显露出什么，这就像我在苦难之门上急促地叩了四下。","count":12256,"chapter":"六"},{"text":"可以说，人们好像是在把我完全撇开的情况下处理这桩案子。所有这一切都是在没有我参与的情况下进行的。我的命运由他们决定，而根本不征求我的意见。","count":11084,"chapter":"四"},{"text":"他的床嘎嘎作响了一下，透过墙壁传来一阵细细的奇怪的声音，我听出来他是在哭。不知道怎么搞的，这时我突然想起了我妈妈，但是明天早晨我得早起。我不饿，所以没有吃晚饭就上床睡了。","count":9420,"chapter":"四"},{"text":"今天，妈妈死了。也许是在昨天，我搞不清。","count":8175,"chapter":"一"},{"text":"这就是这场审讯的形象，所有一切都是真的，但又没有任何东西是真的！","count":8154,"chapter":"三"},{"text":"贝雷兹最后在村口追上我们时的那张面孔。他又激动又难过，大颗大颗的眼泪流在脸颊上，但由于脸上皱纹密布，眼泪竟流不动，时而扩散，时而汇聚，在那张哀伤变形的脸上铺陈为一片水光。","count":6288,"chapter":"一"},{"text":"于是我悟出了，一个人即使只生活过一天，他也可以在监狱里待上一百年而不至于难以度日，他有足够的东西可供回忆，绝不会感到烦闷无聊。从某种意义上来说，这也是一种愉快。","count":5760,"chapter":"二"},{"text":"要是没有妈妈这档子事，能去散散步该有多么愉快。","count":5194,"chapter":"一"},{"text":"妈妈虽说不是无神论者，可活着的时候从来没有想到过宗教。","count":4554,"chapter":"一"},{"text":"当我念大学的时候，有过不少这类雄心大志，但当我辍学之后，很快就懂得了，这一切实际上并不重要。","count":4064,"chapter":"五"},{"text":"这是因为我从来没有什么值得一说的，于是我就不说。","count":3924,"chapter":"一"},{"text":"过了一会儿，她问我爱不爱她。我对她说，这种话毫无意义，但我似乎觉得并不爱。","count":3726,"chapter":"四"},{"text":"到了街上，光天化日之下强烈的阳光，照在我脸上，就像打了我一个耳光。","count":3654,"chapter":"六"},{"text":"我想到将要上床睡上十二个钟头时所感到的那种喜悦。","count":3552,"chapter":"一"},{"text":"像往常那样，当我听某个人说话听烦了，想要摆脱他时，就装出欣然同意的样子。","count":3366,"chapter":"一"},{"text":"这时，我萌生出要结婚的念头，这也许是我生平的第一次。","count":3348,"chapter":"六"},{"text":"但是在他看来，它真正的病是衰老，而衰老是治不好的。","count":3206,"chapter":"五"}]},"853022":{"rating":849,"ratingCount":24367,"highlights":[{"text":"价码比我预期的要高，想也知道是要让我杀价，但我二话不说，立即开了张支票，只见他满脸诧异，甚至还有点失望。","chapter":"2","color":0},{"text":"但是，为什么西方国家—美国尤其如此—会害怕腐败、死亡、饥渴、疾病、衰老、愁恨和虚幻呢？我们其实有旺盛的生命力。我坐在小木屋抽烟斗的时候，觉得精神处于巅峰，精力亟欲找到出口。我绝对不要离世而居，而是要在俗世里生活，享受世上万物，探索其中神性。如果那些狂喜的时刻确实就是梵我合一，并且如同他们所说，只要了结今生业报，就不会再入轮回，我会大感惶恐，因为我想要一而再、再而三地投胎转世，也愿意接受形形色色的人生，不怕任何忧伤痛苦。唯有一个又一个的人生体验，才能满足我的渴望、活力与好奇心。\n","chapter":"8","color":0},{"text":"同样地，说不定种种梵我合一的感受，都代表人类第六感的演化方向，很久很久以后将成为人类共通的能力，如同现在的感官经验那样稀松平常。”\n","chapter":"8","color":0},{"text":"自我牺牲的情感足以压倒一切，就连欲望和饥饿都相形见绌，这是对自我人格的最大肯定，就算因此走向灭亡也在所不惜。无论为什么牺牲，都无关紧要，值不值得也非重点。这就好比美酒，只是更令人陶醉；也好比爱情，只是更让人心碎；更好比罪恶，只是更加使人着迷。一个人牺牲自己的瞬间，比上帝还要伟大，因为上帝既是全知全能，怎么可能牺牲自己？顶多只能牺牲唯一的儿子。","chapter":"4","color":0},{"text":"所谓没有激情的爱情，根本就不是爱情，而是属于喜欢、体贴、共同的兴趣或是习惯。习惯尤其如此。两个人可以因为习惯而保持性关系，就像到了饭点肚子会饿一样。当然，性欲不一定要有爱情。性欲跟激情不同，而是自然而然的性本能，无异于人类其他本能。所以，只要有了天时地利，丈夫难免会出轨，太太却容易小题大做，实在是很傻。","chapter":"6","color":0},{"text":"“圣人的气息。”\n这回答让我感到些许不安。在如此陈设精美、挂着名画的房间里，这句话就像是漫过浴缸的水，在渗透天花板后，滴答一声落了下来。","chapter":"4","color":0},{"text":"我没有插嘴问他，圣马丁的善举和他的行为到底有什么相似之处。他及时抛售股票赚取暴利，如今把钱献给上帝，更像是在支付中介费。但象征意义多半非我这种凡夫俗子所能参透。","chapter":"5","color":0},{"text":"一般人在热恋时，常会编造各种借口，来说服自己凡事跟着感觉走。我猜想，这也许就是不幸的婚姻为何那么多的原因。这就好像你明知某人是骗子，但因为交情深厚，所以偏要把事情托付给他，只因不愿相信骗子会重视利益到牺牲友情，认为即使他对人再不老实，也绝不会辜负自己。","chapter":"1","color":0},{"text":"爱情就好比航海技术很差的水手，颠簸的航程会让人受尽各种折磨。不过，如果你和拉里之间隔了一片大洋，你就会恍然大悟，刚开始那点难以忍受的痛苦，以后竟然会变得微不足道。","chapter":"7","color":0},{"text":"房间宽敞，地板铺着萨弗纳里的地毯，镶着华美木板的墙壁挂着美丽的画作，每把椅子均由纳纱刺绣细雕，五斗柜和零星的茶几均镶嵌精美、价值不凡，每件都可放到博物馆展示。客厅如此布置想必所费不赀，但一切都很值得，既华丽又妥帖，让伊莎贝尔深感震撼，因为她脑海中仍能鲜明浮现出那个蹩脚的旅馆房间，里头有铁床和硬邦邦的椅子，拉里却认为没什么不好，但明明就空荡荡又没生气，让人极不自在。她一想起那个画面，不由得打了冷战。\n","chapter":"5","color":0},{"text":"我认为，他汲汲营营背后的动力，反映出狂热的浪漫精神，得以让他在羸弱瘦小的法国公爵身上，看到往昔与圣路易九世东征圣地的十字军身影，或在作风狂妄、性喜猎狐的英国伯爵身上，瞥见跟随亨利八世前往金缕地￼的祖先。","chapter":"4","color":0}],"thoughts":[{"text":"最后半句话耐人寻味","quote":"价码比我预期的要高，想也知道是要让我杀价，但我二话不说，立即开了张支票，只见他满脸诧异，甚至还有点失望。","chapter":""},{"text":"书中两度出现的侦探小说，似乎毛姆对其颇有微词呀。","quote":"读我的侦探小说","chapter":""},{"text":"那些世间良匠打造的绝美器物，被承载在与之匹配的精美空间，然而主人却很可能是脑袋利欲熏心，性格谄媚溜须之辈。好比最新出的 iPhone 被握在五大三粗的生意人手里。他们只能说它好且贵，却指不清道不明那些美的所在，也不能物尽其用发挥与认识它的所有价值。究其原因，只因为他们有钱，他们有得选择，这是他们的幸运，亦是它们的不幸。","quote":"房间宽敞，地板铺着萨弗纳里的地毯，镶着华美木板的墙壁挂着美丽的画作，每把椅子均由纳纱刺绣细雕，五斗柜和零星的茶几均镶嵌精美、价值不凡，每件都可放到博物馆展示。客厅如此布置想必所费不赀，但一切都很值得，既华丽又妥帖，让伊莎贝尔深感震撼，因为她脑海中仍能鲜明浮现出那个蹩脚的旅馆房间，里头有铁床和硬邦邦的椅子，拉里却认为没什么不好，但明明就空荡荡又没生气，让人极不自在。她一想起那个画面，不由得打了冷战。","chapter":""}],"popularHighlights":[{"text":"人生如果不想随波逐流，就等于是场豪赌，失败的人不胜枚举，成功的人寥寥无几。","count":14339,"chapter":"7"},{"text":"一九二九年十月二十三日，纽约股票市场崩盘了。","count":10872,"chapter":"4"},{"text":"一切都这么残酷，毫无意义可言。你不禁会想问自己，活着到底是为了什么，人生究竟有没有意义，还是只能可悲地任凭命运摆布。","count":10230,"chapter":"10"},{"text":"这位老友为人亲切和善，一生却是如此傻气、无用又微不足道，我想到这里就悲从中来。他出席过无数宴会，和许多王公贵族、爵士名流来往，如今都毫无意义，这些人早把他给忘了。","count":9380,"chapter":"9"},{"text":"可能不实用，也可能很实用，但是非常有趣。你真的很难想象，读懂《奥德赛》的原文有多么令人兴奋，仿佛只要踮起脚尖，伸出手来，就能碰到天上的星星。","count":7756,"chapter":"4"},{"text":"我并不怕犯错，搞不好会在其中一条冤枉路上，找到人生的目标。","count":7752,"chapter":"7"},{"text":"“如果他真的爱你，就该为了你找份工作。”","count":6928,"chapter":"8"},{"text":"大城市里总会有许多自给自足的圈子，彼此不相往来，自成一个个小世界，仿佛是一座座孤岛，隔着无法横渡的海峡，成员相互依赖，过着自己的日子。","count":6498,"chapter":"3"},{"text":"人往往妄自菲薄，智慧才是解脱之道；救赎不必靠出世苦修，只要舍弃自我即可；行事不为私利，能常保心地纯洁；责任就是契机，让人学习放下小我、成就大我。","count":6222,"chapter":"8"},{"text":"悟道之途艰辛困难，如同跨越锋利的剃刀。若救赎之路必经刀山，找到答案的代价为何？","count":5940,"chapter":"导读 上刀山做自己"},{"text":"要女人讲理很容易，说实话是不二法门。","count":5888,"chapter":"4"},{"text":"书房将来要供格雷休息，设计灵感来自慕尼黑狩猎宫的房间，富丽堂皇，除了没地方放书以外，其余堪称完美。","count":5764,"chapter":"3"},{"text":"吾不与人争，胜败均不值。 钟情大自然，次之为艺术。 生命之火暖双手，他日余烬消逝，吾可安然离去。","count":5643,"chapter":"3"},{"text":"印度许多贤者后来也认知到人类的软弱，承认也可以运用爱和工作获得救赎，但是他们从没否认过，唯有知识才是最崇高又艰难的途径，因为知识仰赖人类最宝贵的能力，也就是理性。","count":5580,"chapter":"6"},{"text":"凡是对我有深远影响的人，几乎都是碰巧遇到的，但回想起来，却好像命中注定，仿佛全是在我需要他们时出现的。","count":5577,"chapter":"3"},{"text":"如果你有个儿子从来不回嘴，凡事却只照自己的意思来，你生气的时候他只知道道歉然后乖乖挨骂，你能拿他怎么办？","count":5328,"chapter":"6"},{"text":"剃刀边缘无比锋利，欲通过者无不艰辛； 是故智者常言，救赎之道难行。 ——《迦托·奥义书》","count":5292,"chapter":"引言"},{"text":"同样有涂了睫毛膏的睫毛、画得鲜红的嘴唇、抹了胭脂的面颊、辛苦锻炼过的苗条身材、清晰立体的五官，以及如饥似渴的彷徨眼神，让人无法不察觉到，她们人生的唯一目的，就是尽力挽救逐渐消逝的风采。","count":5253,"chapter":"5"},{"text":"这位一只脚已经踏进棺材的老头，因没获邀参加宴会，竟哭得像小孩一样，让人看了实在不胜唏嘘，此情此景不仅让我震撼，也让我感到凄凉，觉得不忍卒睹。","count":5236,"chapter":"7"},{"text":"艾略特势利归势利，但谁能否认他同时也是个最亲切体贴、最慷慨乐施的人呢？","count":4920,"chapter":"5"}]},"912238":{"rating":837,"ratingCount":51444,"highlights":[{"text":"能帮丈夫直接脱罪的证据因为太过紧张忘了，现在突然又能想起来了，唉，这种演技在电视剧里第一集就死了，居然能在警方面前晃了几个月，真是……","chapter":"第七十一章","color":0},{"text":"很快谈起了人生理想，双方表达了共同度过社会主义初级阶段的决心。","chapter":"第十七章","color":0},{"text":"严良忍不住笑出了声，随后又叹息一声：“这也挺好，文明手段来破案，放过一个坏人总比冤枉一个好人来得好。半年前省高院平反的萧山叔侄杀人冤案，当初也是你们支队的杰作，那对叔侄可是白白坐了十年的牢啊。”","chapter":"第七章","color":0}],"thoughts":[{"text":"作者对茅台耿耿于怀","quote":"茅台","chapter":""},{"text":"无罪推定原则(presumption of innocence)，意指“未经审判证明有罪确定前，推定被控告者无罪”。 无罪推定原则是现代法治国家刑事司法通行的一项重要原则，是国际公约确认和保护的一项基本人权，也是联合国在刑事司法领域制定和推行的最低限度标准之一。 但在中国的司法实践领域，还并未全面承认无罪推定原则。","quote":"严良忍不住笑出了声，随后又叹息一声：“这也挺好，文明手段来破案，放过一个坏人总比冤枉一个好人来得好。半年前省高院平反的萧山叔侄杀人冤案，当初也是你们支队的杰作，那对叔侄可是白白坐了十年的牢啊。”","chapter":""}],"popularHighlights":[{"text":"通常女人三十是个坎，过后利好出尽大盘见顶，终生熊市。","count":9520,"chapter":"第九章"},{"text":"学会妥协，是一个人成熟的标志。","count":7620,"chapter":"第十七章"},{"text":"无论多拥挤的车厢，人们都会善良慷慨为乞丐腾出方圆一米的舒适空间，何况是路上。","count":6324,"chapter":"第一章"},{"text":"“世界本就不公平，”江阳爽朗地笑道，“所以我们想要通过努力，在我们的职责范围里，让世界公平那么一点点。”","count":4224,"chapter":"第四十四章"},{"text":"对啊，这就跟我老婆一样，早上醒来和化完妆完全是两个人，除了我，她妈都快认不出她了。","count":3298,"chapter":"第五章"},{"text":"天很黑，他们不知道什么时候才能亮起来。","count":3276,"chapter":"第七十三章"},{"text":"人们已经想不起来第一次闯红灯的时间了，有了第一次，就会有第二次、第三次……","count":3144,"chapter":"第六十一章"},{"text":"听得两个警察突然好想爸爸妈妈。","count":2985,"chapter":"第一章"},{"text":"集合我们四人之力，法医、警察、检察官、律师，我们四人都精通各自行业，都是各自的行业的顶尖人物，聚集四个人的能力，一定能让最后的方案走到那一步。”","count":2844,"chapter":"第六十五章"},{"text":"来到外面，他抬头看天，夜色尚深，这夜出奇的长……","count":2737,"chapter":"第四十章"},{"text":"人嘛，总会遇到一些自己想坚持最后却放弃的事。放弃也好，坚持也好，说不上哪个对哪个错。坚持也未必会有好结果。","count":2730,"chapter":"第二十二章"},{"text":"胡一浪停在原地，望着他远去的身影，叹息一声：“是个好人，不过，不是聪明人。”","count":2664,"chapter":"第五十四章"},{"text":"张超依旧没有理会他，而是郑重地看着江阳：“我帮你死，换取——程序正义！”","count":2192,"chapter":"第六十四章"},{"text":"赵铁民缓缓点头思索着，然后睁大了眼睛，恍然大悟：“您是怀疑……怀疑他们俩之间有着某种不同寻常的同性感情纠葛？”","count":2119,"chapter":"第六章"},{"text":"当然，少不了年轻女性趁机转过身，调到前置摄像头，自拍美颜一番，配上文字“我就在地铁站，出了大事，好危险啊，怕怕的”。","count":1976,"chapter":"第一章"},{"text":"“我刚说我有很多赚钱的门道，其中一样是炒股。中国股市自从2001年见顶后，已经跌了两年多了，你们现在如果有钱，可以多买一些贵州茅台这只股票，拿上个五年十年，你们会发财的。”","count":1876,"chapter":"第二十章"},{"text":"赵铁民揶揄坏笑：“没问题，我已经约了她明天来单位，到时，这位丈夫入狱、独守空闺的美少妇的时间，就全部交给严老师了。”","count":1872,"chapter":"第四十六章"},{"text":"江阳握着酒杯，手停在空中，过了很久，慢慢地移到嘴边喝完，他身体里的生气仿佛都被抽空，目光空洞地望着前方，艰难又坚定地吐出一句话：“我要离婚。”","count":1807,"chapter":"第五十三章"},{"text":"。只有没有自信的女人才把生活一切都寄托在丈夫身上，管得死死的，什么都要问个一清二楚，我可不是那样的人。难道您每次晚上执行任务，您妻子都要问个不停吗？”","count":1782,"chapter":"第五章"},{"text":"不过显然更多人缺乏这种耐心，尤其是在繁忙的道路上，仿佛一群人一起闯红灯，就无所谓素质高低了，大家穿梭而过，知道车不敢朝一群人撞过来，于是闯红灯就成了理所当然，每个人都跟随周围的人流穿行而过。","count":1770,"chapter":"第一章"}]},"25566772":{"rating":538,"ratingCount":202,"highlights":[{"text":"想想看，我们这群人其实对彼此一无所知。就拿家庭背景来说吧，可能还不如学生处的工作人员知道得多。但这非但不影响我们的关系，还形成了一种绝不涉足对方隐私的默契，而这种默契，正是我们友谊的基础。","chapter":"第三章 精神分裂早期","color":0}],"thoughts":[{"text":"默契是友谊的基础","quote":"想想看，我们这群人其实对彼此一无所知。就拿家庭背景来说吧，可能还不如学生处的工作人员知道得多。但这非但不影响我们的关系，还形成了一种绝不涉足对方隐私的默契，而这种默契，正是我们友谊的基础。","chapter":""}],"popularHighlights":[{"text":"哥哥当时……已经跟美也子发生过关系了。","count":162,"chapter":"返校5"},{"text":"“你喜欢上匠仔啦。”","count":126,"chapter":"第五章 晚期戒断综合征"},{"text":"我希望匠仔喜欢高千，所以不能容忍他被别的女子所吸引。","count":119,"chapter":"第六章 精神失常"},{"text":"每每想到这话，我心里就一阵苦涩。仿佛在偷听的自己也被他表白了似的。","count":102,"chapter":"返校3"},{"text":"“我练过柔道，现在已经是黑带选手","count":68,"chapter":"第五章 晚期戒断综合征"},{"text":"“这一辈子……我这一辈子都想与之携手共度的、这样的人。”","count":56,"chapter":"返校7"},{"text":"“我爱你，千帆。”","count":52,"chapter":"返校日"},{"text":"但跟这回的事也毫无关系，那是另外一个故事了。","count":48,"chapter":"第一章 情感的法则"},{"text":"男生找人同居，就是想减轻自己的负担、寻开心找乐子，平时既省去了自己做饭的麻烦，又能解决生理需求。","count":48,"chapter":"第三章 精神分裂早期"},{"text":"我叫羽迫由纪子，一般大家叫我小兔。","count":45,"chapter":"第一章 情感的法则"},{"text":"漂撇学长则被几把木质折叠椅围住，与众人隔绝开来，孤零零地在一旁半张着嘴酣睡","count":42,"chapter":"返校1"},{"text":"“我不说你也知道吧？当然是你和千晓的孩子了。” ……美也子和匠仔的孩子？！","count":39,"chapter":"返校日"},{"text":"这不过是男权社会强加给女性的一种“角色扮演”，并非女性自身的意愿，斗胆说一句，这是对男人性骚扰的纵容","count":36,"chapter":"第一章 情感的法则"},{"text":"“啊，但是……”学长迅速地将啤酒兑了水，神秘兮兮地说，“人活着就是会遇到各种各样的事情啊。”","count":36,"chapter":"第二章 隐秘疗法"},{"text":"一想到过去一对对同居情侣大摇大摆地在校园里走来走去，我突然有些嫌弃这所大学了。","count":36,"chapter":"第三章 精神分裂早期"},{"text":"是的，在他车上装窃听器很简单。因为驾驶座的车门锁到现在还是坏的。","count":36,"chapter":"第五章 晚期戒断综合征"},{"text":"拥有物品这一行为意味着自己肩负的责任和风险不断地向外部世界扩大。","count":34,"chapter":"第一章 情感的法则"},{"text":"每次这两个人说话的时候，我都想看清他们分别是什么表情，但无论是匠仔还是高千，都跟对方没什么特别的眼神交流，我虽然对此心知肚明，可还是忍不住去看。","count":34,"chapter":"第一章 情感的法则"},{"text":"第二天，不知道谁捡到我的钥匙送到管理员那里，他便交还给我了。”","count":34,"chapter":"第一章 情感的法则"},{"text":"这样的话，就是两个人彼此默契有加，唱了一出双簧戏——也许是我想多了，但这种念头如幽灵一般地缠住我不放，我开始胡思乱想起来。 ","count":34,"chapter":"第二章 隐秘疗法"}]}};
     const allBooks = books.slice(); // preserve original for repeated filtering
     let searchQuery = '';
     let searchDebounce = null;
@@ -1091,7 +1344,7 @@
         const item = document.createElement('div');
         item.className = 'cover-item';
         item.innerHTML = `
-          <div class="cover-link" onclick="window.open('${b.doubanLink}', '_blank')" title="${b.title}">
+          <div class="cover-link" onclick="openBookPanel(${allBooks.indexOf(b)})" title="${b.title}">
             <div class="cover-img-wrap">
               <img src="${b.cover}" alt="${b.title}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 150%22><rect fill=%22%23f6f5f4%22 width=%22100%22 height=%22150%22/><text x=%2250%22 y=%2280%22 text-anchor=%22middle%22 fill=%22%23a39e98%22 font-size=%2210%22>${b.title}</text></svg>'">
               <div class="cover-overlay">
@@ -1255,6 +1508,200 @@
         }
       }]
     });
+
+    // ===== Book Notes Panel =====
+    const panelOverlay = document.getElementById('panelOverlay');
+    const bookPanel = document.getElementById('bookPanel');
+    const panelClose = document.getElementById('panelClose');
+    const panelHeader = document.getElementById('panelHeader');
+    const panelBody = document.getElementById('panelBody');
+    const panelDragBar = document.getElementById('panelDragBar');
+
+    function openBookPanel(bookIndex) {
+      const b = allBooks[bookIndex];
+      if (!b) return;
+      const weread = b.wereadId ? wereadData[b.wereadId] : null;
+      renderPanelContent(b, weread);
+      // 补偿滚动条宽度，防止背景抖动
+      const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = scrollbarW + 'px';
+      panelOverlay.classList.add('active');
+      bookPanel.classList.add('active');
+    }
+
+    function closeBookPanel() {
+      panelOverlay.classList.remove('active');
+      bookPanel.classList.remove('active');
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+
+    panelOverlay.addEventListener('click', closeBookPanel);
+    panelClose.addEventListener('click', closeBookPanel);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && bookPanel.classList.contains('active')) {
+        closeBookPanel();
+      }
+    });
+
+    // Mobile drag-to-close
+    let dragStartY = 0;
+    let dragging = false;
+    panelDragBar.addEventListener('touchstart', (e) => {
+      dragStartY = e.touches[0].clientY;
+      dragging = true;
+    });
+    document.addEventListener('touchmove', (e) => {
+      if (!dragging) return;
+      const dy = e.touches[0].clientY - dragStartY;
+      if (dy > 0) {
+        bookPanel.style.transform = 'translateY(' + dy + 'px)';
+      }
+    });
+    document.addEventListener('touchend', (e) => {
+      if (!dragging) return;
+      dragging = false;
+      const dy = e.changedTouches[0].clientY - dragStartY;
+      bookPanel.style.transform = '';
+      if (dy > 100) {
+        closeBookPanel();
+      }
+    });
+
+    function renderPanelContent(book, weread) {
+      const coverHtml = book.doubanLink
+        ? '<a href="' + book.doubanLink + '" target="_blank" style="display:block;flex-shrink:0;"><img class="panel-cover" src="' + book.cover + '" alt="' + book.title + '" onerror="this.style.display=\'none\'"></a>'
+        : '<img class="panel-cover" src="' + book.cover + '" alt="' + book.title + '" onerror="this.style.display=\'none\'">';
+      panelHeader.innerHTML =
+        coverHtml +
+        '<div class="panel-book-info">' +
+          '<div class="panel-title">' + book.title + '</div>' +
+          '<div class="panel-author">' + book.author + '</div>' +
+          (weread && weread.rating
+            ? '<div class="panel-rating">微信读书 <span class="panel-rating-score">' +
+              (weread.rating / 10).toFixed(1) + '%</span> · ' +
+              formatRatingCount(weread.ratingCount) + '人评价</div>'
+            : '')
+        + '</div>';
+
+      let html = '';
+
+      // Review section — 使用 Airtable 的 Review 字段
+      if (book.review) {
+        html += '<div class="panel-section">';
+        html += '<div class="panel-section-title">📝 我的点评</div>';
+        const needsCollapse = book.review.length > 200;
+        html += '<div class="panel-review-text' + (needsCollapse ? ' collapsed' : '') + '" id="panelReviewText">' +
+          book.review.replace(/\n/g, '<br>') + '</div>';
+        if (needsCollapse) {
+          html += '<button class="panel-review-toggle" onclick="togglePanelReview(this)">展开全文</button>';
+        }
+        html += '</div>';
+      }
+
+      if (!weread) {
+        if (!book.review) {
+          html += '<div class="panel-empty">暂无微信读书笔记</div>';
+        }
+        panelBody.innerHTML = html;
+        return;
+      }
+
+      // Tabs
+      const hlCount = weread.highlights ? weread.highlights.length : 0;
+      const thCount = weread.thoughts ? weread.thoughts.length : 0;
+      const popCount = weread.popularHighlights ? weread.popularHighlights.length : 0;
+
+      html += '<div class="panel-tabs">';
+      html += '<button class="panel-tab active" data-tab="highlights">划线 (' + hlCount + ')</button>';
+      html += '<button class="panel-tab" data-tab="thoughts">想法 (' + thCount + ')</button>';
+      html += '<button class="panel-tab" data-tab="popular">热门划线 (' + popCount + ')</button>';
+      html += '</div>';
+
+      // Highlights tab
+      html += '<div class="panel-tab-content active" data-tab-content="highlights">';
+      if (hlCount > 0) {
+        weread.highlights.forEach(function(h) {
+          html += '<div class="panel-note-item">';
+          html += '<div class="panel-note-text">' + escapeHtml(h.text) + '</div>';
+          if (h.chapter) html += '<div class="panel-note-chapter">「' + escapeHtml(h.chapter) + '」</div>';
+          html += '</div>';
+        });
+      } else {
+        html += '<div class="panel-empty">暂无划线</div>';
+      }
+      html += '</div>';
+
+      // Thoughts tab
+      html += '<div class="panel-tab-content" data-tab-content="thoughts">';
+      if (thCount > 0) {
+        weread.thoughts.forEach(function(t) {
+          html += '<div class="panel-note-item">';
+          if (t.quote) {
+            html += '<div class="panel-quote">' + escapeHtml(t.quote) + '</div>';
+          }
+          html += '<div class="panel-thought-content">' + escapeHtml(t.text) + '</div>';
+          if (t.chapter) html += '<div class="panel-note-chapter">「' + escapeHtml(t.chapter) + '」</div>';
+          html += '</div>';
+        });
+      } else {
+        html += '<div class="panel-empty">暂无想法</div>';
+      }
+      html += '</div>';
+
+      // Popular highlights tab
+      html += '<div class="panel-tab-content" data-tab-content="popular">';
+      if (popCount > 0) {
+        weread.popularHighlights.forEach(function(p) {
+          html += '<div class="panel-note-item">';
+          html += '<div class="panel-note-text">' + escapeHtml(p.text) + '</div>';
+          html += '<div class="panel-note-count">' + p.count + '人划线</div>';
+          if (p.chapter) html += '<div class="panel-note-chapter">「' + escapeHtml(p.chapter) + '」</div>';
+          html += '</div>';
+        });
+      } else {
+        html += '<div class="panel-empty">暂无热门划线</div>';
+      }
+      html += '</div>';
+
+      panelBody.innerHTML = html;
+
+      // Tab click handlers
+      panelBody.querySelectorAll('.panel-tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          panelBody.querySelectorAll('.panel-tab').forEach(function(t) { t.classList.remove('active'); });
+          panelBody.querySelectorAll('.panel-tab-content').forEach(function(c) { c.classList.remove('active'); });
+          tab.classList.add('active');
+          panelBody.querySelector('[data-tab-content="' + tab.dataset.tab + '"]').classList.add('active');
+          // 切换 tab 后重置滚动位置，防止抖动
+          panelBody.scrollTop = 0;
+        });
+      });
+    }
+
+    function togglePanelReview(btn) {
+      var textEl = document.getElementById('panelReviewText');
+      if (textEl.classList.contains('collapsed')) {
+        textEl.classList.remove('collapsed');
+        btn.textContent = '收起';
+      } else {
+        textEl.classList.add('collapsed');
+        btn.textContent = '展开全文';
+      }
+    }
+
+    function formatRatingCount(count) {
+      if (count >= 10000) return (count / 10000).toFixed(1) + '万';
+      if (count >= 1000) return (count / 1000).toFixed(1) + 'k';
+      return String(count);
+    }
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
 
     // ===== 初始渲染 =====
     applySearchAndFilter();

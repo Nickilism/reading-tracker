@@ -26,6 +26,9 @@ const https = require('https');
 const fs = require('fs');
 process.env.DOTENV_CONFIG_QUIET = 'true';
 require('dotenv').config({ debug: false });
+const { fetchShelf, fetchBookInfo, fetchHighlights, fetchThoughts, fetchPopularHighlights, fetchNotebooks, searchBooks, sleep } = require('./weread-api');
+const { matchBooks } = require('./weread-match');
+const { loadCache, saveCache, isCached } = require('./weread-cache');
 
 // API Key 从环境变量读取
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
@@ -98,13 +101,187 @@ function addDerived(books) {
   return books;
 }
 
-function generate(year, books) {
+async function fetchWeReadData(books, noCache) {
+  if (!process.env.WEAREAD_API_KEY && !process.env.WEREAD_API_KEY) {
+    console.log('\n未设置 WEREAD_API_KEY，跳过微信读书数据获取');
+    return {};
+  }
+
+  console.log('\n正在获取微信读书数据...');
+  const cache = noCache ? {} : loadCache();
+  const cacheHits = [];
+  const toFetch = [];
+
+  // 1. 从书架匹配
+  let shelfBooks;
+  try {
+    shelfBooks = await fetchShelf();
+    console.log('  书架获取成功，共 ' + shelfBooks.length + ' 本');
+  } catch (e) {
+    console.error('  获取书架失败:', e.message);
+    return {};
+  }
+
+  let { matched, unmatched } = matchBooks(books, shelfBooks);
+  console.log('  书架匹配: ' + matched.length + ' 本');
+
+  // 2. 对未匹配的书，从笔记本概览中再次匹配（覆盖已从书架删除的书）
+  if (unmatched.length > 0) {
+    try {
+      const notebooks = await fetchNotebooks();
+      console.log('  笔记本概览获取成功，共 ' + notebooks.length + ' 本有笔记');
+      const notebookShelf = notebooks.map(nb => ({
+        bookId: nb.bookId,
+        title: (nb.book && nb.book.title) || '',
+        author: (nb.book && nb.book.author) || ''
+      }));
+      const retry = matchBooks(unmatched, notebookShelf);
+      matched = matched.concat(retry.matched);
+      unmatched = retry.unmatched;
+      console.log('  笔记本补充匹配: ' + retry.matched.length + ' 本');
+    } catch (e) {
+      console.error('  获取笔记本概览失败:', e.message);
+    }
+  }
+
+  if (unmatched.length > 0) {
+    console.log('  最终未匹配: ' + unmatched.length + ' 本 (' + unmatched.map(b => b.title).join(', ') + ')');
+  }
+
+  // 3. 分流：缓存 vs 需要获取
+  const wereadData = {};
+  for (const { airtable, shelf } of matched) {
+    airtable.wereadId = shelf.bookId;
+    if (!noCache && isCached(cache, shelf.bookId)) {
+      wereadData[shelf.bookId] = cache[shelf.bookId];
+      cacheHits.push(airtable.title);
+    } else {
+      toFetch.push({ airtable, shelf });
+    }
+  }
+
+  if (cacheHits.length > 0) {
+    console.log('  缓存命中: ' + cacheHits.length + ' 本');
+  }
+
+  if (toFetch.length > 0) {
+    console.log('  需要获取: ' + toFetch.length + ' 本');
+  }
+
+  // 4. 逐本获取数据
+  for (let i = 0; i < toFetch.length; i++) {
+    const { airtable, shelf } = toFetch[i];
+    const bookId = shelf.bookId;
+    console.log('  [' + (i + 1) + '/' + toFetch.length + '] ' + airtable.title);
+
+    try {
+      const [info, highlights, thoughts, popular] = await Promise.all([
+        fetchBookInfo(bookId),
+        fetchHighlights(bookId),
+        fetchThoughts(bookId),
+        fetchPopularHighlights(bookId)
+      ]);
+
+      const chapterMap = {};
+      (highlights.chapters || []).forEach(ch => {
+        chapterMap[ch.chapterUid] = ch.title;
+      });
+
+      const hlList = (highlights.updated || []).map(h => ({
+        text: h.markText || '',
+        chapter: chapterMap[h.chapterUid] || '',
+        color: h.colorStyle || 0
+      }));
+
+      const thList = (thoughts.reviews || [])
+        .filter(r => (r.review && r.review.type) !== 4)  // 排除全书点评（type=4）
+        .map(r => {
+          const rev = r.review || {};
+          return {
+            text: rev.content || '',
+            quote: rev.abstract || '',
+            chapter: rev.chapterName || ''
+          };
+        })
+        .filter(t => t.text);
+
+      const popChapters = {};
+      (popular.chapters || []).forEach(ch => {
+        popChapters[ch.chapterUid] = ch.title;
+      });
+      let popList = (popular.items || []).map(item => ({
+        text: item.markText || '',
+        count: item.totalCount || 0,
+        chapter: popChapters[item.chapterUid] || ''
+      }));
+
+      // 5. 导入书籍兜底：如果热门划线为空，搜索官方版本获取
+      if (popList.length === 0) {
+        try {
+          const searchResults = await searchBooks(airtable.title);
+          const official = searchResults.find(b => {
+            const sTitle = (b.title || '').toLowerCase();
+            const aTitle = airtable.title.toLowerCase();
+            return sTitle.includes(aTitle) || aTitle.includes(sTitle);
+          });
+          if (official && official.bookId !== bookId) {
+            const officialPopular = await fetchPopularHighlights(official.bookId);
+            const offChapters = {};
+            (officialPopular.chapters || []).forEach(ch => {
+              offChapters[ch.chapterUid] = ch.title;
+            });
+            popList = (officialPopular.items || []).map(item => ({
+              text: item.markText || '',
+              count: item.totalCount || 0,
+              chapter: offChapters[item.chapterUid] || ''
+            }));
+            if (popList.length > 0) {
+              console.log('    → 从官方版本获取热门划线: ' + popList.length + ' 条');
+            }
+          }
+          await sleep(200);
+        } catch (e) {
+          // 搜索失败不影响主流程
+        }
+      }
+
+      wereadData[bookId] = {
+        rating: info.newRating || 0,
+        ratingCount: info.newRatingCount || 0,
+        highlights: hlList,
+        thoughts: thList,
+        popularHighlights: popList
+      };
+
+      if (i < toFetch.length - 1) {
+        await sleep(300);
+      }
+    } catch (e) {
+      console.error('    获取失败: ' + e.message);
+    }
+  }
+
+  // 6. 合并写回缓存
+  const updatedCache = { ...cache, ...wereadData };
+  if (toFetch.length > 0 && !noCache) {
+    saveCache(updatedCache);
+    console.log('  缓存已更新');
+  }
+
+  const totalWithData = Object.keys(wereadData).length;
+  console.log('微信读书数据获取完成: ' + totalWithData + ' 本书有笔记数据');
+
+  return wereadData;
+}
+
+function generate(year, books, wereadData) {
   const countryMapStr = JSON.stringify(COUNTRY_PREFIX_MAP).replace(/"/g, "'");
   let output = TEMPLATE
     .replace(/\{\{YEAR\}\}/g, String(year))
     .replace(/\{\{GENERATED_DATE\}\}/g, new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Shanghai' }))
     .replace('{{COUNTRY_PREFIX_MAP}}', countryMapStr)
-    .replace('{{BOOKS_JSON}}', JSON.stringify(books));
+    .replace('{{BOOKS_JSON}}', JSON.stringify(books))
+    .replace('{{WEREAD_JSON}}', JSON.stringify(wereadData));
   return output;
 }
 
@@ -154,8 +331,11 @@ async function fetchAirtableRecords(year) {
 }
 
 async function main() {
-  // 支持命令行参数指定年份，默认当前年份
-  const year = process.argv[2] || String(new Date().getFullYear());
+  const noCache = process.argv.includes('--no-cache');
+
+  // 支持命令行参数指定年份，默认当前年份（跳过 --no-cache 标志）
+  const yearArg = process.argv.slice(2).find(a => /^\d{4}$/.test(a));
+  const year = yearArg || String(new Date().getFullYear());
 
   if (!/^\d{4}$/.test(year)) {
     console.log('年份格式错误，请输入4位数字年份');
@@ -173,7 +353,8 @@ async function main() {
     }
     console.log('获取到 ' + records.length + ' 条记录');
     const processed = addDerived(processBooks(records));
-    const html = generate(year, processed);
+    const wereadData = await fetchWeReadData(processed, noCache);
+    const html = generate(year, processed, wereadData);
     fs.writeFileSync(outputFilename, html);
     console.log('\n已生成 ' + outputFilename);
     const cc = {};
