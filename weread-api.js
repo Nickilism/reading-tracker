@@ -4,7 +4,7 @@
 
 const https = require('https');
 
-const WEREAD_API_KEY = process.env.WEREAD_API_KEY;
+const WEREAD_API_KEY = process.env.WEAREAD_API_KEY || process.env.WEREAD_API_KEY;
 const GATEWAY_HOST = 'i.weread.qq.com';
 const GATEWAY_PATH = '/api/agent/gateway';
 const SKILL_VERSION = '1.0.3';

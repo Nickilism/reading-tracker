@@ -102,7 +102,7 @@ function addDerived(books) {
 }
 
 async function fetchWeReadData(books, noCache) {
-  if (!process.env.WEREAD_API_KEY) {
+  if (!process.env.WEAREAD_API_KEY && !process.env.WEREAD_API_KEY) {
     console.log('\n未设置 WEREAD_API_KEY，跳过微信读书数据获取');
     return {};
   }
