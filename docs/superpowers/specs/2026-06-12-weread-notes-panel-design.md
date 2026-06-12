@@ -26,12 +26,34 @@
 Airtable 数据
   → processBooks()
   → [新增] fetchWeReadData(books)
-      1. 调用 /shelf/sync 获取完整书架 (bookId, title, author)
-      2. 模糊匹配 Airtable 书籍 ↔ 微信读书书架
-      3. 匹配成功的书：调用 /book/bookmarklist (划线) + /review/list/mine (想法和点评)
-      4. 调用 /book/info 获取评分和评分人数
+      1. 加载本地缓存 weread-cache.json
+      2. 调用 /shelf/sync 获取完整书架 (bookId, title, author)
+      3. 模糊匹配 Airtable 书籍 ↔ 微信读书书架
+      4. 对缓存中已有 → 直接使用，跳过 API 调用
+      5. 对缓存中没有（新增书籍）→ 调用 /book/bookmarklist + /review/list/mine + /book/info
+      6. 将新获取的数据合并回缓存，写入 weread-cache.json
   → 注入 {{BOOKS_JSON}} + {{WEREAD_JSON}} 到模板
 ```
+
+### 增量缓存机制
+
+**缓存文件**: `weread-cache.json`（项目根目录）
+
+**策略**: 历史书籍的划线和想法基本不会改动，因此缓存已有书籍的微信读书数据，每次构建只对新增书籍调用 API。
+
+**缓存 key**: 以 `wereadId` 为 key，缓存内容与 `{{WEREAD_JSON}}` 结构一致。
+
+**流程**:
+1. 构建开始时读取 `weread-cache.json`（不存在则视为空缓存）
+2. 模糊匹配后，对比当前书籍列表与缓存：
+   - 缓存命中 → 直接使用，零 API 调用
+   - 缓存未命中（新增书籍）→ 调用 API 获取数据
+3. 构建结束时将新数据合并写回缓存
+
+**缓存管理**:
+- `weread-cache.json` 加入 `.gitignore`（纯本地文件）
+- CI 环境可通过 GitHub Actions cache 持久化
+- 提供 `--no-cache` 标志强制全量刷新
 
 ### 模糊匹配策略
 
@@ -199,7 +221,8 @@ Authorization: Bearer ${WEREAD_API_KEY}
 
 ## 风险与注意事项
 
-1. **微信读书 API 速率限制**：批量获取笔记时需控制请求频率，建议每本书间隔 200-500ms
-2. **构建时间**：每本书需要 2-3 个 API 调用，50 本书约需 30-60 秒
-3. **API Key 安全**：`WEREAD_API_KEY` 仅在构建时使用（Node.js 环境），不暴露到前端
-4. **书架变动**：如果用户从微信读书书架移除了某本书，下次构建时匹配会失败，自动降级
+1. **微信读书 API 速率限制**（已通过缓存机制缓解）：增量缓存确保每次构建只对新增书籍调用 API，通常 1-2 本，不存在批量限流风险。首次全量构建时需控制频率，每本书间隔 200-500ms。
+2. **构建时间**（已通过缓存机制缓解）：首次全量构建约 30-60 秒（50 本书）；后续增量构建仅几秒。
+3. **API Key 安全**：`WEREAD_API_KEY` 仅在构建时使用（Node.js 环境），不暴露到前端。
+4. **书架变动**：如果用户从微信读书书架移除了某本书，下次构建时匹配会失败，自动降级。
+5. **缓存一致性**：用户修改划线/想法后，缓存不会自动更新。使用 `--no-cache` 标志可强制全量刷新。
