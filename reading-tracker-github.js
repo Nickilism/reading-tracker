@@ -153,8 +153,10 @@ async function fetchWeReadData(books, noCache) {
   const wereadData = {};
   for (const { airtable, shelf } of matched) {
     airtable.wereadId = shelf.bookId;
-    if (!noCache && isCached(cache, shelf.bookId)) {
-      wereadData[shelf.bookId] = cache[shelf.bookId];
+    const cached = cache[shelf.bookId];
+    // 缓存命中条件：有数据且有 chapters（旧缓存可能缺少 chapters）
+    if (!noCache && cached && cached.chapters) {
+      wereadData[shelf.bookId] = cached;
       cacheHits.push(airtable.title);
     } else {
       toFetch.push({ airtable, shelf });
