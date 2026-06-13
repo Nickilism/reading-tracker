@@ -14,7 +14,7 @@ const template = `<!DOCTYPE html>
 <html lang="zh" id="html">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafaf9">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f0f11">
@@ -667,12 +667,15 @@ const template = `<!DOCTYPE html>
       background: rgba(0, 0, 0, 0.3);
       z-index: 999;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0s 0.3s;
       pointer-events: none;
     }
     .panel-overlay.active {
       opacity: 1;
+      visibility: visible;
       pointer-events: auto;
+      transition: opacity 0.3s ease, visibility 0s 0s;
     }
     @media (prefers-color-scheme: dark) {
       .panel-overlay { background: rgba(0, 0, 0, 0.5); }
@@ -915,8 +918,9 @@ const template = `<!DOCTYPE html>
       display: none;
     }
 
-    /* Mobile: full-screen slide-in */
+    /* Mobile: full-screen push from right */
     @media (max-width: 599px) {
+      .panel-overlay { display: none; }
       .panel-back-btn {
         display: flex;
         align-items: center;
@@ -926,6 +930,7 @@ const template = `<!DOCTYPE html>
         left: 0;
         width: 44px;
         height: 44px;
+        padding-top: env(safe-area-inset-top, 0);
         background: color-mix(in srgb, var(--bg) 80%, transparent);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
@@ -934,7 +939,8 @@ const template = `<!DOCTYPE html>
         color: var(--text);
         cursor: pointer;
         z-index: 10;
-        padding: 0;
+        padding-left: 0;
+        padding-right: 0;
         flex-shrink: 0;
       }
       .book-panel {
@@ -942,10 +948,12 @@ const template = `<!DOCTYPE html>
         left: 0;
         width: 100%;
         height: 100%;
+        height: 100dvh;
         border-radius: 0;
-        transform: translateY(100%);
+        transform: translateX(100%);
+        box-shadow: none;
       }
-      .book-panel.active { transform: translateY(0); }
+      .book-panel.active { transform: translateX(0); }
       .panel-close { display: none; }
       .panel-header { padding: 12px 20px 14px; }
       .panel-body { padding: 0 20px 20px; }
@@ -1584,12 +1592,18 @@ const template = `<!DOCTYPE html>
       return window.innerWidth < 600;
     }
 
+    let panelOpen = false;
+    let closingFromPopstate = false;
+
     function openBookPanel(bookIndex) {
       const b = allBooks[bookIndex];
       if (!b) return;
       const weread = b.wereadId ? wereadData[b.wereadId] : null;
       renderPanelContent(b, weread);
-      if (!isMobile()) {
+      if (isMobile()) {
+        // 移动端：用 history 管理导航，支持左边缘滑动返回
+        history.pushState({ panel: true }, '');
+      } else {
         // 桌面端：锁定背景滚动
         const scrollY = window.scrollY;
         document.body.style.position = 'fixed';
@@ -1598,16 +1612,23 @@ const template = `<!DOCTYPE html>
         const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
         document.body.style.paddingRight = scrollbarW + 'px';
         document.body.dataset.scrollY = scrollY;
+        panelOverlay.classList.add('active');
       }
-      panelOverlay.classList.add('active');
       bookPanel.classList.add('active');
+      panelOpen = true;
       panelBody.scrollTop = 0;
     }
 
     function closeBookPanel() {
-      panelOverlay.classList.remove('active');
+      if (isMobile() && !closingFromPopstate) {
+        // 移动端：通过 history.back() 关闭，popstate 会处理动画
+        closingFromPopstate = true;
+        history.back();
+        return;
+      }
       bookPanel.classList.remove('active');
       if (!isMobile()) {
+        panelOverlay.classList.remove('active');
         // 桌面端：恢复背景滚动
         const scrollY = parseInt(document.body.dataset.scrollY || '0', 10);
         document.body.style.position = '';
@@ -1617,13 +1638,23 @@ const template = `<!DOCTYPE html>
         delete document.body.dataset.scrollY;
         window.scrollTo(0, scrollY);
       }
+      panelOpen = false;
+      closingFromPopstate = false;
     }
+
+    // 浏览器返回按钮 / 左边缘滑动返回
+    window.addEventListener('popstate', (e) => {
+      if (panelOpen) {
+        closingFromPopstate = true;
+        closeBookPanel();
+      }
+    });
 
     panelOverlay.addEventListener('click', closeBookPanel);
     panelClose.addEventListener('click', closeBookPanel);
     panelBackBtn.addEventListener('click', closeBookPanel);
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && bookPanel.classList.contains('active')) {
+      if (e.key === 'Escape' && panelOpen) {
         closeBookPanel();
       }
     });
