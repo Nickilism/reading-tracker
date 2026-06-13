@@ -922,26 +922,28 @@ const template = `<!DOCTYPE html>
     @media (max-width: 599px) {
       .panel-overlay { display: none; }
       .panel-back-btn {
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
+        gap: 2px;
         position: sticky;
         top: 0;
         left: 0;
-        width: 44px;
-        height: 44px;
-        padding-top: env(safe-area-inset-top, 0);
-        background: color-mix(in srgb, var(--bg) 80%, transparent);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: none;
-        font-size: 24px;
+        margin: 0;
+        margin-top: env(safe-area-inset-top, 0);
+        padding: 8px 14px 8px 10px;
+        background: color-mix(in srgb, var(--bg) 65%, transparent);
+        backdrop-filter: blur(20px) saturate(1.8);
+        -webkit-backdrop-filter: blur(20px) saturate(1.8);
+        border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+        border-radius: 100px;
+        font-size: 17px;
+        font-weight: 400;
         color: var(--text);
         cursor: pointer;
         z-index: 10;
-        padding-left: 0;
-        padding-right: 0;
         flex-shrink: 0;
+        line-height: 1;
+        letter-spacing: -0.2px;
       }
       .book-panel {
         top: 0;
@@ -1029,7 +1031,7 @@ const template = `<!DOCTYPE html>
     <!-- ===== Book Notes Panel ===== -->
     <div class="panel-overlay" id="panelOverlay"></div>
     <div class="book-panel" id="bookPanel">
-      <button class="panel-back-btn" id="panelBackBtn" aria-label="返回">‹</button>
+      <button class="panel-back-btn" id="panelBackBtn" aria-label="返回">‹ 返回</button>
       <button class="panel-close" id="panelClose" aria-label="关闭">✕</button>
       <div class="panel-header" id="panelHeader"></div>
       <div class="panel-body" id="panelBody"></div>
