@@ -289,53 +289,41 @@ async function fetchWeReadData(books, noCache) {
         };
       }).sort(byChapter);
 
-      // 5. 导入书籍兜底：如果热门划线为空，搜索官方版本获取
-      if (popList.length === 0) {
+      // 5. 导入书籍：从官方版本获取热门划线和评分
+      //    划线/想法从匹配版本获取（通常是 PDF 导入版，有用户笔记），
+      //    热门划线和推荐值从官方版本获取（导入版通常没有这些数据）
+      let finalRating = info.newRating || 0;
+      let finalRatingCount = info.newRatingCount || 0;
+      const officialBookId = shelf.inStoreBookId;
+      if (officialBookId && officialBookId !== String(bookId)) {
         try {
-          const searchResults = await searchBooks(airtable.title);
-          const official = searchResults.find(b => {
-            const sTitle = (b.title || '').toLowerCase();
-            const aTitle = airtable.title.toLowerCase();
-            return sTitle.includes(aTitle) || aTitle.includes(sTitle);
+          const [officialPopular, officialInfo] = await Promise.all([
+            fetchPopularHighlights(officialBookId),
+            fetchBookInfo(officialBookId)
+          ]);
+          // 热门划线
+          const offChapters = {};
+          (officialPopular.chapters || []).forEach(ch => {
+            offChapters[ch.chapterUid] = ch.title;
           });
-          if (official && official.bookId !== bookId) {
-            const officialPopular = await fetchPopularHighlights(official.bookId);
-            const offChapters = {};
-            (officialPopular.chapters || []).forEach(ch => {
-              offChapters[ch.chapterUid] = ch.title;
-            });
-            popList = (officialPopular.items || []).map(item => ({
-              text: item.markText || '',
-              count: item.totalCount || 0,
-              chapter: offChapters[item.chapterUid] || ''
-            }));
-            if (popList.length > 0) {
-              console.log('    → 从官方版本获取热门划线: ' + popList.length + ' 条');
-            }
+          const officialPopList = (officialPopular.items || []).map(item => ({
+            text: item.markText || '',
+            count: item.totalCount || 0,
+            chapter: offChapters[item.chapterUid] || ''
+          }));
+          if (officialPopList.length > 0) {
+            popList = officialPopList;
+            console.log('    → 从官方版本获取热门划线: ' + popList.length + ' 条');
+          }
+          // 评分
+          if (finalRating === 0 && officialInfo.newRating) {
+            finalRating = officialInfo.newRating;
+            finalRatingCount = officialInfo.newRatingCount || 0;
+            console.log('    → 从官方版本获取评分: ' + finalRating);
           }
           await sleep(200);
         } catch (e) {
-          // 搜索失败不影响主流程
-        }
-      }
-
-      // 6. 导入书籍兜底：如果评分为空，从官方版本获取
-      let finalRating = info.newRating || 0;
-      let finalRatingCount = info.newRatingCount || 0;
-      if (finalRating === 0) {
-        const officialBookId = shelf.inStoreBookId;
-        if (officialBookId && officialBookId !== String(bookId)) {
-          try {
-            const officialInfo = await fetchBookInfo(officialBookId);
-            if (officialInfo.newRating) {
-              finalRating = officialInfo.newRating;
-              finalRatingCount = officialInfo.newRatingCount || 0;
-              console.log('    → 从官方版本获取评分: ' + finalRating);
-            }
-            await sleep(200);
-          } catch (e) {
-            // 获取失败不影响主流程
-          }
+          // 获取失败不影响主流程
         }
       }
 
