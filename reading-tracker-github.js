@@ -134,8 +134,21 @@ async function fetchWeReadData(books, noCache) {
       const notebookShelf = notebooks.map(nb => ({
         bookId: nb.bookId,
         title: (nb.book && nb.book.title) || '',
-        author: (nb.book && nb.book.author) || ''
+        author: (nb.book && nb.book.author) || '',
+        inStoreBookId: (nb.book && nb.book.inStoreBookId) || ''
       }));
+      // 为所有 matched 的书补充 inStoreBookId（书架数据可能缺少此字段）
+      const storeIdMap = {};
+      notebooks.forEach(nb => {
+        if (nb.book && nb.book.inStoreBookId) {
+          storeIdMap[nb.bookId] = nb.book.inStoreBookId;
+        }
+      });
+      matched.forEach(m => {
+        if (!m.shelf.inStoreBookId && storeIdMap[m.shelf.bookId]) {
+          m.shelf.inStoreBookId = storeIdMap[m.shelf.bookId];
+        }
+      });
       const retry = matchBooks(unmatched, notebookShelf);
       matched = matched.concat(retry.matched);
       unmatched = retry.unmatched;
@@ -306,9 +319,29 @@ async function fetchWeReadData(books, noCache) {
         }
       }
 
+      // 6. 导入书籍兜底：如果评分为空，从官方版本获取
+      let finalRating = info.newRating || 0;
+      let finalRatingCount = info.newRatingCount || 0;
+      if (finalRating === 0) {
+        const officialBookId = shelf.inStoreBookId;
+        if (officialBookId && officialBookId !== String(bookId)) {
+          try {
+            const officialInfo = await fetchBookInfo(officialBookId);
+            if (officialInfo.newRating) {
+              finalRating = officialInfo.newRating;
+              finalRatingCount = officialInfo.newRatingCount || 0;
+              console.log('    → 从官方版本获取评分: ' + finalRating);
+            }
+            await sleep(200);
+          } catch (e) {
+            // 获取失败不影响主流程
+          }
+        }
+      }
+
       wereadData[bookId] = {
-        rating: info.newRating || 0,
-        ratingCount: info.newRatingCount || 0,
+        rating: finalRating,
+        ratingCount: finalRatingCount,
         chapters: highlights.chapters || [],
         highlights: hlList,
         thoughts: thList,
