@@ -952,11 +952,14 @@ const template = `<!DOCTYPE html>
         border-radius: 0;
         transform: translateX(100%);
         box-shadow: none;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
       }
       .book-panel.active { transform: translateX(0); }
       .panel-close { display: none; }
       .panel-header { padding: 12px 20px 14px; }
-      .panel-body { padding: 0 20px 20px; }
+      .panel-body { flex: 1; padding: 0 20px 20px; overflow: visible; }
       .panel-cover { width: 60px; height: 82px; }
     }
   </style>
