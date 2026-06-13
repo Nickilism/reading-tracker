@@ -167,21 +167,12 @@ async function fetchWeReadData(books, noCache) {
     const book = wereadData[bookId];
     if (book.highlights && book.highlights.length > 0 && book.highlights[0]._order === undefined) {
       cacheRebuilt = true;
-      // 用保存的 chapters 重建顺序，或从 chapter 名称首次出现顺序推断
       let chapterOrder = {};
       if (book.chapters && book.chapters.length > 0) {
+        // API chapters 数组是倒序的，反转得到正序
+        const len = book.chapters.length;
         book.chapters.forEach((ch, idx) => {
-          chapterOrder[ch.chapterUid] = idx;
-        });
-      } else {
-        // 从 highlights 中 chapter 名称的出现顺序推断
-        const seen = new Set();
-        let idx = 0;
-        book.highlights.forEach(h => {
-          if (h.chapter && !seen.has(h.chapter)) {
-            seen.add(h.chapter);
-            chapterOrder[h.chapter] = idx++;
-          }
+          chapterOrder[ch.chapterUid] = len - 1 - idx;
         });
       }
       const getOrder = (ch) => chapterOrder[ch] !== undefined ? chapterOrder[ch] : 9999;
@@ -222,9 +213,11 @@ async function fetchWeReadData(books, noCache) {
 
       const chapterMap = {};
       const chapterOrder = {};  // chapterUid → 章节顺序索引
-      (highlights.chapters || []).forEach((ch, idx) => {
+      const chapters = highlights.chapters || [];
+      // API chapters 数组是倒序的，反转得到正序
+      chapters.forEach((ch, idx) => {
         chapterMap[ch.chapterUid] = ch.title;
-        chapterOrder[ch.chapterUid] = idx;
+        chapterOrder[ch.chapterUid] = chapters.length - 1 - idx;
       });
 
       // 按章节顺序排序的比较函数
