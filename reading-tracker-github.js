@@ -169,15 +169,15 @@ async function fetchWeReadData(books, noCache) {
     const book = wereadData[bookId];
     if (book.highlights && book.highlights.length > 0 && book.highlights[0]._order === undefined) {
       cacheRebuilt = true;
-      let chapterOrder = {};
+      // 章节名 → 顺序 映射
+      const nameOrder = {};
       if (book.chapters && book.chapters.length > 0) {
-        // API chapters 数组是倒序的，反转得到正序
         const len = book.chapters.length;
         book.chapters.forEach((ch, idx) => {
-          chapterOrder[ch.chapterUid] = len - 1 - idx;
+          nameOrder[ch.title] = len - 1 - idx;
         });
       }
-      const getOrder = (ch) => chapterOrder[ch] !== undefined ? chapterOrder[ch] : 9999;
+      const getOrder = (chName) => nameOrder[chName] !== undefined ? nameOrder[chName] : 9999;
       book.highlights.forEach(h => { h._order = getOrder(h.chapter); });
       book.highlights.sort((a, b) => a._order - b._order);
       if (book.thoughts) {
@@ -216,10 +216,10 @@ async function fetchWeReadData(books, noCache) {
       const chapterMap = {};
       const chapterOrder = {};  // chapterUid → 章节顺序索引
       const chapters = highlights.chapters || [];
-      // API chapters 数组是倒序的，反转得到正序
-      chapters.forEach((ch, idx) => {
+      // 用 chapterIdx（章节在书中的真实位置）排序
+      chapters.forEach(ch => {
         chapterMap[ch.chapterUid] = ch.title;
-        chapterOrder[ch.chapterUid] = chapters.length - 1 - idx;
+        chapterOrder[ch.chapterUid] = ch.chapterIdx !== undefined ? ch.chapterIdx : 0;
       });
 
       // 按章节顺序排序的比较函数
@@ -236,7 +236,7 @@ async function fetchWeReadData(books, noCache) {
         _order: chapterOrder[h.chapterUid] !== undefined ? chapterOrder[h.chapterUid] : 9999
       })).sort(byChapter);
 
-      // 章节名 → 顺序索引映射（用于想法排序）
+      // 章节名 → 顺序索引映射（用于想法和热门划线排序）
       const chapterNameOrder = {};
       Object.entries(chapterMap).forEach(([uid, title]) => {
         chapterNameOrder[title] = chapterOrder[uid];
@@ -257,15 +257,24 @@ async function fetchWeReadData(books, noCache) {
         .sort(byChapter);
 
       const popChapters = {};
+      // 合并 highlights 和 popular 的章节，popular 覆盖更全
+      const allNameOrder = Object.assign({}, chapterNameOrder);
       (popular.chapters || []).forEach(ch => {
         popChapters[ch.chapterUid] = ch.title;
+        // 用 chapterIdx 补全 highlights 中没有的章节
+        if (allNameOrder[ch.title] === undefined && ch.chapterIdx !== undefined) {
+          allNameOrder[ch.title] = ch.chapterIdx;
+        }
       });
-      let popList = (popular.items || []).map(item => ({
-        text: item.markText || '',
-        count: item.totalCount || 0,
-        chapter: popChapters[item.chapterUid] || '',
-        _order: chapterOrder[item.chapterUid] !== undefined ? chapterOrder[item.chapterUid] : 9999
-      })).sort(byChapter);
+      let popList = (popular.items || []).map(item => {
+        const chName = popChapters[item.chapterUid] || '';
+        return {
+          text: item.markText || '',
+          count: item.totalCount || 0,
+          chapter: chName,
+          _order: allNameOrder[chName] !== undefined ? allNameOrder[chName] : 9999
+        };
+      }).sort(byChapter);
 
       // 5. 导入书籍兜底：如果热门划线为空，搜索官方版本获取
       if (popList.length === 0) {
