@@ -27,7 +27,7 @@ const fs = require('fs');
 process.env.DOTENV_CONFIG_QUIET = 'true';
 require('dotenv').config({ debug: false });
 const { fetchShelf, fetchBookInfo, fetchHighlights, fetchThoughts, fetchPopularHighlights, fetchNotebooks, searchBooks, sleep } = require('./weread-api');
-const { matchBooks } = require('./weread-match');
+const { matchBooks, normalize } = require('./weread-match');
 const { loadCache, saveCache, isCached } = require('./weread-cache');
 
 // API Key 从环境变量读取
@@ -137,16 +137,50 @@ async function fetchWeReadData(books, noCache) {
         author: (nb.book && nb.book.author) || '',
         inStoreBookId: (nb.book && nb.book.inStoreBookId) || ''
       }));
-      // 为所有 matched 的书补充 inStoreBookId（书架数据可能缺少此字段）
+      // 为 matched 的书补充 inStoreBookId 和 noteCount，
+      // 并在有更好版本时替换（书架匹配时没有 noteCount 信息）
       const storeIdMap = {};
+      const noteCountMap = {};
       notebooks.forEach(nb => {
-        if (nb.book && nb.book.inStoreBookId) {
-          storeIdMap[nb.bookId] = nb.book.inStoreBookId;
+        if (nb.book) {
+          if (nb.book.inStoreBookId) {
+            storeIdMap[nb.bookId] = nb.book.inStoreBookId;
+          }
+          noteCountMap[nb.bookId] = (nb.noteCount || 0) + (nb.bookmarkCount || 0);
+        }
+      });
+      // 建立 title → notebooks 条目索引，用于查找同名导入版
+      const titleNotebookMap = {};
+      notebooks.forEach(nb => {
+        if (nb.book && nb.noteCount > 0) {
+          const norm = normalize(nb.book.title || '');
+          if (norm && !titleNotebookMap[norm]) {
+            titleNotebookMap[norm] = nb;
+          }
         }
       });
       matched.forEach(m => {
+        // 补充 inStoreBookId
         if (!m.shelf.inStoreBookId && storeIdMap[m.shelf.bookId]) {
           m.shelf.inStoreBookId = storeIdMap[m.shelf.bookId];
+        }
+        // 补充 noteCount
+        if (m.shelf.noteCount === undefined) {
+          m.shelf.noteCount = noteCountMap[m.shelf.bookId] || 0;
+        }
+        // 如果当前版本没有笔记，检查是否有同名导入版有笔记
+        if (m.shelf.noteCount === 0) {
+          const norm = normalize(m.airtable.title);
+          const better = titleNotebookMap[norm];
+          if (better && better.bookId !== m.shelf.bookId) {
+            m.shelf = {
+              bookId: better.bookId,
+              title: (better.book && better.book.title) || '',
+              author: (better.book && better.book.author) || '',
+              inStoreBookId: (better.book && better.book.inStoreBookId) || '',
+              noteCount: (better.noteCount || 0) + (better.bookmarkCount || 0)
+            };
+          }
         }
       });
       const retry = matchBooks(unmatched, notebookShelf);
