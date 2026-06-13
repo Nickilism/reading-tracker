@@ -706,7 +706,7 @@ const template = `<!DOCTYPE html>
       color: var(--text-muted);
       cursor: pointer;
       padding: 4px 8px;
-      z-index: 1;
+      z-index: 2;
       transition: color 0.15s;
     }
     .panel-close:hover { color: var(--text); }
@@ -754,7 +754,6 @@ const template = `<!DOCTYPE html>
     .panel-body {
       flex: 1;
       overflow-y: auto;
-      overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
       scrollbar-gutter: stable;
       padding: 0 24px 24px;
@@ -919,11 +918,12 @@ const template = `<!DOCTYPE html>
         left: 0;
         width: 100%;
         height: 85dvh;
-        max-height: 85vh;
+        max-height: 95dvh;
         border-radius: 16px 16px 0 0;
         transform: translateY(100%);
       }
       .book-panel.active { transform: translateY(0); }
+      .panel-close { top: 12px; z-index: 3; }
       .panel-header { padding: 20px 20px 14px; }
       .panel-body { padding: 0 20px 20px; }
       .panel-cover { width: 60px; height: 82px; }
@@ -932,8 +932,15 @@ const template = `<!DOCTYPE html>
         height: 4px;
         background: var(--border-strong);
         border-radius: 2px;
-        margin: 8px auto 0;
+        margin: 0 auto;
+        padding: 14px 0;
+        background-clip: content-box;
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+        cursor: grab;
       }
+      .panel-drag-bar:active { cursor: grabbing; }
     }
   </style>
 </head>
@@ -1569,26 +1576,38 @@ const template = `<!DOCTYPE html>
       if (!b) return;
       const weread = b.wereadId ? wereadData[b.wereadId] : null;
       renderPanelContent(b, weread);
-      // 锁定背景滚动
+      // 锁定背景滚动（position:fixed 防止 iOS Safari 橡皮筋）
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = '-' + scrollY + 'px';
+      document.body.style.width = '100%';
       const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
-      document.documentElement.style.overflow = 'hidden';
-      document.documentElement.style.overscrollBehavior = 'contain';
-      document.body.style.overflow = 'hidden';
-      document.body.style.overscrollBehavior = 'contain';
       document.body.style.paddingRight = scrollbarW + 'px';
+      document.body.dataset.scrollY = scrollY;
       panelOverlay.classList.add('active');
       bookPanel.classList.add('active');
+      // 重置移动端拖拽状态
+      bookPanel.style.height = '';
+      bookPanel.style.transition = '';
+      bookPanel.style.transform = '';
       panelBody.scrollTop = 0;
     }
 
     function closeBookPanel() {
       panelOverlay.classList.remove('active');
       bookPanel.classList.remove('active');
-      document.documentElement.style.overflow = '';
-      document.documentElement.style.overscrollBehavior = '';
-      document.body.style.overflow = '';
-      document.body.style.overscrollBehavior = '';
+      // 恢复背景滚动
+      const scrollY = parseInt(document.body.dataset.scrollY || '0', 10);
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
       document.body.style.paddingRight = '';
+      delete document.body.dataset.scrollY;
+      window.scrollTo(0, scrollY);
+      // 清除拖拽内联样式，避免 Safari 渲染残留
+      bookPanel.style.height = '';
+      bookPanel.style.transition = '';
+      bookPanel.style.transform = '';
     }
 
     panelOverlay.addEventListener('click', closeBookPanel);
@@ -1599,30 +1618,76 @@ const template = `<!DOCTYPE html>
       }
     });
 
-    // Mobile drag-to-close (whole header area)
+    // Mobile: drag bar to expand/collapse bottom sheet
     let dragStartY = 0;
+    let dragStartH = 0;
     let dragging = false;
-    panelHeader.addEventListener('touchstart', (e) => {
+    let lastMoveTime = 0;
+    let lastMoveY = 0;
+    const PANEL_DEFAULT = 85;   // dvh
+    const PANEL_EXPANDED = 95;  // dvh
+    const PANEL_MIN = 40;       // dvh — 低于此值关闭
+    const CLOSE_V_THRESHOLD = 0.5; // px/ms 速度阈值
+
+    panelDragBar.addEventListener('touchstart', (e) => {
       dragStartY = e.touches[0].clientY;
+      dragStartH = bookPanel.getBoundingClientRect().height;
       dragging = true;
+      lastMoveTime = Date.now();
+      lastMoveY = dragStartY;
       bookPanel.style.transition = 'none';
     }, { passive: true });
+
     document.addEventListener('touchmove', (e) => {
       if (!dragging) return;
-      const dy = e.touches[0].clientY - dragStartY;
-      if (dy > 0) {
-        bookPanel.style.transform = 'translateY(' + dy + 'px)';
+      const now = Date.now();
+      const clientY = e.touches[0].clientY;
+      const dy = clientY - dragStartY;  // 正=向下, 负=向上
+      const newH = dragStartH + (-dy);  // 向上拖→增高
+      const vh = window.innerHeight;
+      const newDvh = (newH / vh) * 100;
+      // 橡皮筋：超出范围时增加阻力
+      let clampedDvh;
+      if (newDvh < PANEL_MIN) {
+        clampedDvh = PANEL_MIN - (PANEL_MIN - newDvh) * 0.3;
+      } else if (newDvh > PANEL_EXPANDED) {
+        clampedDvh = PANEL_EXPANDED + (newDvh - PANEL_EXPANDED) * 0.2;
+      } else {
+        clampedDvh = newDvh;
       }
+      bookPanel.style.height = clampedDvh + 'dvh';
+      lastMoveTime = now;
+      lastMoveY = clientY;
     }, { passive: true });
+
     document.addEventListener('touchend', (e) => {
       if (!dragging) return;
       dragging = false;
-      const dy = e.changedTouches[0].clientY - dragStartY;
+      const clientY = e.changedTouches[0].clientY;
+      const dy = clientY - dragStartY;
+      const endH = bookPanel.getBoundingClientRect().height;
+      const endDvh = (endH / window.innerHeight) * 100;
+      const velocity = (clientY - lastMoveY) / Math.max(Date.now() - lastMoveTime, 1); // px/ms
+
       bookPanel.style.transition = '';
-      bookPanel.style.transform = '';
-      if (dy > 80) {
+
+      // 快速向下甩 → 关闭
+      if (velocity > CLOSE_V_THRESHOLD && dy > 0) {
         closeBookPanel();
+        return;
       }
+      // 低于最小高度 → 关闭
+      if (endDvh < PANEL_MIN + 10) {
+        closeBookPanel();
+        return;
+      }
+      // 超过默认高度 → 展开
+      if (endDvh > (PANEL_DEFAULT + PANEL_EXPANDED) / 2) {
+        bookPanel.style.height = PANEL_EXPANDED + 'dvh';
+        return;
+      }
+      // 回到默认
+      bookPanel.style.height = '';
     });
 
     function renderPanelContent(book, weread) {
