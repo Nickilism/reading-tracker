@@ -161,6 +161,43 @@ async function fetchWeReadData(books, noCache) {
     }
   }
 
+  // 为缓存数据重建 _order（旧缓存可能没有 chapters 或 _order）
+  let cacheRebuilt = false;
+  for (const bookId of Object.keys(wereadData)) {
+    const book = wereadData[bookId];
+    if (book.highlights && book.highlights.length > 0 && book.highlights[0]._order === undefined) {
+      cacheRebuilt = true;
+      // 用保存的 chapters 重建顺序，或从 chapter 名称首次出现顺序推断
+      let chapterOrder = {};
+      if (book.chapters && book.chapters.length > 0) {
+        book.chapters.forEach((ch, idx) => {
+          chapterOrder[ch.chapterUid] = idx;
+        });
+      } else {
+        // 从 highlights 中 chapter 名称的出现顺序推断
+        const seen = new Set();
+        let idx = 0;
+        book.highlights.forEach(h => {
+          if (h.chapter && !seen.has(h.chapter)) {
+            seen.add(h.chapter);
+            chapterOrder[h.chapter] = idx++;
+          }
+        });
+      }
+      const getOrder = (ch) => chapterOrder[ch] !== undefined ? chapterOrder[ch] : 9999;
+      book.highlights.forEach(h => { h._order = getOrder(h.chapter); });
+      book.highlights.sort((a, b) => a._order - b._order);
+      if (book.thoughts) {
+        book.thoughts.forEach(t => { t._order = getOrder(t.chapter); });
+        book.thoughts.sort((a, b) => a._order - b._order);
+      }
+      if (book.popularHighlights) {
+        book.popularHighlights.forEach(p => { p._order = getOrder(p.chapter); });
+        book.popularHighlights.sort((a, b) => a._order - b._order);
+      }
+    }
+  }
+
   if (cacheHits.length > 0) {
     console.log('  缓存命中: ' + cacheHits.length + ' 本');
   }
@@ -268,6 +305,7 @@ async function fetchWeReadData(books, noCache) {
       wereadData[bookId] = {
         rating: info.newRating || 0,
         ratingCount: info.newRatingCount || 0,
+        chapters: highlights.chapters || [],
         highlights: hlList,
         thoughts: thList,
         popularHighlights: popList
@@ -283,7 +321,7 @@ async function fetchWeReadData(books, noCache) {
 
   // 6. 合并写回缓存
   const updatedCache = { ...cache, ...wereadData };
-  if (toFetch.length > 0 && !noCache) {
+  if ((toFetch.length > 0 || cacheRebuilt) && !noCache) {
     saveCache(updatedCache);
     console.log('  缓存已更新');
   }
