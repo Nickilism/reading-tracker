@@ -337,14 +337,22 @@ async function fetchWeReadData(books, noCache) {
           ]);
           // 热门划线
           const offChapters = {};
+          const offChapterOrder = {};
           (officialPopular.chapters || []).forEach(ch => {
             offChapters[ch.chapterUid] = ch.title;
+            if (ch.chapterIdx !== undefined) {
+              offChapterOrder[ch.title] = ch.chapterIdx;
+            }
           });
-          const officialPopList = (officialPopular.items || []).map(item => ({
-            text: item.markText || '',
-            count: item.totalCount || 0,
-            chapter: offChapters[item.chapterUid] || ''
-          }));
+          const officialPopList = (officialPopular.items || []).map(item => {
+            const chName = offChapters[item.chapterUid] || '';
+            return {
+              text: item.markText || '',
+              count: item.totalCount || 0,
+              chapter: chName,
+              _order: offChapterOrder[chName] !== undefined ? offChapterOrder[chName] : 9999
+            };
+          }).sort(byChapter);
           if (officialPopList.length > 0) {
             popList = officialPopList;
             console.log('    → 从官方版本获取热门划线: ' + popList.length + ' 条');
