@@ -109,7 +109,7 @@ async function fetchWeReadData(books, noCache) {
   }
 
   console.log('\n正在获取微信读书数据...');
-  const cache = noCache ? {} : loadCache();
+  const cache = loadCache();
   const cacheHits = [];
   const toFetch = [];
 
@@ -380,7 +380,7 @@ async function fetchWeReadData(books, noCache) {
 
   // 6. 合并写回缓存
   const updatedCache = { ...cache, ...wereadData };
-  if ((toFetch.length > 0 || cacheRebuilt) && !noCache) {
+  if (toFetch.length > 0 || cacheRebuilt) {
     saveCache(updatedCache);
     console.log('  缓存已更新');
   }
