@@ -30,7 +30,7 @@ node builder_offline.js <year>                 # Build offline HTML with inlined
 - **reading-tracker-year-github.js** — Interactive version for local use; uses readline to prompt for year input
 - **template.js** — HTML template with `{{PLACEHOLDER}}` syntax; the generator replaces `{{YEAR}}`, `{{GENERATED_DATE}}`, `{{BOOKS_JSON}}`, `{{COUNTRY_PREFIX_MAP}}`, and `{{WEREAD_JSON}}` via String.replace()
 - **weread-api.js** — WeRead API client; calls `/shelf/sync`, `/book/info`, `/book/bookmarklist`, `/review/list/mine`, `/book/bestbookmarks`, `/user/notebooks`, `/store/search` via gateway endpoint
-- **weread-match.js** — Fuzzy matching logic; maps Airtable books to WeRead books by normalized title+author comparison
+- **weread-match.js** — Fuzzy matching logic; maps Airtable books to WeRead books by normalized title+author comparison, prefers versions with notes when duplicates exist
 - **weread-cache.js** — Cache management; reads/writes `weread-cache.json` for incremental WeRead data persistence
 - **weread-cache.json** — Cached WeRead data (keyed by bookId); committed to git so CI can reuse it
 - **builder_offline.js** — Offline HTML builder; downloads Chart.js and cover images, converts to base64 data URIs, outputs fully self-contained `_offline.html` files
@@ -44,7 +44,7 @@ The generator extracts the template string via regex:
 const templateContent = fs.readFileSync('./template.js', 'utf8');
 const TEMPLATE = templateContent.match(/const template = `([\s\S]*)`;/)[1];
 ```
-Then replaces placeholders and writes the output HTML file. Placeholders: `{{YEAR}}`, `{{GENERATED_DATE}}`, `{{BOOKS_JSON}}`, `{{COUNTRY_PREFIX_MAP}}`, `{{WEREAD_JSON}}`.
+Then replaces placeholders and writes the output HTML file. Placeholders: `{{YEAR}}`, `{{GENERATED_DATE}}`, `{{BOOKS_JSON}}`, `{{COUNTRY_PREFIX_MAP}}`, `{{WEREAD_JSON}}`, `{{FAVICON_PREFIX}}` (empty for current year in root, `../` for historical years in `reading archive/`).
 
 ### Country Derivation
 Authors are prefixed with country markers in brackets/parentheses (e.g., `[日]`, `(美)`, `〔德〕`). The script strips these to display author names while mapping prefixes to countries. Unmarked Chinese names default to China; unmarked non-Chinese names default to USA.
@@ -66,10 +66,17 @@ The output HTML embeds all CSS/JS inline. It includes:
 **匹配流程**（`fetchWeReadData()` in `reading-tracker-github.js`）:
 1. 调 `/shelf/sync` 获取书架 → 模糊匹配 Airtable 书籍（`matchBooks()` in `weread-match.js`）
 2. 对未匹配的书，调 `/user/notebooks` 获取所有有笔记的书 → 再次匹配（覆盖已从书架删除的书）
-3. 对匹配成功的书，调 `/book/bookmarklist`（划线）、`/review/list/mine`（想法，过滤 type=4）、`/book/bestbookmarks`（热门划线）
-4. 导入书籍热门划线为空时，调 `/store/search` 搜索官方版本获取
+3. 从 notebooks 补充 `inStoreBookId`（书架 API 不返回此字段），并用 notebooks 的 noteCount 替换无笔记的匹配版本
+4. 对匹配成功的书，调 `/book/bookmarklist`（划线）、`/review/list/mine`（想法，过滤 type=4）、`/book/bestbookmarks`（热门划线）
+5. 导入书籍（有 `inStoreBookId`）：从官方版本获取热门划线和评分（`fetchBookInfo` + `fetchPopularHighlights`）
 
-**缓存机制**: `weread-cache.json` 以 bookId 为 key 缓存数据，每次构建只对新增书调 API。`--no-cache` 强制全量刷新。
+**匹配优先级**: 有笔记 > title exact > author 匹配 > 笔记数量。author 为空时仅靠 title 匹配（PDF 导入常见）。
+
+**数据来源**（导入书籍）:
+- 划线、想法 → 匹配版本（通常是导入版，有用户笔记）
+- 热门划线、推荐值 → 官方版本（通过 `inStoreBookId`）
+
+**缓存机制**: `weread-cache.json` 以 bookId 为 key 缓存数据，每次构建只对新增书调 API。`--no-cache` 强制全量刷新并保存结果。缓存始终写回（无论是否 `--no-cache`）。
 
 **API 网关**: `POST https://i.weread.qq.com/api/agent/gateway`，Bearer token 认证，参数平铺在 body 顶层。
 
