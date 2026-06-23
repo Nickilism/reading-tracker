@@ -401,12 +401,15 @@ async function fetchWeReadData(books, noCache) {
 
 function generate(year, books, wereadData) {
   const countryMapStr = JSON.stringify(COUNTRY_PREFIX_MAP).replace(/"/g, "'");
+  const isCurrentYear = String(year) === String(new Date().getFullYear());
+  const faviconPrefix = isCurrentYear ? '' : '../';
   let output = TEMPLATE
     .replace(/\{\{YEAR\}\}/g, String(year))
     .replace(/\{\{GENERATED_DATE\}\}/g, new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Shanghai' }))
     .replace('{{COUNTRY_PREFIX_MAP}}', countryMapStr)
     .replace('{{BOOKS_JSON}}', JSON.stringify(books))
-    .replace('{{WEREAD_JSON}}', JSON.stringify(wereadData));
+    .replace('{{WEREAD_JSON}}', JSON.stringify(wereadData))
+    .replace(/\{\{FAVICON_PREFIX\}\}/g, faviconPrefix);
   return output;
 }
 

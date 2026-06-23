@@ -44,7 +44,7 @@ The generator extracts the template string via regex:
 const templateContent = fs.readFileSync('./template.js', 'utf8');
 const TEMPLATE = templateContent.match(/const template = `([\s\S]*)`;/)[1];
 ```
-Then replaces placeholders and writes the output HTML file. Placeholders: `{{YEAR}}`, `{{GENERATED_DATE}}`, `{{BOOKS_JSON}}`, `{{COUNTRY_PREFIX_MAP}}`, `{{WEREAD_JSON}}`.
+Then replaces placeholders and writes the output HTML file. Placeholders: `{{YEAR}}`, `{{GENERATED_DATE}}`, `{{BOOKS_JSON}}`, `{{COUNTRY_PREFIX_MAP}}`, `{{WEREAD_JSON}}`, `{{FAVICON_PREFIX}}` (empty for current year in root, `../` for historical years in `reading archive/`).
 
 ### Country Derivation
 Authors are prefixed with country markers in brackets/parentheses (e.g., `[日]`, `(美)`, `〔德〕`). The script strips these to display author names while mapping prefixes to countries. Unmarked Chinese names default to China; unmarked non-Chinese names default to USA.
