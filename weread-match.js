@@ -6,7 +6,7 @@ function normalize(str) {
   return str
     .toLowerCase()
     .replace(/[\s　]/g, '')
-    .replace(/[^\w一-龥]/g, '')
+    .replace(/[^a-z0-9一-龥]/g, '')
     .trim();
 }
 
@@ -44,8 +44,9 @@ function matchBooks(airtableBooks, shelfBooks) {
 
       const shelfAuthor = shelf.author || '';
       const hasAuthorMatch = shelfAuthor && authorMatch(book.author, shelfAuthor);
-      // PDF 导入的书 author 常为空，此时仅靠 title 匹配
-      if (!shelfAuthor || hasAuthorMatch) {
+      // PDF 导入的书 author 常为空，此时仅靠 title 匹配；
+      // 书名已匹配（精确或包含）时，作者不匹配不排除候选，仅降低优先级（导入版元数据可能不准确）
+      if (!shelfAuthor || hasAuthorMatch || titleExact || titleFuzzy) {
         candidates.push({
           shelf,
           titleExact,

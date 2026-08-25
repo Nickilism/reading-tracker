@@ -149,16 +149,6 @@ async function fetchWeReadData(books, noCache) {
           noteCountMap[nb.bookId] = (nb.noteCount || 0) + (nb.bookmarkCount || 0);
         }
       });
-      // 建立 title → notebooks 条目索引，用于查找同名导入版
-      const titleNotebookMap = {};
-      notebooks.forEach(nb => {
-        if (nb.book && nb.noteCount > 0) {
-          const norm = normalize(nb.book.title || '');
-          if (norm && !titleNotebookMap[norm]) {
-            titleNotebookMap[norm] = nb;
-          }
-        }
-      });
       matched.forEach(m => {
         // 补充 inStoreBookId
         if (!m.shelf.inStoreBookId && storeIdMap[m.shelf.bookId]) {
@@ -169,16 +159,27 @@ async function fetchWeReadData(books, noCache) {
           m.shelf.noteCount = noteCountMap[m.shelf.bookId] || 0;
         }
         // 如果当前版本没有笔记，检查是否有同名导入版有笔记
+        // 导入版书名较长（如「书楼吊堂_炎昼_王华懋_日_京极夏彦」），用包含匹配
         if (m.shelf.noteCount === 0) {
           const norm = normalize(m.airtable.title);
-          const better = titleNotebookMap[norm];
+          let better = null;
+          let betterCount = 0;
+          for (const nb of notebooks) {
+            if (!nb.book || !(nb.noteCount > 0)) continue;
+            const nbNorm = normalize(nb.book.title || '');
+            const count = (nb.noteCount || 0) + (nb.bookmarkCount || 0);
+            if ((nbNorm === norm || (norm.length >= 3 && nbNorm.includes(norm))) && count > betterCount) {
+              better = nb;
+              betterCount = count;
+            }
+          }
           if (better && better.bookId !== m.shelf.bookId) {
             m.shelf = {
               bookId: better.bookId,
               title: (better.book && better.book.title) || '',
               author: (better.book && better.book.author) || '',
-              inStoreBookId: (better.book && better.book.inStoreBookId) || '',
-              noteCount: (better.noteCount || 0) + (better.bookmarkCount || 0)
+              inStoreBookId: (better.book && better.book.inStoreBookId) || m.shelf.inStoreBookId || '',
+              noteCount: betterCount
             };
           }
         }
