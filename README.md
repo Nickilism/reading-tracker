@@ -4,7 +4,7 @@
 
 演示地址：
 
-https://nickilism.github.io/reading-tracker/reading%20archive/index.html
+https://nickilism.github.io/reading-tracker/
 
 ## 功能
 
@@ -39,7 +39,7 @@ reading-tracker-github.js (Node.js)
     ↓ 微信读书 API (可选)
 weread-api.js → weread-match.js → weread-cache.json
     ↓ 模板注入
-template.js → {year}_reading_tracker.html
+template.js → reading archive/{year}_reading_tracker.html
     ↓ 部署
 GitHub Pages (gh-pages 分支)
 ```
@@ -61,7 +61,7 @@ GitHub Pages (gh-pages 分支)
 | `weread-match.js` | 模糊匹配逻辑（Airtable 书籍 ↔ 微信读书书籍） |
 | `weread-cache.js` | 缓存管理 |
 | `weread-cache.json` | 微信读书缓存数据 |
-| `reading archive/index.html` | 归档页面，聚合所有年度数据 |
+| `index.html` | 归档页面，聚合所有年度数据 |
 | `.github/workflows/deploy.yml` | GitHub Actions 工作流 |
 
 ## Airtable 表结构要求
@@ -218,7 +218,7 @@ git push -u origin main
 
 ### 第九步：验证
 
-访问 `https://你的用户名.github.io/reading-tracker/reading%20archive/index.html`
+访问 `https://你的用户名.github.io/reading-tracker/`
 
 ## 触发方式
 
@@ -247,6 +247,12 @@ node reading-tracker-github.js 2025 --no-cache
 # 交互式版本（本地使用）
 node reading-tracker-year-github.js
 ```
+
+### 本地预览（双击即可）
+
+浏览器出于安全限制不允许直接双击 `index.html` 预览（`file://` 协议禁止读取本地文件）。
+在项目文件夹里双击 **`preview.cmd`**，会自动启动本机预览并打开浏览器，效果与线上一致；
+关闭弹出的命令行窗口即停止预览。
 
 ## 自定义
 
@@ -290,7 +296,7 @@ A:
 
 ### Q: 归档页面如何工作？
 
-A: `reading archive/index.html` 在浏览器端动态加载所有年度 HTML 文件，提取嵌入的 JSON 数据，计算跨年统计（总本数、总页数、国家分布等）。
+A: `index.html` 在浏览器端动态加载所有年度 HTML 文件，提取嵌入的 JSON 数据，计算跨年统计（总本数、总页数、国家分布等）。
 
 ## 相关文档
 

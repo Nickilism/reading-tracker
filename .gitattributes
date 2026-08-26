@@ -7,3 +7,6 @@
 *.yml text eol=lf
 *.md text eol=lf
 *.json text eol=lf
+
+# Windows batch launchers: keep CRLF
+*.cmd text eol=crlf

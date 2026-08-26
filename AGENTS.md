@@ -4,7 +4,7 @@
 
 本项目将 Airtable `Books` 表中的阅读记录生成年度静态 HTML 页面，并发布到 GitHub Pages。可选地从微信读书获取划线、想法和热门划线，嵌入每本书的笔记面板。
 
-线上归档页：`https://nickilism.github.io/reading-tracker/reading%20archive/index.html`
+线上归档页：`https://nickilism.github.io/reading-tracker/`
 
 ## 工作原则
 
@@ -21,13 +21,14 @@
 | `reading-tracker-github.js` | CI/非交互主生成器 | 年度数据处理、Airtable 拉取、微信读书整合与模板注入 |
 | `reading-tracker-year-github.js` | 本地交互式生成器 | 保持与主生成器的数据处理逻辑一致；不在此处引入只属于 CI 的行为 |
 | `template.js` | 年度页面的唯一模板 | 修改 UI 或客户端行为时的主入口 |
-| `reading archive/index.html` | 跨年度归档入口与视觉规范源 | 与 `template.js` 共同维护，优先在此确定视觉规范 |
+| `index.html` | 跨年度归档入口与视觉规范源 | 与 `template.js` 共同维护，优先在此确定视觉规范 |
 | `weread-api.js` | 微信读书 API 客户端 | 仅负责请求封装与接口参数 |
 | `weread-match.js` | Airtable/微信读书书籍匹配 | 保持匹配规则可解释，避免无依据地降低匹配门槛 |
 | `weread-cache.js` / `weread-cache.json` | 微信读书增量缓存 | JSON 是构建产物兼缓存；只在需要刷新数据时更新 |
-| `YYYY_reading_tracker.html` | 当年生成页面 | 由主生成器生成；当前年份位于根目录 |
-| `reading archive/YYYY_reading_tracker.html` | 历年生成页面 | 由主生成器生成；不要与根目录当前年份重复存放 |
+| `reading archive/YYYY_reading_tracker.html` | 年度生成页面（含当年） | 由主生成器生成，统一存放在此目录 |
 | `builder_offline.js` | 离线页面构建器 | 读取已有年度页面、内联 Chart.js 和封面，不访问 Airtable |
+| `preview.js` | 本地预览服务器 | 双击 `preview.cmd` 时启动；仅监听本机 127.0.0.1，不访问 Airtable |
+| `preview.cmd` | 预览启动器 | 双击即可启动本地预览并自动打开浏览器 |
 | `.github/workflows/deploy.yml` | CI 与 GitHub Pages 发布 | 仅在用户明确要求时修改 |
 
 不要将临时文件、下载素材、调试输出放在项目根目录；使用系统临时目录或项目已有的忽略目录。新增长期文档放在 `docs/`，设计与实施记录放在 `docs/superpowers/specs/`、`docs/superpowers/plans/`。
@@ -39,7 +40,7 @@ Airtable Books
   -> reading-tracker-github.js
   -> template.js 注入数据
   -> YYYY_reading_tracker.html
-  -> GitHub Pages / reading archive/index.html
+  -> GitHub Pages / index.html
 
 微信读书 API
   -> weread-api.js -> weread-match.js -> weread-cache.json
@@ -59,7 +60,7 @@ Airtable Books
 
 - `template.js` 是被读取并提取的模板文本，不是可直接执行的普通 JavaScript 模块；不要对它直接运行 `node --check`。
 - 生成器会注入 `{{YEAR}}`、`{{GENERATED_DATE}}`、`{{BOOKS_JSON}}`、`{{COUNTRY_PREFIX_MAP}}`、`{{WEREAD_JSON}}`、`{{FAVICON_PREFIX}}`。增删占位符时，必须同步更新生成器。
-- 年度页和归档页共用一套设计语言。改视觉规范时，先改 `reading archive/index.html`，再同步 `template.js`，最后重新生成受影响年度页面。
+- 年度页和归档页共用一套设计语言。改视觉规范时，先改 `index.html`，再同步 `template.js`，最后重新生成受影响年度页面。
 - 颜色必须通过 CSS 变量定义和引用；不要在组件样式中新增硬编码 hex/rgba 色值。
 - 保持页面主体宽度和基础布局：`.page { max-width: 780px; margin: 0 auto; }`，`body { padding: 2.5rem 1rem 2rem; }`。
 - 页面应持续支持系统深色模式、移动端笔记底部面板和桌面端右侧笔记面板。

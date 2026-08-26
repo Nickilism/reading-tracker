@@ -7,9 +7,9 @@
  * 示例: node builder_offline.js 2025
  *
  * 功能:
- *   从 {年份}_reading_tracker.html 读取书籍数据
+ *   从 reading archive/{年份}_reading_tracker.html 读取书籍数据
  *   下载所有封面图片转为 base64
- *   生成 {年份}_reading_tracker_offline.html
+ *   生成 reading archive/{年份}_reading_tracker_offline.html
  */
 
 const fs = require('fs');
@@ -63,7 +63,7 @@ async function main() {
 
   // 2. 从 {year}_reading_tracker.html 读取书籍数据
   console.log('\n2. 读取 ' + YEAR + ' 年书籍数据 ...');
-  const htmlPath = YEAR + '_reading_tracker.html';
+  const htmlPath = 'reading archive/' + YEAR + '_reading_tracker.html';
   if (!fs.existsSync(htmlPath)) {
     console.error('   ✗ 文件不存在: ' + htmlPath);
     process.exit(1);
@@ -122,7 +122,7 @@ async function main() {
   output = output.replace(/const books = \[[\s\S]+?\];/, 'const books = ' + booksJsonStr + ';');
 
   // 7. 输出文件
-  const outputPath = YEAR + '_reading_tracker_offline.html';
+  const outputPath = 'reading archive/' + YEAR + '_reading_tracker_offline.html';
   fs.writeFileSync(outputPath, output);
   const sizeMB = (fs.statSync(outputPath).size / (1024 * 1024)).toFixed(2);
   console.log('   ✓ 已生成 ' + outputPath + ' (' + sizeMB + 'MB)');
