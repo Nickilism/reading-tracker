@@ -26,11 +26,11 @@ Preferred when: the user has made local changes to `template.js`, `reading-track
 
 Steps:
 1. Run `node reading-tracker-github.js` in the project root to generate the HTML
-2. Verify the output file was created (e.g., `2026_reading_tracker.html`)
+2. Verify the output file was created (e.g., `reading archive/2026_reading_tracker.html`)
 3. Force-push the generated HTML to `gh-pages`:
    ```bash
    git checkout gh-pages
-   git add -f *_reading_tracker.html
+   git add -f "reading archive"/*_reading_tracker.html
    git commit -m "deploy: update reading tracker"
    git push origin gh-pages
    git checkout main

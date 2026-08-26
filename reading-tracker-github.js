@@ -19,7 +19,7 @@
  *   用于 GitHub Actions 自动部署
  *
  * 输出文件:
- *   {年份}_reading_tracker.html (如 2026_reading_tracker.html)
+ *   reading archive/{年份}_reading_tracker.html (如 reading archive/2026_reading_tracker.html)
  */
 
 const https = require('https');
@@ -402,8 +402,8 @@ async function fetchWeReadData(books, noCache) {
 
 function generate(year, books, wereadData) {
   const countryMapStr = JSON.stringify(COUNTRY_PREFIX_MAP).replace(/"/g, "'");
-  const isCurrentYear = String(year) === String(new Date().getFullYear());
-  const faviconPrefix = isCurrentYear ? '' : '../';
+  // 所有年度页面统一存放在 reading archive/ 目录，favicon 固定使用 ../ 前缀
+  const faviconPrefix = '../';
   let output = TEMPLATE
     .replace(/\{\{YEAR\}\}/g, String(year))
     .replace(/\{\{GENERATED_DATE\}\}/g, new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Shanghai' }))
@@ -471,7 +471,7 @@ async function main() {
     process.exit(1);
   }
 
-  const outputFilename = year + '_reading_tracker.html';
+  const outputFilename = 'reading archive/' + year + '_reading_tracker.html';
 
   console.log('\n正在从 Airtable 获取 ' + year + ' 年的数据...');
   try {

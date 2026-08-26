@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A reading tracker that fetches book data from Airtable and generates self-contained HTML pages deployed to GitHub Pages. Includes an archive landing page that aggregates all years. The system uses country prefix parsing in author fields to derive book origins. Integrates with WeRead (微信读书) to embed reading highlights, thoughts, and popular highlights into a slide-in panel.
 
-**Live site**: https://nickilism.github.io/reading-tracker/reading%20archive/index.html
+**Live site**: https://nickilism.github.io/reading-tracker/
 
 ## Build & Run Commands
 
@@ -23,7 +23,7 @@ node builder_offline.js <year>                 # Build offline HTML with inlined
 ### Data Flow
 1. **Airtable** (Books table) → **reading-tracker-github.js** (Node.js, fetches via REST API) → **{year}_reading_tracker.html** (self-contained HTML)
 2. **WeRead API** (微信读书) → **reading-tracker-github.js** (fetches highlights, thoughts, popular highlights) → embedded in HTML as `{{WEREAD_JSON}}`
-3. **reading archive/index.html** — Archive landing page that fetches all yearly HTML files, extracts embedded book JSON, and computes aggregate stats across years
+3. **index.html** — Archive landing page that fetches all yearly HTML files, extracts embedded book JSON, and computes aggregate stats across years
 
 ### Key Files
 - **reading-tracker-github.js** — Non-interactive generator for CI; fetches records from Airtable, fetches WeRead data, processes books, generates HTML by injecting data into template
@@ -34,7 +34,8 @@ node builder_offline.js <year>                 # Build offline HTML with inlined
 - **weread-cache.js** — Cache management; reads/writes `weread-cache.json` for incremental WeRead data persistence
 - **weread-cache.json** — Cached WeRead data (keyed by bookId); committed to git so CI can reuse it
 - **builder_offline.js** — Offline HTML builder; downloads Chart.js and cover images, converts to base64 data URIs, outputs fully self-contained `_offline.html` files
-- **reading archive/index.html** — Archive landing page; dynamically generates year cards (2019–current year) with aggregated stats and top-5 book cover fans per card
+- **preview.js / preview.cmd** — Local preview launcher; double-click `preview.cmd` to start a localhost static server and open the browser (file:// blocks reading local year pages, so a server is required)
+- **index.html** — Archive landing page; dynamically generates year cards (2019–current year) with aggregated stats and top-5 book cover fans per card
 - **.github/workflows/deploy.yml** — GitHub Actions workflow; triggers on push to `main` (when source files change), `repository_dispatch` (`airtable-update`), manual (`workflow_dispatch`), or schedule (Mon/Thu 06:00 UTC)
 - **.gitattributes** — Enforces LF line endings for `.html`, `.js`, `.yml`, `.md`, `.json`
 
@@ -44,7 +45,7 @@ The generator extracts the template string via regex:
 const templateContent = fs.readFileSync('./template.js', 'utf8');
 const TEMPLATE = templateContent.match(/const template = `([\s\S]*)`;/)[1];
 ```
-Then replaces placeholders and writes the output HTML file. Placeholders: `{{YEAR}}`, `{{GENERATED_DATE}}`, `{{BOOKS_JSON}}`, `{{COUNTRY_PREFIX_MAP}}`, `{{WEREAD_JSON}}`, `{{FAVICON_PREFIX}}` (empty for current year in root, `../` for historical years in `reading archive/`).
+Then replaces placeholders and writes the output HTML file. Placeholders: `{{YEAR}}`, `{{GENERATED_DATE}}`, `{{BOOKS_JSON}}`, `{{COUNTRY_PREFIX_MAP}}`, `{{WEREAD_JSON}}`, `{{FAVICON_PREFIX}}` (`../`；所有年度页面统一存放在 `reading archive/` 目录).
 
 ### Country Derivation
 Authors are prefixed with country markers in brackets/parentheses (e.g., `[日]`, `(美)`, `〔德〕`). The script strips these to display author names while mapping prefixes to countries. Unmarked Chinese names default to China; unmarked non-Chinese names default to USA.
@@ -83,7 +84,7 @@ The output HTML embeds all CSS/JS inline. It includes:
 ## Automation
 
 GitHub Actions deploys to the `gh-pages` branch. To trigger a deploy:
-- **Push**: Push to `main` when `template.js`, `reading-tracker-github.js`, `reading-tracker-year-github.js`, or `reading archive/index.html` change
+- **Push**: Push to `main` when `template.js`, `reading-tracker-github.js`, `reading-tracker-year-github.js`, or `index.html` change
 - **Automatic**: Airtable record changes → Zapier sends `repository_dispatch` with type `airtable-update`
 - **Manual**: GitHub Actions UI → "Run workflow"
 - **Scheduled**: Every Monday and Thursday at 06:00 UTC (14:00 Beijing time)
@@ -114,7 +115,7 @@ Key routing rules:
 
 ## Design System
 
-所有页面（index 和各年度 tracker）必须共享同一套视觉规范。以 `reading archive/index.html` 为 Single Source of Truth。
+所有页面（index 和各年度 tracker）必须共享同一套视觉规范。以 `index.html` 为 Single Source of Truth。
 
 ### Design Tokens
 
@@ -161,6 +162,6 @@ h1 基础 1.75rem，>=768px 时 2.25rem，<=480px 时 1.55rem
 
 ### 修改流程
 
-1. 改 `reading archive/index.html`
+1. 改 `index.html`
 2. 同步改 `template.js`
 3. 重新生成年度 HTML：`node reading-tracker-github.js <year>`

@@ -15,10 +15,10 @@
  *   AIRTABLE_API_KEY - Airtable API Key（必须）
  *
  * 功能说明:
- *   交互式输入年份，从 Airtable 获取该年阅读数据，生成 {年份}_reading_tracker.html 文件
+ *   交互式输入年份，从 Airtable 获取该年阅读数据，生成 reading archive/{年份}_reading_tracker.html 文件
  *
  * 输出文件:
- *   {年份}_reading_tracker.html (如 2026_reading_tracker.html)
+ *   reading archive/{年份}_reading_tracker.html (如 reading archive/2026_reading_tracker.html)
  */
 
 const https = require('https');
@@ -104,7 +104,9 @@ function generate(year, books) {
     .replace(/\{\{YEAR\}\}/g, String(year))
     .replace(/\{\{GENERATED_DATE\}\}/g, new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Shanghai' }))
     .replace('{{COUNTRY_PREFIX_MAP}}', countryMapStr)
-    .replace('{{BOOKS_JSON}}', JSON.stringify(books));
+    .replace('{{BOOKS_JSON}}', JSON.stringify(books))
+    .replace('{{WEREAD_JSON}}', '{}')
+    .replace(/\{\{FAVICON_PREFIX\}\}/g, '../');
   return output;
 }
 
@@ -159,7 +161,7 @@ async function generateForYear(year) {
     return;
   }
 
-  const outputFilename = year + '_reading_tracker.html';
+  const outputFilename = 'reading archive/' + year + '_reading_tracker.html';
 
   console.log('\n正在从 Airtable 获取 ' + year + ' 年的数据...');
   try {
