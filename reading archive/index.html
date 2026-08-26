@@ -773,7 +773,10 @@
       if (count === 0) return { count: 0, avgRating: 0, totalPages: 0, topCovers: [], books: [] };
       const totalRating = books.reduce((s, b) => s + (b.rating || 0), 0);
       const totalPages = books.reduce((s, b) => s + (parseInt(b.pages) || 0), 0);
-      const sorted = [...books].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      const sorted = [...books].sort((a, b) =>
+  (b.rating || 0) - (a.rating || 0) ||
+  (b.finish || '').localeCompare(a.finish || '')
+); // 同分按读完时间：配合下方 reverse，展示时先读完的靠左
       const topCovers = sorted.slice(0, 5).reverse().map(b => b.cover || '').filter(Boolean);
       return { count, avgRating: totalRating / count, totalPages, topCovers, books };
     }
