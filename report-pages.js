@@ -42,13 +42,15 @@ function buildReportPage({ year, title, author, content, isHtml }) {
     '  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">\n' +
     '  <style>\n' +
     '    :root {\n' +
-    '      --bg: #fafaf9; --bg-alt: #f2f0ee; --text: #1c1917; --text-secondary: #44403c;\n' +
-    '      --text-muted: #78716c; --border: #e7e5e4; --accent: #b45309; --accent-hover: #92400e;\n' +
+    '      --bg: #fafaf9; --bg-alt: #f2f0ee; --bg-card: #ffffff; --text: #1a1817;\n' +
+    '      --text-secondary: #5c5855; --text-muted: #9c9793; --border: rgba(0, 0, 0, 0.06);\n' +
+    '      --accent: #0066cc; --accent-hover: #004d99;\n' +
     '    }\n' +
     '    @media (prefers-color-scheme: dark) {\n' +
     '      :root {\n' +
-    '        --bg: #11100f; --bg-alt: #1a1817; --text: #f5f5f4; --text-secondary: #d6d3d1;\n' +
-    '        --text-muted: #a8a29e; --border: #292524; --accent: #d6a24e; --accent-hover: #e2b86b;\n' +
+    '        --bg: #0f0f11; --bg-alt: #1a1a1d; --bg-card: #161618;\n' +
+    '        --text: rgba(255, 255, 255, 0.91); --text-secondary: #a19d98; --text-muted: #6e6a65;\n' +
+    '        --border: rgba(255, 255, 255, 0.06); --accent: #5ba4f0; --accent-hover: #7cb8f5;\n' +
     '      }\n' +
     '    }\n' +
     '    * { box-sizing: border-box; margin: 0; padding: 0; }\n' +
@@ -73,7 +75,7 @@ function buildReportPage({ year, title, author, content, isHtml }) {
     '    .report-content img { max-width: 100%; height: auto; border-radius: 6px; }\n' +
     '    .report-content table { border-collapse: collapse; margin: 1em 0; }\n' +
     '    .report-content th, .report-content td { border: 1px solid var(--border); padding: 0.5em 0.75em; }\n' +
-    '    .report-frame { width: 100%; border: 1px solid var(--border); border-radius: 8px; background: #fff; }\n' +
+    '    .report-frame { width: 100%; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); }\n' +
     '  </style>\n' +
     '</head>\n' +
     '<body>\n' +
