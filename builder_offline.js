@@ -8,7 +8,7 @@
  *
  * 功能:
  *   从 reading archive/{年份}_reading_tracker.html 读取书籍数据
- *   下载所有封面图片转为 base64
+ *   读取 covers/ 本地封面（远程兜底下载）并转为 base64
  *   生成 reading archive/{年份}_reading_tracker_offline.html
  */
 
