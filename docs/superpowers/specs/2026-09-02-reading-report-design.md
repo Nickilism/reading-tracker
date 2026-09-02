@@ -24,7 +24,7 @@ Airtable Report 附件
 - 报告统一存放在 `reading archive/reports/<年份>/`。
 - 文件名使用 Airtable 记录 ID：`<recId>.html`。无论源文件是 `.md` 还是 `.html`，产物一律是 `.html`。
 - 记录 ID 全局唯一、稳定、纯 ASCII，避免中文书名的 URL 编码问题和重名冲突。
-- 无记录 ID 的兜底（正常流程不会出现）：由「书名-作者」生成 ASCII slug。
+- 无记录 ID（正常流程不会出现）：跳过该报告的生成并在构建日志中告警，避免生成歧义文件名。
 
 ### 报告与书籍的对应关系
 
