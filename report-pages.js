@@ -26,10 +26,17 @@ function buildReportPage({ year, title, author, content, isHtml }) {
     ? '<iframe class="report-frame" id="reportFrame" srcdoc="' + escapeHtml(content) + '"></iframe>\n' +
       '<script>\n' +
       "  const reportFrame = document.getElementById('reportFrame');\n" +
-      "  reportFrame.addEventListener('load', () => {\n" +
+      '  function fitReportFrame() {\n' +
       '    const doc = reportFrame.contentDocument;\n' +
-      '    if (doc) reportFrame.style.height = (doc.documentElement.scrollHeight + 24) + "px";\n' +
-      '  });\n' +
+      '    if (doc && doc.body && doc.body.childElementCount > 0) {\n' +
+      '      reportFrame.style.height = (doc.documentElement.scrollHeight + 24) + "px";\n' +
+      '      return true;\n' +
+      '    }\n' +
+      '    return false;\n' +
+      '  }\n' +
+      "  if (!fitReportFrame()) {\n" +
+      "    reportFrame.addEventListener('load', fitReportFrame);\n" +
+      '  }\n' +
       '</script>'
     : '<div class="report-content">' + marked.parse(content) + '</div>';
 

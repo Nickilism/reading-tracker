@@ -238,10 +238,17 @@
 "></iframe>
 <script>
   const reportFrame = document.getElementById('reportFrame');
-  reportFrame.addEventListener('load', () => {
+  function fitReportFrame() {
     const doc = reportFrame.contentDocument;
-    if (doc) reportFrame.style.height = (doc.documentElement.scrollHeight + 24) + "px";
-  });
+    if (doc && doc.body && doc.body.childElementCount > 0) {
+      reportFrame.style.height = (doc.documentElement.scrollHeight + 24) + "px";
+      return true;
+    }
+    return false;
+  }
+  if (!fitReportFrame()) {
+    reportFrame.addEventListener('load', fitReportFrame);
+  }
 </script>
   </div>
 </body>
