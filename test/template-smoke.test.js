@@ -40,3 +40,13 @@ test('模板包含报告按钮渲染逻辑', () => {
   assert.match(html, /class="report-btn"/);
   assert.match(html, /\$\{b\.report\}/);
 });
+
+test('模板包含「阅读报告」筛选按钮及过滤逻辑', () => {
+  const html = renderTemplate([
+    { title: '有报告的书', finish: '2026-05-01', rating: 8, report: 'reports/2026/recAAA.html' },
+    { title: '无报告的书', finish: '2026-06-01', rating: 8, report: '' }
+  ]);
+  assert.match(html, /report:\s*b\s*=>\s*Boolean\(b\.report\)/);
+  assert.match(html, /key:\s*'report'/);
+  assert.match(html, /阅读报告/);
+});
