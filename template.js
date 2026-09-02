@@ -565,6 +565,35 @@ const template = `<!DOCTYPE html>
       line-height: 1.4;
     }
 
+    .book-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 3px;
+    }
+
+    .book-title-row .book-title { margin-bottom: 0; }
+
+    .report-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .report-btn:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
     .book-author {
       font-size: 11px;
       color: var(--text-muted);
@@ -743,6 +772,10 @@ const template = `<!DOCTYPE html>
     .panel-author {
       font-size: 14px;
       color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .panel-report-btn {
+      align-self: flex-start;
       margin-bottom: 8px;
     }
     .panel-rating {
@@ -1449,10 +1482,16 @@ const template = `<!DOCTYPE html>
             ${needsTruncation ? `<button class="review-more-btn" onclick="toggleReview(${idx}, this)">展开</button>` : ''}
           `;
         }
+        const reportBtn = b.report
+          ? `<a class="report-btn" href="${b.report}" target="_blank" rel="noopener">阅读报告</a>`
+          : '';
         return `<div class="book-row">
           <div class="book-info">
             <div class="book-dates">${b.start}<br>${b.finish}</div>
-            <div class="book-title"><a href="${b.doubanLink}" target="_blank" style="color:inherit;text-decoration:none;">${b.title}</a></div>
+            <div class="book-title-row">
+              <div class="book-title"><a href="${b.doubanLink}" target="_blank" style="color:inherit;text-decoration:none;">${b.title}</a></div>
+              ${reportBtn}
+            </div>
             <div class="book-author">${b.author}</div>
             <div class="book-meta">
               <span class="month-tag" style="background:${m.bg};color:${m.color}">${m.label}</span>
@@ -1672,6 +1711,9 @@ const template = `<!DOCTYPE html>
         '<div class="panel-book-info">' +
           '<div class="panel-title">' + book.title + '</div>' +
           '<div class="panel-author">' + book.author + '</div>' +
+          (book.report
+            ? '<a class="report-btn panel-report-btn" href="' + book.report + '" target="_blank" rel="noopener">阅读报告</a>'
+            : '') +
           (weread && weread.rating
             ? '<div class="panel-rating">微信读书推荐值 <span class="panel-rating-score">' +
               (weread.rating / 10).toFixed(1) + '%</span> · ' +

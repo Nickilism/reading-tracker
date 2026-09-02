@@ -26,6 +26,7 @@ const https = require('https');
 const fs = require('fs');
 process.env.DOTENV_CONFIG_QUIET = 'true';
 require('dotenv').config({ debug: false });
+const { buildReportPage } = require('./report-pages');
 const { fetchShelf, fetchBookInfo, fetchHighlights, fetchThoughts, fetchPopularHighlights, fetchNotebooks, searchBooks, sleep } = require('./weread-api');
 const { matchBooks, normalize } = require('./weread-match');
 const { loadCache, saveCache, isCached } = require('./weread-cache');
@@ -79,6 +80,13 @@ function processBooks(records) {
     const start = b['Start Time'] ? new Date(b['Start Time']).toISOString().split('T')[0] : '';
     const finish = b['Finish Time'] ? new Date(b['Finish Time']).toISOString().split('T')[0] : '';
     const rating = b['My Rating'];
+    const reportAttachments =
+      (Array.isArray(b.Report) && b.Report.length > 0)
+        ? b.Report
+        : (Array.isArray(b.report) && b.report.length > 0 ? b.report : null);
+    if (reportAttachments && reportAttachments.length > 1) {
+      console.warn('  注意: ' + (b.Title || '(未命名)') + ' 的 Report 字段有 ' + reportAttachments.length + ' 个附件，仅使用第一个');
+    }
     return {
       title: b.Title || '',
       author: b.Author || '',
@@ -89,7 +97,11 @@ function processBooks(records) {
       doubanLink: b['Douban Link'] || '',
       cover: b['Douban Cover Link'] || '',
       review: b.Review || '',
-      summary: b.Summary || ''
+      summary: b.Summary || '',
+      id: r.id || '',
+      report: reportAttachments
+        ? { url: reportAttachments[0].url || '', filename: reportAttachments[0].filename || '' }
+        : '',
     };
   });
 }
@@ -100,6 +112,73 @@ function addDerived(books) {
     b.country = deriveCountry(b.author);
   });
   return books;
+}
+
+function downloadUrl(url) {
+  return new Promise((resolve, reject) => {
+    let redirects = 0;
+    const get = (target) => {
+      const req = https.get(target, (res) => {
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          res.resume();
+          if (++redirects > 5) {
+            reject(new Error('重定向次数过多'));
+            return;
+          }
+          get(new URL(res.headers.location, target).toString());
+          return;
+        }
+        if (res.statusCode !== 200) {
+          res.resume();
+          reject(new Error('HTTP ' + res.statusCode));
+          return;
+        }
+        const chunks = [];
+        res.on('data', (c) => chunks.push(c));
+        res.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+      });
+      req.on('error', reject);
+    };
+    get(url);
+  });
+}
+
+async function fetchReports(books, year) {
+  const reportDir = 'reading archive/reports/' + year;
+  fs.mkdirSync(reportDir, { recursive: true });
+  let reportCount = 0;
+  for (const book of books) {
+    if (!book.report || typeof book.report !== 'object') continue;
+    if (!book.id) {
+      console.warn('  跳过报告: ' + (book.title || '(未命名)') + ' 缺少记录 ID');
+      book.report = '';
+      continue;
+    }
+    const filename = book.report.filename || '';
+    const isHtml = /\.html?$/i.test(filename);
+    if (!isHtml && !/\.md$/i.test(filename)) {
+      console.warn('  提示: ' + (book.title || '(未命名)') + ' 的报告格式 ' + (filename || '(未知)') + ' 按 Markdown 处理');
+    }
+    const outPath = reportDir + '/' + book.id + '.html';
+    try {
+      const content = await downloadUrl(book.report.url);
+      const html = buildReportPage({
+        year: year,
+        title: book.title,
+        author: book.author,
+        content: content,
+        isHtml: isHtml
+      });
+      fs.writeFileSync(outPath, html, 'utf8');
+      book.report = 'reports/' + year + '/' + book.id + '.html';
+      reportCount++;
+      console.log('  已生成报告: ' + book.title + ' -> ' + outPath);
+    } catch (err) {
+      console.warn('  报告处理失败，已跳过: ' + (book.title || '(未命名)') + ' - ' + err.message);
+      book.report = '';
+    }
+  }
+  if (reportCount > 0) console.log('阅读报告生成完成: ' + reportCount + ' 本');
 }
 
 async function fetchWeReadData(books, noCache) {
@@ -482,6 +561,7 @@ async function main() {
     }
     console.log('获取到 ' + records.length + ' 条记录');
     const processed = addDerived(processBooks(records));
+    await fetchReports(processed, year);
     const wereadData = await fetchWeReadData(processed, noCache);
     const html = generate(year, processed, wereadData);
     fs.writeFileSync(outputFilename, html);
