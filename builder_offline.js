@@ -44,6 +44,21 @@ function downloadAndEncode(url) {
   });
 }
 
+
+function encodeLocalCover(coverValue, rootDir = process.cwd()) {
+  const rel = coverValue.replace(/^\.\.\//, '');
+  if (!rel.startsWith('covers/')) {
+    throw new Error('未知本地封面路径: ' + coverValue);
+  }
+  const filePath = path.resolve(rootDir, ...rel.split('/'));
+  const coversRoot = path.resolve(rootDir, 'covers');
+  if (!filePath.startsWith(coversRoot + path.sep)) {
+    throw new Error('未知本地封面路径: ' + coverValue);
+  }
+  const ext = path.extname(filePath).toLowerCase().slice(1);
+  const mimeType = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : ext === 'gif' ? 'image/gif' : 'image/jpeg';
+  return 'data:' + mimeType + ';base64,' + fs.readFileSync(filePath).toString('base64');
+}
 // 主流程
 async function main() {
   console.log('\n📚 离线阅读记录生成器 (' + YEAR + '年)\n');
@@ -90,11 +105,11 @@ async function main() {
   let done = 0;
   for (const url of coverUrls) {
     try {
-      coverMap[url] = await downloadAndEncode(url);
+      coverMap[url] = url.startsWith('../') ? encodeLocalCover(url) : await downloadAndEncode(url);
       done++;
       process.stdout.write('   进度: ' + done + '/' + coverUrls.length + '\r');
     } catch (e) {
-      console.error('\n   ✗ 下载失败: ' + url);
+      console.error('\n   ✗ 封面处理失败: ' + url);
       coverMap[url] = null;
       done++;
     }
@@ -133,7 +148,11 @@ async function main() {
   console.log('   断开网络后刷新页面确认离线正常');
 }
 
-main().catch(e => {
-  console.error('\n✗ 错误:', e.message);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch(e => {
+    console.error('\n✗ 错误:', e.message);
+    process.exit(1);
+  });
+}
+
+module.exports = { downloadAndEncode, encodeLocalCover };

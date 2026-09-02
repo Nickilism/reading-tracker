@@ -27,6 +27,9 @@
 | `weread-cache.js` / `weread-cache.json` | 微信读书增量缓存 | JSON 是构建产物兼缓存；只在需要刷新数据时更新 |
 | `reading archive/YYYY_reading_tracker.html` | 年度生成页面（含当年） | 由主生成器生成，统一存放在此目录 |
 | `report-pages.js` | 阅读报告页构建（纯函数） | 两个生成器共享；修改后需重新生成受影响年度页面与报告页 |
+| `cover-mirror.js` | 封面本地化镜像 | 由 URL 哈希计算本地文件名、识别本仓库 raw 链接、下载缺失封面；生成器与 sync-covers 共用 |
+| `sync-covers.js` | 年度页封面同步/迁移 | 原地把 `reading archive/*.html` 中外链封面替换为 `covers/` 本地路径；不访问 Airtable |
+| `covers/` | 封面镜像资源目录 | 资源兼构建产物；文件名 = URL 哈希；CI 只自动回写此目录 |
 | `reading archive/reports/YYYY/<recId>.html` | 年度阅读报告页（构建产物） | 由生成器根据 Airtable `Report` 附件生成；文件名 = Airtable 记录 ID，不要手改 |
 | `builder_offline.js` | 离线页面构建器 | 读取已有年度页面、内联 Chart.js 和封面，不访问 Airtable |
 | `preview.js` | 本地预览服务器 | 双击 `preview.cmd` 时启动；仅监听本机 127.0.0.1，不访问 Airtable |
@@ -59,6 +62,7 @@ Airtable Report 附件 (.md/.html)
 - 作者字段中的国家前缀用于推导书籍来源；修改 `COUNTRY_PREFIX_MAP` 时，要保持显示名称、统计和现有前缀兼容。
 - 阅读报告：构建时下载 `Report` 附件，`.md` 用 `marked` 转 HTML，`.html` 原样放入 `<iframe srcdoc>`；产物为 `reading archive/reports/<年份>/<recId>.html`。书的 `report` 字段保存相对路径，书单书名右侧与详情面板作者下方据此渲染按钮；无报告/下载失败时为 `''`，不渲染、不中断构建。
 - 报告页位于 `reading archive/reports/<年份>/`（两级目录），返回年度页链接必须写成 `../../<年份>_reading_tracker.html`；少写一级 `../` 会 404。
+- 封面镜像：`Douban Cover Link`（外链或本仓库 raw 链接）→ `cover-mirror.js` → `covers/<sha1(url)>.<ext>` → BOOKS_JSON 中保存 `../covers/...`。存量封面一经入库不再依赖外站；镜像失败保留原链接并告警，不中断构建。
 - 微信读书匹配优先级是：有笔记 > 书名精确匹配 > 作者匹配 > 笔记数量。作者为空时仅按书名匹配。
 - 书名已匹配（精确或包含）时，作者不匹配不会排除候选，仅降低匹配优先级（导入版作者元数据可能不准确，如《中文打字机》导入版作者误为「张朋亮」）。
 - 同一本书存在多个版本时，优先选有笔记的版本；若匹配到的版本无笔记，会按「书名包含」关系在笔记概览中查找同名导入版（导入版文件名较长，如「书楼吊堂_炎昼_王华懋_日_京极夏彦」，normalize 时下划线视为分隔符一并清理）。
