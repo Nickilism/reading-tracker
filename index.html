@@ -781,6 +781,12 @@
       const json = extractBooksJson(html);
       if (!json) throw new Error('no books data');
       const books = JSON.parse(json);
+      const yearUrl = new URL(path, location.href);
+      for (const b of books) {
+        if (b.cover && !/^https?:\/\//i.test(b.cover) && !b.cover.startsWith('data:')) {
+          b.cover = new URL(b.cover, yearUrl).href;
+        }
+      }
       const count = books.length;
       if (count === 0) return { count: 0, avgRating: 0, totalPages: 0, topCovers: [], books: [] };
       const totalRating = books.reduce((s, b) => s + (b.rating || 0), 0);
