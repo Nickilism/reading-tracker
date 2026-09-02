@@ -26,6 +26,8 @@
 | `weread-match.js` | Airtable/微信读书书籍匹配 | 保持匹配规则可解释，避免无依据地降低匹配门槛 |
 | `weread-cache.js` / `weread-cache.json` | 微信读书增量缓存 | JSON 是构建产物兼缓存；只在需要刷新数据时更新 |
 | `reading archive/YYYY_reading_tracker.html` | 年度生成页面（含当年） | 由主生成器生成，统一存放在此目录 |
+| `report-pages.js` | 阅读报告页构建（纯函数） | 两个生成器共享；修改后需重新生成受影响年度页面与报告页 |
+| `reading archive/reports/YYYY/<recId>.html` | 年度阅读报告页（构建产物） | 由生成器根据 Airtable `Report` 附件生成；文件名 = Airtable 记录 ID，不要手改 |
 | `builder_offline.js` | 离线页面构建器 | 读取已有年度页面、内联 Chart.js 和封面，不访问 Airtable |
 | `preview.js` | 本地预览服务器 | 双击 `preview.cmd` 时启动；仅监听本机 127.0.0.1，不访问 Airtable |
 | `preview.cmd` | 预览启动器 | 双击即可启动本地预览并自动打开浏览器 |
@@ -45,11 +47,18 @@ Airtable Books
 微信读书 API
   -> weread-api.js -> weread-match.js -> weread-cache.json
   -> 年度页面的 WEREAD_JSON
+
+Airtable Report 附件 (.md/.html)
+  -> reading-tracker-github.js -> report-pages.js
+  -> reading archive/reports/YYYY/<recId>.html
+  -> 年度页 BOOKS_JSON 中的 report 相对路径
 ```
 
 - “已读”以 Airtable `Finish Time` 非空为准；年度查询按 `YEAR({Finish Time})` 筛选。
-- Airtable 书籍字段包括：`Title`、`Author`、`Start Time`、`Finish Time`、`My Rating`、`Pages`、`Douban Link`、`Douban Cover Link`、`Review`、`Summary`。
+- Airtable 书籍字段包括：`Title`、`Author`、`Start Time`、`Finish Time`、`My Rating`、`Pages`、`Douban Link`、`Douban Cover Link`、`Review`、`Summary`、`Report`（附件 `.md`/`.html`，可空）。
 - 作者字段中的国家前缀用于推导书籍来源；修改 `COUNTRY_PREFIX_MAP` 时，要保持显示名称、统计和现有前缀兼容。
+- 阅读报告：构建时下载 `Report` 附件，`.md` 用 `marked` 转 HTML，`.html` 原样放入 `<iframe srcdoc>`；产物为 `reading archive/reports/<年份>/<recId>.html`。书的 `report` 字段保存相对路径，书单书名右侧与详情面板作者下方据此渲染按钮；无报告/下载失败时为 `''`，不渲染、不中断构建。
+- 报告页位于 `reading archive/reports/<年份>/`（两级目录），返回年度页链接必须写成 `../../<年份>_reading_tracker.html`；少写一级 `../` 会 404。
 - 微信读书匹配优先级是：有笔记 > 书名精确匹配 > 作者匹配 > 笔记数量。作者为空时仅按书名匹配。
 - 书名已匹配（精确或包含）时，作者不匹配不会排除候选，仅降低匹配优先级（导入版作者元数据可能不准确，如《中文打字机》导入版作者误为「张朋亮」）。
 - 同一本书存在多个版本时，优先选有笔记的版本；若匹配到的版本无笔记，会按「书名包含」关系在笔记概览中查找同名导入版（导入版文件名较长，如「书楼吊堂_炎昼_王华懋_日_京极夏彦」，normalize 时下划线视为分隔符一并清理）。
@@ -64,6 +73,7 @@ Airtable Books
 - 颜色必须通过 CSS 变量定义和引用；不要在组件样式中新增硬编码 hex/rgba 色值。
 - 保持页面主体宽度和基础布局：`.page { max-width: 780px; margin: 0 auto; }`，`body { padding: 2.5rem 1rem 2rem; }`。
 - 页面应持续支持系统深色模式、移动端笔记底部面板和桌面端右侧笔记面板。
+- 阅读报告页是独立 HTML，由 `report-pages.js` 生成，沿用年度页同一组 CSS 变量与字体。
 
 ## 构建与验证
 
@@ -88,6 +98,7 @@ node builder_offline.js 2026
 ```
 
 - 运行主生成器前，明确告知它会访问外部 API 并可能改写 `weread-cache.json` 和目标年度 HTML。
+- 生成时若 Airtable `Report` 有附件，会输出 `reading archive/reports/<年份>/` 下的报告页；附件下载失败仅告警并跳过该书。
 - 若工作区已有生成页面或缓存的未提交改动，先保留它们；除非用户明确要求，不用构建覆盖。
 - 改动普通 JS 模块后运行 `node --check <file>`。验证 `template.js` 时，应按生成器方式注入占位符后，再检查其内嵌脚本语法。
 - 改动 UI 时，用浏览器检查归档页、当前年度页、窄屏布局、深色模式、搜索/筛选和笔记面板；网页测试与截图使用 `/browse` skill。

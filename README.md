@@ -15,6 +15,7 @@ https://nickilism.github.io/reading-tracker/
 - 自动事件触发或定时更新
 - 深色模式支持
 - 点击封面查看读书笔记面板
+- 阅读报告：Airtable `Report` 附件（.md/.html）自动生成独立报告页，书单与详情面板提供「阅读报告」入口
 
 ## 前提条件
 
@@ -36,6 +37,8 @@ https://nickilism.github.io/reading-tracker/
 Airtable (Books 表)
     ↓ REST API
 reading-tracker-github.js (Node.js)
+    ↓ Report 附件（.md/.html）→ report-pages.js
+reading archive/reports/{年份}/{记录ID}.html
     ↓ 微信读书 API (可选)
 weread-api.js → weread-match.js → weread-cache.json
     ↓ 模板注入
@@ -61,6 +64,7 @@ GitHub Pages (gh-pages 分支)
 | `weread-match.js` | 模糊匹配逻辑（Airtable 书籍 ↔ 微信读书书籍） |
 | `weread-cache.js` | 缓存管理 |
 | `weread-cache.json` | 微信读书缓存数据 |
+| `report-pages.js` | 阅读报告页构建（Markdown 转换 / HTML iframe 包装，纯函数） |
 | `index.html` | 归档页面，聚合所有年度数据 |
 | `.github/workflows/deploy.yml` | GitHub Actions 工作流 |
 
@@ -79,6 +83,8 @@ GitHub Pages (gh-pages 分支)
 | Douban Link | URL | 豆瓣链接 |
 | Douban Cover Link | URL | 封面图链接（推荐 neodb.social） |
 | Review | 文本 | 书评 |
+| Summary | 文本 | 书籍简介（详情面板展示） |
+| Report | 附件（可空） | 阅读报告文件，支持 `.md` 或 `.html`；有附件时为该书生成报告页，并在书单书名右侧与详情面板作者下方显示「阅读报告」按钮 |
 
 **"已读"判断标准**：Finish Time 字段不为空
 
@@ -297,6 +303,10 @@ A:
 ### Q: 归档页面如何工作？
 
 A: `index.html` 在浏览器端动态加载所有年度 HTML 文件，提取嵌入的 JSON 数据，计算跨年统计（总本数、总页数、国家分布等）。
+
+### Q: 有报告的书没有显示「阅读报告」按钮？
+
+A: 确认 Airtable `Report` 字段已上传附件且文件后缀为 `.md` 或 `.html`，然后重新构建（推送 `main` 触发 CI，或本地运行 `node reading-tracker-github.js <年份>`）。报告页生成在 `reading archive/reports/<年份>/` 下，文件名为 Airtable 记录 ID。
 
 ## 相关文档
 
