@@ -27,6 +27,7 @@ const readline = require('readline');
 process.env.DOTENV_CONFIG_QUIET = 'true';
 require('dotenv').config({ debug: false });
 const { buildReportPage } = require('./report-pages');
+const { mirrorCovers } = require('./cover-mirror');
 
 // API Key 从环境变量读取
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
@@ -252,6 +253,7 @@ async function generateForYear(year) {
     console.log('获取到 ' + records.length + ' 条记录');
     const processed = addDerived(processBooks(records));
     await fetchReports(processed, year);
+    await mirrorCovers(processed);
     const html = generate(year, processed);
     fs.writeFileSync(outputFilename, html);
     console.log('\n已生成 ' + outputFilename);

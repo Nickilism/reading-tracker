@@ -27,6 +27,7 @@ const fs = require('fs');
 process.env.DOTENV_CONFIG_QUIET = 'true';
 require('dotenv').config({ debug: false });
 const { buildReportPage } = require('./report-pages');
+const { mirrorCovers } = require('./cover-mirror');
 const { fetchShelf, fetchBookInfo, fetchHighlights, fetchThoughts, fetchPopularHighlights, fetchNotebooks, searchBooks, sleep } = require('./weread-api');
 const { matchBooks, normalize } = require('./weread-match');
 const { loadCache, saveCache, isCached } = require('./weread-cache');
@@ -562,6 +563,7 @@ async function main() {
     console.log('获取到 ' + records.length + ' 条记录');
     const processed = addDerived(processBooks(records));
     await fetchReports(processed, year);
+    await mirrorCovers(processed);
     const wereadData = await fetchWeReadData(processed, noCache);
     const html = generate(year, processed, wereadData);
     fs.writeFileSync(outputFilename, html);
