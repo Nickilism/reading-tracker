@@ -878,7 +878,7 @@ git commit -m "docs: register cover mirror files and manual cover workflow"
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add covers/
+          git add covers/ 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No new cover files to sync"
           else
