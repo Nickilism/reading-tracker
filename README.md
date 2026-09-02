@@ -16,6 +16,7 @@ https://nickilism.github.io/reading-tracker/
 - 深色模式支持
 - 点击封面查看读书笔记面板
 - 阅读报告：Airtable `Report` 附件（.md/.html）自动生成独立报告页，书单与详情面板提供「阅读报告」入口
+- 封面本地化：封面镜像到仓库 `covers/`，页面只从 GitHub Pages 加载
 
 ## 前提条件
 
@@ -81,7 +82,7 @@ GitHub Pages (gh-pages 分支)
 | My Rating | 数字 | 评分（1-10） |
 | Pages | 数字 | 页数 |
 | Douban Link | URL | 豆瓣链接 |
-| Douban Cover Link | URL | 封面图链接（推荐 neodb.social） |
+| Douban Cover Link | URL | 封面图链接：neodb.social 链接，或本仓库 `covers/` 文件 raw 链接（生成时镜像到 `covers/`） |
 | Review | 文本 | 书评 |
 | Summary | 文本 | 书籍简介（详情面板展示） |
 | Report | 附件（可空） | 阅读报告文件，支持 `.md` 或 `.html`；有附件时为该书生成报告页，并在书单书名右侧与详情面板作者下方显示「阅读报告」按钮 |
@@ -141,6 +142,15 @@ GitHub Pages (gh-pages 分支)
    - **"Get text from input"** - 输入 ISBN 或书名
    - **"URL"** - 构建 Airtable API 请求
    - **"Get contents of URL"** - 发送 POST 请求到 Airtable
+
+### 没有 neodb 封面的书（手工上传封面）
+
+1. 在 GitHub 网页打开仓库 → `covers/` 目录 → Add file → Upload files，上传 JPG/PNG/WebP 封面（建议小于 10MB）。
+2. 点开刚上传的图片 → 右上角 Raw → 复制链接（形如 `https://raw.githubusercontent.com/Nickilism/reading-tracker/main/covers/xxx.jpg`）。
+3. 把该链接填入 Airtable 的 `Douban Cover Link`。
+4. Zapier 触发部署后，页面会直接复用仓库内该文件；用户访问时只加载 GitHub Pages 资源。
+
+若图片尚未推送到 main，本次构建会保留该链接并告警，推送成功后下次运行自动纠正。
 
 ## 部署步骤
 
