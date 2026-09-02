@@ -125,7 +125,7 @@ async function main() {
   );
 
   // 5. 移除 Google Fonts
-  output = output.replace(/<link[^>]*fonts\.googleapis\.com[^>]*>/, '');
+  output = output.replace(/<link[^>]*(?:fonts\.googleapis\.com|fonts\.gstatic\.com)[^>]*>/g, '');
 
   // 6. 替换封面 URL 为 base64
   let booksJsonStr = JSON.stringify(booksData, null, 2);
