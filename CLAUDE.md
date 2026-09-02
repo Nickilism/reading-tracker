@@ -11,7 +11,7 @@ A reading tracker that fetches book data from Airtable and generates self-contai
 ## Build & Run Commands
 
 ```bash
-npm install                                    # Install dependencies (dotenv, prettier)
+npm install                                    # Install dependencies (dotenv, marked, prettier)
 node reading-tracker-github.js [year]          # Generate HTML for year (CI mode, default: current year)
 node reading-tracker-github.js 2026 --no-cache # Force full WeRead data refresh (ignore cache)
 node reading-tracker-year-github.js            # Generate HTML interactively (prompts for year)
@@ -23,7 +23,8 @@ node builder_offline.js <year>                 # Build offline HTML with inlined
 ### Data Flow
 1. **Airtable** (Books table) → **reading-tracker-github.js** (Node.js, fetches via REST API) → **{year}_reading_tracker.html** (self-contained HTML)
 2. **WeRead API** (微信读书) → **reading-tracker-github.js** (fetches highlights, thoughts, popular highlights) → embedded in HTML as `{{WEREAD_JSON}}`
-3. **index.html** — Archive landing page that fetches all yearly HTML files, extracts embedded book JSON, and computes aggregate stats across years
+3. **Airtable Report attachment** (.md/.html, optional) → generator downloads → **report-pages.js** → `reading archive/reports/{year}/{recordId}.html`; each book's `report` field carries the relative path into `{{BOOKS_JSON}}`
+4. **index.html** — Archive landing page that fetches all yearly HTML files, extracts embedded book JSON, and computes aggregate stats across years
 
 ### Key Files
 - **reading-tracker-github.js** — Non-interactive generator for CI; fetches records from Airtable, fetches WeRead data, processes books, generates HTML by injecting data into template
@@ -33,6 +34,7 @@ node builder_offline.js <year>                 # Build offline HTML with inlined
 - **weread-match.js** — Fuzzy matching logic; maps Airtable books to WeRead books by normalized title+author comparison, prefers versions with notes when duplicates exist
 - **weread-cache.js** — Cache management; reads/writes `weread-cache.json` for incremental WeRead data persistence
 - **weread-cache.json** — Cached WeRead data (keyed by bookId); committed to git so CI can reuse it
+- **report-pages.js** — Shared pure module that builds standalone reading-report pages: `.md` via `marked`, `.html` wrapped in an `<iframe srcdoc>` with auto-height; report pages live at `reading archive/reports/{year}/{recordId}.html`
 - **builder_offline.js** — Offline HTML builder; downloads Chart.js and cover images, converts to base64 data URIs, outputs fully self-contained `_offline.html` files
 - **preview.js / preview.cmd** — Local preview launcher; double-click `preview.cmd` to start a localhost static server and open the browser (file:// blocks reading local year pages, so a server is required)
 - **index.html** — Archive landing page; dynamically generates year cards (2019–current year) with aggregated stats and top-5 book cover fans per card
@@ -56,6 +58,7 @@ The output HTML embeds all CSS/JS inline. It includes:
 - Chart.js bar chart for monthly reading counts
 - Cover wall grid with hover overlays
 - **Book notes panel** — click any cover to open a slide-in panel (desktop: right side, mobile: bottom sheet) showing WeRead highlights, thoughts, popular highlights, and Airtable review
+- **Reading report buttons** — books with a `Report` attachment show a button right of the title in the book list and below the author in the notes panel; it opens the standalone report page in a new tab
 - Collapsible book list with sort/filter controls (by date, rating, pages; filters by rating tier, country, month)
 - Country distribution badges with flag emojis
 - All book data serialized as JSON and embedded at generation time (`{{BOOKS_JSON}}` + `{{WEREAD_JSON}}`)
