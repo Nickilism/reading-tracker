@@ -76,6 +76,13 @@ function processBooks(records) {
     const start = b['Start Time'] ? new Date(b['Start Time']).toISOString().split('T')[0] : '';
     const finish = b['Finish Time'] ? new Date(b['Finish Time']).toISOString().split('T')[0] : '';
     const rating = b['My Rating'];
+    const reportAttachments =
+      (Array.isArray(b.Report) && b.Report.length > 0)
+        ? b.Report
+        : (Array.isArray(b.report) && b.report.length > 0 ? b.report : null);
+    if (reportAttachments && reportAttachments.length > 1) {
+      console.warn('  注意: ' + (b.Title || '(未命名)') + ' 的 Report 字段有 ' + reportAttachments.length + ' 个附件，仅使用第一个');
+    }
     return {
       title: b.Title || '',
       author: b.Author || '',
@@ -85,7 +92,11 @@ function processBooks(records) {
       pages: b.Pages || '',
       doubanLink: b['Douban Link'] || '',
       cover: b['Douban Cover Link'] || '',
-      review: b.Review || ''
+      review: b.Review || '',
+      id: r.id || '',
+      report: reportAttachments
+        ? { url: reportAttachments[0].url || '', filename: reportAttachments[0].filename || '' }
+        : '',
     };
   });
 }
