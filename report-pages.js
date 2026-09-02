@@ -81,7 +81,7 @@ function buildReportPage({ year, title, author, content, isHtml }) {
     '<body>\n' +
     '  <div class="page">\n' +
     '    <div class="report-head">\n' +
-    '      <a class="report-back" href="../' + year + '_reading_tracker.html">&larr; 返回 ' + year + ' 阅读记录</a>\n' +
+    '      <a class="report-back" href="../../' + year + '_reading_tracker.html">&larr; 返回 ' + year + ' 阅读记录</a>\n' +
     '      <h1 class="report-title">' + safeTitle + '</h1>\n' +
     '      <div class="report-author">' + safeAuthor + '</div>\n' +
     '    </div>\n' +

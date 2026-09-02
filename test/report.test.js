@@ -12,7 +12,7 @@ test('markdown 报告: 转换为 HTML 并包含返回链接、书名、作者', 
   });
   assert.match(html, /<h1[^>]*>第一章<\/h1>/);
   assert.match(html, /<p>这是正文。<\/p>/);
-  assert.match(html, /href="\.\.\/2026_reading_tracker\.html"/);
+  assert.match(html, /href="\.\.\/\.\.\/2026_reading_tracker\.html"/);
   assert.match(html, /书楼吊堂：炎昼/);
   assert.match(html, /\[日\] 京极夏彦/);
 });
