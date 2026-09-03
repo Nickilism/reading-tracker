@@ -30,6 +30,7 @@
 | `cover-mirror.js` | 封面本地化镜像 | 由 URL 哈希计算本地文件名、识别本仓库 raw 链接、下载缺失封面；生成器与 sync-covers 共用 |
 | `sync-covers.js` | 年度页封面同步/迁移 | 原地把 `reading archive/*.html` 中外链封面替换为 `covers/` 本地路径；不访问 Airtable |
 | `covers/` | 封面镜像资源目录 | 资源兼构建产物；文件名 = URL 哈希；CI 只自动回写此目录 |
+| `vendor/` | 本地化第三方前端库（Chart.js 4.4.1） | 静态资源，版本固定；由年度页相对路径引用 |
 | `reading archive/reports/YYYY/<recId>.html` | 年度阅读报告页（构建产物） | 由生成器根据 Airtable `Report` 附件生成；文件名 = Airtable 记录 ID，不要手改 |
 | `builder_offline.js` | 离线页面构建器 | 读取已有年度页面、内联 Chart.js 与 covers/ 封面（缺失远程封面才下载），不访问 Airtable |
 | `preview.js` | 本地预览服务器 | 双击 `preview.cmd` 时启动；仅监听本机 127.0.0.1，不访问 Airtable |

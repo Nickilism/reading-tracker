@@ -28,7 +28,7 @@ const template = `<!DOCTYPE html>
   <link rel="icon" type="image/png" sizes="32x32" href="{{FAVICON_PREFIX}}icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="{{FAVICON_PREFIX}}icons/android-chrome-192x192.png">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script src="{{FAVICON_PREFIX}}vendor/chart.umd.js"></script>
   <style>
     /* ===== Reset & Variables ===== */
     *, *::before, *::after {
@@ -1364,6 +1364,7 @@ const template = `<!DOCTYPE html>
     }
 
     function updateChart(list) {
+      if (!monthChart) return;
       const counts = {};
       actualMonths.forEach(m => { counts[m] = 0; });
       list.forEach(b => { if (counts[b.month] !== undefined) counts[b.month]++; });
@@ -1572,7 +1573,10 @@ const template = `<!DOCTYPE html>
     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const chartTextColor = isDark ? '#9e9a96' : '#615d59';
     const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
-    const monthChart = new Chart(document.getElementById('monthChart'), {
+    // Chart.js 由仓库本地资源提供；若未加载成功则降级为不渲染图表，不影响书单/笔记等其它功能
+    let monthChart = null;
+    if (window.Chart) {
+      monthChart = new Chart(document.getElementById('monthChart'), {
       type: 'bar',
       data: {
         labels: monthLabels,
@@ -1625,6 +1629,7 @@ const template = `<!DOCTYPE html>
         }
       }]
     });
+    }
 
     // ===== Book Notes Panel =====
     const panelOverlay = document.getElementById('panelOverlay');
