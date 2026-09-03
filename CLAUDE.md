@@ -38,10 +38,10 @@ node sync-covers.js [year]              # 把年度页外链封面迁移到 cove
 - **report-pages.js** — Shared pure module that builds standalone reading-report pages: `.md` via `marked`, `.html` wrapped in an `<iframe srcdoc>` with auto-height; report pages live at `reading archive/reports/{year}/{recordId}.html`
 - **cover-mirror.js** — 封面镜像；计算 `covers/<sha1(url)>.<ext>`、识别本仓库 raw 链接、下载缺失封面；两个生成器与 sync-covers 共用
 - **sync-covers.js** — 历史年度页封面迁移工具；原地替换外链封面为 `../covers/<file>`
-- **builder_offline.js** — Offline HTML builder; downloads Chart.js and cover images, converts to base64 data URIs, outputs fully self-contained `_offline.html` files
+- **builder_offline.js** — Offline HTML builder; downloads Chart.js, reads local cover files under `covers/` (falls back to downloading unmirrored remote URLs), converts to base64 data URIs, outputs fully self-contained `_offline.html` files
 - **preview.js / preview.cmd** — Local preview launcher; double-click `preview.cmd` to start a localhost static server and open the browser (file:// blocks reading local year pages, so a server is required)
 - **index.html** — Archive landing page; dynamically generates year cards (2019–current year) with aggregated stats and top-5 book cover fans per card
-- **.github/workflows/deploy.yml** — GitHub Actions workflow; triggers on push to `main` (when source files change), `repository_dispatch` (`airtable-update`), manual (`workflow_dispatch`), or schedule (Mon/Thu 06:00 UTC)
+- **.github/workflows/deploy.yml** — GitHub Actions workflow; triggers on push to `main` (when source files change), `repository_dispatch` (`airtable-update`), manual (`workflow_dispatch`), or schedule (Mon/Thu 06:00 UTC); after generating pages it syncs newly downloaded cover files back to `main` (covers/ only)
 - **.gitattributes** — Enforces LF line endings for `.html`, `.js`, `.yml`, `.md`, `.json`
 
 ### Template Injection Pattern

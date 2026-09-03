@@ -31,7 +31,7 @@
 | `sync-covers.js` | 年度页封面同步/迁移 | 原地把 `reading archive/*.html` 中外链封面替换为 `covers/` 本地路径；不访问 Airtable |
 | `covers/` | 封面镜像资源目录 | 资源兼构建产物；文件名 = URL 哈希；CI 只自动回写此目录 |
 | `reading archive/reports/YYYY/<recId>.html` | 年度阅读报告页（构建产物） | 由生成器根据 Airtable `Report` 附件生成；文件名 = Airtable 记录 ID，不要手改 |
-| `builder_offline.js` | 离线页面构建器 | 读取已有年度页面、内联 Chart.js 和封面，不访问 Airtable |
+| `builder_offline.js` | 离线页面构建器 | 读取已有年度页面、内联 Chart.js 与 covers/ 封面（缺失远程封面才下载），不访问 Airtable |
 | `preview.js` | 本地预览服务器 | 双击 `preview.cmd` 时启动；仅监听本机 127.0.0.1，不访问 Airtable |
 | `preview.cmd` | 预览启动器 | 双击即可启动本地预览并自动打开浏览器 |
 | `.github/workflows/deploy.yml` | CI 与 GitHub Pages 发布 | 仅在用户明确要求时修改 |
@@ -97,8 +97,11 @@ node reading-tracker-github.js 2026 --no-cache
 # 本地交互式生成
 node reading-tracker-year-github.js
 
-# 从已有年度页面生成完全离线版本（会下载 Chart.js 和封面）
+# 从已有年度页面生成完全离线版本（会内联 Chart.js；封面优先读 covers/，缺失远程封面才下载）
 node builder_offline.js 2026
+
+# 把年度页外链封面同步/迁移到 covers/（历史页迁移或新封面补漏）
+node sync-covers.js [年份]
 ```
 
 - 运行主生成器前，明确告知它会访问外部 API 并可能改写 `weread-cache.json` 和目标年度 HTML。

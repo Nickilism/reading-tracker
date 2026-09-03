@@ -66,6 +66,9 @@ GitHub Pages (gh-pages 分支)
 | `weread-cache.js` | 缓存管理 |
 | `weread-cache.json` | 微信读书缓存数据 |
 | `report-pages.js` | 阅读报告页构建（Markdown 转换 / HTML iframe 包装，纯函数） |
+| `cover-mirror.js` | 封面本地化镜像：URL 哈希命名、本仓库 raw 链接直连、缺失封面自动下载 |
+| `sync-covers.js` | 年度页封面同步/迁移：原地把外链封面改写为 `../covers/<file>` |
+| `covers/` | 封面资源目录：文件名 = URL SHA-1，随页面一起发布，CI 只自动回写此目录 |
 | `index.html` | 归档页面，聚合所有年度数据 |
 | `.github/workflows/deploy.yml` | GitHub Actions 工作流 |
 
