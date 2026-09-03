@@ -69,6 +69,7 @@ GitHub Pages (gh-pages 分支)
 | `cover-mirror.js` | 封面本地化镜像：URL 哈希命名、本仓库 raw 链接直连、缺失封面自动下载 |
 | `sync-covers.js` | 年度页封面同步/迁移：原地把外链封面改写为 `../covers/<file>` |
 | `covers/` | 封面资源目录：文件名 = URL SHA-1，随页面一起发布，CI 只自动回写此目录 |
+| `vendor/` | 本地化第三方前端库：Chart.js 4.4.1，随页面一起发布，由年度页相对路径引用 |
 | `index.html` | 归档页面，聚合所有年度数据 |
 | `.github/workflows/deploy.yml` | GitHub Actions 工作流 |
 
