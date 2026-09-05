@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A reading tracker that fetches book data from Airtable and generates self-contained HTML pages deployed to GitHub Pages. Includes an archive landing page that aggregates all years. The system uses country prefix parsing in author fields to derive book origins. Integrates with WeRead (微信读书) to embed reading highlights, thoughts, and popular highlights into a slide-in panel.
+A reading tracker that fetches book data from Airtable and generates self-contained HTML pages deployed to GitHub Pages. Includes an archive landing page that aggregates all years, plus an all-years overview page (`reading archive/all.html`) that re-renders every year's books (2019–current) at runtime. The system uses country prefix parsing in author fields to derive book origins. Integrates with WeRead (微信读书) to embed reading highlights, thoughts, and popular highlights into a slide-in panel.
 
 **Live site**: https://nickilism.github.io/reading-tracker/
 
@@ -26,6 +26,7 @@ node sync-covers.js [year]              # 把年度页外链封面迁移到 cove
 2. **WeRead API** (微信读书) → **reading-tracker-github.js** (fetches highlights, thoughts, popular highlights) → embedded in HTML as `{{WEREAD_JSON}}`
 3. **Airtable Report attachment** (.md/.html, optional) → generator downloads → **report-pages.js** → `reading archive/reports/{year}/{recordId}.html`; each book's `report` field carries the relative path into `{{BOOKS_JSON}}`
 4. **index.html** — Archive landing page that fetches all yearly HTML files, extracts embedded book JSON, and computes aggregate stats across years
+5. **reading archive/all.html** — All-years overview: on load, fetches each `{year}_reading_tracker.html` sibling, merges book JSON, and renders yearly chart + cumulative line, year/rating filters (Top10 with ties), cover wall, book list, and lazy-loaded WeRead notes panel
 
 ### Key Files
 - **reading-tracker-github.js** — Non-interactive generator for CI; fetches records from Airtable, fetches WeRead data, processes books, generates HTML by injecting data into template
@@ -41,7 +42,8 @@ node sync-covers.js [year]              # 把年度页外链封面迁移到 cove
 - **builder_offline.js** — Offline HTML builder; downloads Chart.js, reads local cover files under `covers/` (falls back to downloading unmirrored remote URLs), converts to base64 data URIs, outputs fully self-contained `_offline.html` files
 - **vendor/** — 本地化第三方前端库（Chart.js 4.4.1）；由年度页相对路径引用，随页面一起发布
 - **preview.js / preview.cmd** — Local preview launcher; double-click `preview.cmd` to start a localhost static server and open the browser (file:// blocks reading local year pages, so a server is required)
-- **index.html** — Archive landing page; dynamically generates year cards (2019–current year) with aggregated stats and top-5 book cover fans per card
+- **index.html** — Archive landing page; dynamically generates year cards (2019–current year) with aggregated stats and top-5 book cover fans per card; the top stats strip links to the all-years overview
+- **reading archive/all.html** — All-years overview (hand-maintained, not generated); entry is the archive stats bar; year range 2019→current is dynamic
 - **.github/workflows/deploy.yml** — GitHub Actions workflow; triggers on push to `main` (when source files change), `repository_dispatch` (`airtable-update`), manual (`workflow_dispatch`), or schedule (Mon/Thu 06:00 UTC); after generating pages it syncs newly downloaded cover files back to `main` (covers/ only)
 - **.gitattributes** — Enforces LF line endings for `.html`, `.js`, `.yml`, `.md`, `.json`
 
@@ -141,6 +143,8 @@ Key routing rules:
 body { padding: 2.5rem 1rem 2rem; }
 ```
 
+≤480px 时（首页与年度页一致）`body` padding 收紧为 `1.5rem 0.75rem 1.5rem`、`h1` 为 `1.55rem`、`year-badge` 保持 3rem 不缩小（≥768px 为 4rem）。首页标题为「阅读记录」（勿改回「阅读记录归档」，以免与年份区间在窄屏换行）。
+
 ### Header
 
 ```html
@@ -171,4 +175,5 @@ h1 基础 1.75rem，>=768px 时 2.25rem，<=480px 时 1.55rem
 
 1. 改 `index.html`
 2. 同步改 `template.js`
-3. 重新生成年度 HTML：`node reading-tracker-github.js <year>`
+3. 同步总览页 `reading archive/all.html`（同一套视觉与交互；改设计语言或交互时需检查）
+4. 重新生成年度 HTML：`node reading-tracker-github.js <year>`
