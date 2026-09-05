@@ -79,6 +79,8 @@ Airtable Report 附件 (.md/.html)
 - 全部年份总览页 `reading archive/all.html` 沿用同一套设计语言与交互模式；改动 `index.html` / `template.js` 的视觉或交互时，需同步检查并更新 `all.html`。
 - 颜色必须通过 CSS 变量定义和引用；不要在组件样式中新增硬编码 hex/rgba 色值。
 - 保持页面主体宽度和基础布局：`.page { max-width: 780px; margin: 0 auto; }`，`body { padding: 2.5rem 1rem 2rem; }`。
+- 移动端顶部（≤480px）规则在 `index.html`、`template.js`、`reading archive/all.html` 保持一致：`body` padding 收紧为 `1.5rem 0.75rem 1.5rem`、`h1` 为 `1.55rem`；右上角年份数字不随窄屏缩小（基础 3rem，≥768px 为 4rem）。
+- 首页标题固定为「阅读记录」（含 `<title>`），不要改回「阅读记录归档」：否则标题与「2019-YYYY」年份区间在手机宽度会换行，破坏与年份页的顶部对齐。
 - 页面应持续支持系统深色模式、移动端笔记底部面板和桌面端右侧笔记面板。
 - 阅读报告页是独立 HTML，由 `report-pages.js` 生成，沿用年度页同一组 CSS 变量与字体。
 
