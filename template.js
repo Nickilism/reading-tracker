@@ -1252,14 +1252,14 @@ const template = `<!DOCTYPE html>
     // ===== 筛选器 =====
     const filterMap = {
       all: () => true,
-      high: b => b.rating >= 8.3,
-      normal: b => b.rating > 7.9 && b.rating < 8.3,
+      high: b => b.rating >= 8.4,
+      normal: b => b.rating > 7.9 && b.rating < 8.4,
       low: b => b.rating <= 7.9,
       report: b => Boolean(b.report),
     };
 
-    const highCount = allBooks.filter(b => b.rating >= 8.3).length;
-    const normalCount = allBooks.filter(b => b.rating > 7.9 && b.rating < 8.3).length;
+    const highCount = allBooks.filter(b => b.rating >= 8.4).length;
+    const normalCount = allBooks.filter(b => b.rating > 7.9 && b.rating < 8.4).length;
     const lowCount = allBooks.filter(b => b.rating <= 7.9).length;
     const reportCount = allBooks.filter(b => b.report).length;
 
@@ -1268,7 +1268,7 @@ const template = `<!DOCTYPE html>
       { key: 'high', label: `🟢 高分 (${highCount})` },
       { key: 'normal', label: `🟡 普通 (${normalCount})` },
       { key: 'low', label: `🔴 低分 (${lowCount})` },
-      { key: 'report', label: `阅读报告 (${reportCount})` },
+      { key: 'report', label: `📖 阅读报告 (${reportCount})` },
     ];
 
     // 添加国家筛选按钮
