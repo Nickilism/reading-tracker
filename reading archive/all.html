@@ -1010,33 +1010,7 @@
       line-height: 1.6;
     }
     .load-error.visible { display: block; }
-    .top10-section {
-      margin-top: 2rem;
-      border-top: 1px solid var(--border);
-      padding-top: 1.5rem;
-    }
-    .top10-header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 1.25rem;
-    }
-    .top10-header h2 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.25px; }
-    .top10-header span { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
-    .top10-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    @media (min-width: 600px) { .top10-grid { grid-template-columns: repeat(5, 1fr); gap: 12px; } }
-    @media (min-width: 900px) { .top10-grid { grid-template-columns: repeat(5, 1fr); gap: 14px; } }
     .cover-item { position: relative; }
-    .rank-badge {
-      position: absolute; top: 6px; left: 6px; z-index: 2;
-      min-width: 20px; height: 20px; padding: 0 5px;
-      border-radius: 999px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 700; color: #fff;
-      background: var(--rank-other);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-    .rank-badge.rank-top { background: var(--rank-top); }
     .cover-chip {
       position: absolute; top: 6px; right: 6px; z-index: 2;
       font-size: 9px; font-weight: 700; color: #fff;
@@ -1078,7 +1052,7 @@
     <!-- ===== Header ===== -->
     <header>
       <div class="title-block">
-        <h1>阅读记录 · 全部年份</h1>
+        <h1>阅读记录</h1>
         <p id="subtitle">正在汇总各年度页…</p>
       </div>
       <div class="year-badge" id="yearBadge">ALL</div>
@@ -1120,15 +1094,6 @@
       <div class="chart-container">
         <canvas id="yearChart" role="img"></canvas>
       </div>
-    </div>
-
-    <!-- ===== Top 10 ===== -->
-    <div class="top10-section">
-      <div class="top10-header">
-        <h2>高分榜 · Top 10</h2>
-        <span id="top10-count">— 本</span>
-      </div>
-      <div class="top10-grid" id="top10-grid"></div>
     </div>
 
     <!-- ===== Filters ===== -->
@@ -1199,6 +1164,17 @@
     let currentSortDir = 'desc';
     let booklistOpen = true;
     const filterMap = { all: () => true };
+    let currentTop10Set = new Set();
+
+    // 每年柱状图配色（与年度页 MONTH_COLORS 一致）
+    const YEAR_COLORS = [
+      { bg: '#b5d4f4', color: '#0c447c' }, { bg: '#9fe1cb', color: '#085041' },
+      { bg: '#fac775', color: '#633806' }, { bg: '#f5c4b3', color: '#712b13' },
+      { bg: '#d4c4f4', color: '#4c147c' }, { bg: '#f4d4b5', color: '#7c4414' },
+      { bg: '#b5f4d4', color: '#147c54' }, { bg: '#f4b5d4', color: '#7c1454' },
+      { bg: '#d4f4b5', color: '#547c14' }, { bg: '#b5d4f4', color: '#147c8c' },
+      { bg: '#f4b5b5', color: '#7c1414' }, { bg: '#b5f4f4', color: '#147c7c' }
+    ];
 
     // 国家旗帜（与年度页一致）
     const COUNTRY_FLAGS = {
@@ -1366,22 +1342,23 @@
       if (!window.Chart || !yearsAsc.length) return;
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       const cssVar = function (n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
-      const barColor = cssVar('--accent') || (isDark ? '#5ba4f0' : '#0066cc');
       const lineColor = cssVar('--chart-line') || '#b45309';
       const chartTextColor = isDark ? '#9e9a96' : '#615d59';
       const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
+      const yearColors = yearsAsc.map(function (y) { return YEAR_COLORS[(y - START_YEAR) % YEAR_COLORS.length]; });
 
       yearChart = new Chart($('yearChart'), {
         data: {
           labels: yearsAsc.map(String),
           datasets: [
-            { type: 'bar', label: '本数', data: [], backgroundColor: barColor, borderRadius: 6, order: 2, yAxisID: 'y' },
+            { type: 'bar', label: '本数', data: [], backgroundColor: yearColors.map(function (c) { return c.bg; }), borderColor: yearColors.map(function (c) { return c.color; }), borderWidth: 1, borderRadius: 6, order: 2, yAxisID: 'y' },
             { type: 'line', label: '累计', data: [], borderColor: lineColor, backgroundColor: lineColor, pointBackgroundColor: lineColor, pointRadius: 2, borderWidth: 2, tension: 0.25, fill: false, order: 1, yAxisID: 'y1' }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          layout: { padding: { top: 14 } },
           plugins: { legend: { display: false } },
           onClick: function (evt, els) {
             if (els && els.length && els[0].datasetIndex === 0) {
@@ -1421,7 +1398,8 @@
             chart.data.datasets[0].data.forEach(function (value, index) {
               if (value > 0) {
                 const x = chart.scales.x.getPixelForValue(index);
-                const y = chart.scales.y.getPixelForValue(value) - 6;
+                const yPix = chart.scales.y.getPixelForValue(value);
+                const y = Math.max(yPix - 8, chart.chartArea.top + 2);
                 ctx.fillText(value, x, y);
               }
             });
@@ -1442,7 +1420,7 @@
       barData.forEach(function (v) { acc += v; cum.push(acc); });
       yearChart.data.datasets[0].data = barData;
       yearChart.data.datasets[1].data = cum;
-      yearChart.options.scales.y.max = Math.max(Math.max.apply(null, barData) + 1, 4);
+      yearChart.options.scales.y.max = Math.max(Math.max.apply(null, barData) + 2, 5);
       yearChart.update();
     }
 
@@ -1453,18 +1431,19 @@
 
       const base = [
         { key: 'all', label: '全部' },
+        { key: 'top10', label: '🏆 Top10' },
         { key: 'high', label: '🟢 高分' },
         { key: 'normal', label: '🟡 普通' },
         { key: 'low', label: '🔴 低分' },
         { key: 'report', label: '📖 阅读报告' }
       ];
       base.forEach(function (fb) {
-        filterMap[fb.key] = fb.key === 'all'
-          ? function () { return true; }
-          : (fb.key === 'high' ? function (b) { return b.rating >= 8.4; }
-            : fb.key === 'normal' ? function (b) { return b.rating > 7.9 && b.rating < 8.4; }
-            : fb.key === 'low' ? function (b) { return b.rating <= 7.9; }
-            : function (b) { return Boolean(b.report); });
+        if (fb.key === 'all') filterMap[fb.key] = function () { return true; };
+        else if (fb.key === 'high') filterMap[fb.key] = function (b) { return b.rating >= 8.4; };
+        else if (fb.key === 'normal') filterMap[fb.key] = function (b) { return b.rating > 7.9 && b.rating < 8.4; };
+        else if (fb.key === 'low') filterMap[fb.key] = function (b) { return b.rating <= 7.9; };
+        else if (fb.key === 'report') filterMap[fb.key] = function (b) { return Boolean(b.report); };
+        else if (fb.key === 'top10') filterMap[fb.key] = function (b) { return currentTop10Set.has(b); };
         addFilterButton(filtersEl, fb.key, fb.label);
       });
 
@@ -1579,10 +1558,10 @@
 
     function applySearchAndFilter() {
       if (!dataReady) return;
+      refreshTop10Set();
       const filtered = getFilteredBooks();
       updateStats(filtered);
       updateChart(filtered);
-      renderTop10(filtered);
       if (filtered.length > 0) {
         renderWall(filtered);
         renderBooklist(getSortedList(filtered));
@@ -1594,7 +1573,6 @@
         $('cover-wall').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
         $('booklist-content').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
         $('wall-count').textContent = '0 本';
-        $('top10-count').textContent = '0 本';
       }
     }
 
@@ -1632,42 +1610,21 @@
       });
     }
 
-    // ===== 高分榜 Top 10（随当前范围联动） =====
-    function rankTopBooks(list) {
+    // ===== Top10 筛选（评分前 10，分数相同并列纳入） =====
+    function topBooksWithTies(list) {
       const rated = list.filter(function (b) { return typeof b.rating === 'number'; });
       rated.sort(function (a, b) {
         if (b.rating !== a.rating) return b.rating - a.rating;
         return (b.finish || '').localeCompare(a.finish || '');
       });
-      return rated.slice(0, 10);
+      const top = rated.slice(0, 10);
+      if (!top.length) return [];
+      const cutoff = top[top.length - 1].rating;
+      return rated.filter(function (b) { return b.rating >= cutoff; });
     }
 
-    function renderTop10(list) {
-      const grid = $('top10-grid');
-      const top = rankTopBooks(list);
-      $('top10-count').textContent = top.length + ' 本';
-      if (!top.length) {
-        grid.innerHTML = '<div class="no-results">当前范围暂无评分书籍</div>';
-        return;
-      }
-      grid.innerHTML = '';
-      top.forEach(function (b, i) {
-        const idx = allBooks.indexOf(b);
-        const item = document.createElement('div');
-        item.className = 'cover-item';
-        item.innerHTML =
-          '<span class="rank-badge' + (i < 3 ? ' rank-top' : '') + '">' + (i + 1) + '</span>' +
-          '<span class="cover-chip">' + b.year + '</span>' +
-          '<div class="cover-link" onclick="openBookPanel(' + idx + ')" title="' + b.title + '">' +
-            '<div class="cover-img-wrap"><img src="' + b.cover + '" alt="' + b.title + '" loading="lazy" onerror="' + coverFallback(b.title) + '">' +
-            '<div class="cover-overlay">' +
-              '<div class="cover-title">' + b.title + '</div>' +
-              '<div class="cover-author">' + b.author + '</div>' +
-              '<div class="cover-rating">' + stars(b.rating) + ' ' + b.rating + '</div>' +
-            '</div></div>' +
-          '</div>';
-        grid.appendChild(item);
-      });
+    function refreshTop10Set() {
+      currentTop10Set = new Set(topBooksWithTies(getSearchOnlyBooks()));
     }
 
     // ===== 书影留存 =====
