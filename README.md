@@ -16,7 +16,7 @@ https://nickilism.github.io/reading-tracker/
 - 深色模式支持
 - 点击封面查看读书笔记面板
 - 阅读报告：Airtable `Report` 附件（.md/.html）自动生成独立报告页，书单与详情面板提供「阅读报告」入口
-- 全部年份总览：`reading archive/all.html` 运行时汇总 2019 至当前年份的全部记录（每年阅读量 + 累计趋势、年份筛选、跨年高分榜），随新年度自动扩展
+- 全部年份总览：`reading archive/all.html` 运行时汇总 2019 至当前年份的全部记录（每年阅读量 + 累计趋势、年份/评分筛选含 Top10 同分并列、书影留存、书籍清单与划线面板），随新年度自动扩展
 - 封面本地化：封面镜像到仓库 `covers/`，页面只从 GitHub Pages 加载
 
 ## 前提条件
