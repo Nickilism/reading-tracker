@@ -1017,7 +1017,11 @@
       background: var(--cover-chip-bg);
       padding: 1px 5px; border-radius: 6px;
       letter-spacing: 0.03em;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
     }
+    .cover-item:hover .cover-chip { opacity: 1; }
     .year-tag {
       display: inline-block;
       font-size: 10px; font-weight: 600;
@@ -1480,6 +1484,7 @@
       btn.textContent = label;
       btn.addEventListener('click', function () {
         currentFilter = key;
+        applyRatingDefaultSort();
         syncActiveFilter();
         applySearchAndFilter();
       });
@@ -1723,9 +1728,29 @@
       }
     }
 
-    // ===== 排序按钮事件 =====
-    function bindSort() {
+    // ===== 排序 =====
+    const RATING_SORT_KEYS = { top10: true, high: true, normal: true, low: true };
+
+    function renderSortButtons() {
       const fieldLabels = { finish: '时间', rating: '评分', pages: '页数', year: '年份' };
+      document.querySelectorAll('.sort-btn').forEach(function (b) {
+        const f = b.dataset.sort;
+        const a = (currentSortField === f) ? currentSortDir : 'desc';
+        b.textContent = fieldLabels[f] + (a === 'desc' ? ' ↓' : ' ↑');
+        b.classList.toggle('active', currentSortField === f);
+      });
+    }
+
+    // 评分类筛选激活时，列表默认按评分从高到低排序
+    function applyRatingDefaultSort() {
+      if (RATING_SORT_KEYS[currentFilter] && currentSortField !== 'rating') {
+        currentSortField = 'rating';
+        currentSortDir = 'desc';
+        renderSortButtons();
+      }
+    }
+
+    function bindSort() {
       document.querySelectorAll('.sort-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
           const field = btn.dataset.sort;
@@ -1735,12 +1760,7 @@
             currentSortField = field;
             currentSortDir = 'desc';
           }
-          document.querySelectorAll('.sort-btn').forEach(function (b) {
-            const f = b.dataset.sort;
-            const a = (currentSortField === f) ? currentSortDir : 'desc';
-            b.textContent = fieldLabels[f] + (a === 'desc' ? ' ↓' : ' ↑');
-            b.classList.toggle('active', currentSortField === f);
-          });
+          renderSortButtons();
           applySearchAndFilter();
         });
       });
