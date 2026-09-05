@@ -1206,13 +1206,13 @@
     // ===== 筛选器 =====
     const filterMap = {
       all: () => true,
-      high: b => b.rating >= 8.3,
-      normal: b => b.rating > 7.9 && b.rating < 8.3,
+      high: b => b.rating >= 8.4,
+      normal: b => b.rating > 7.9 && b.rating < 8.4,
       low: b => b.rating <= 7.9,
     };
 
-    const highCount = allBooks.filter(b => b.rating >= 8.3).length;
-    const normalCount = allBooks.filter(b => b.rating > 7.9 && b.rating < 8.3).length;
+    const highCount = allBooks.filter(b => b.rating >= 8.4).length;
+    const normalCount = allBooks.filter(b => b.rating > 7.9 && b.rating < 8.4).length;
     const lowCount = allBooks.filter(b => b.rating <= 7.9).length;
 
     const filterBtns = [

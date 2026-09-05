@@ -1,16 +1,4 @@
-/**
- * template.js - 阅读记录 HTML 模板
- *
- * 生成脚本通过 String.replace() 注入以下变量：
- *   {{YEAR}}          - 年份
- *   {{GENERATED_DATE}} - 生成日期
- *   {{BOOKS_JSON}}    - 书籍数据 JSON
- *
- * 结构说明：
- *   HTML 模板 → CSS 样式 → JavaScript 逻辑
- */
-
-const template = `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh" id="html">
 <head>
   <meta charset="UTF-8">
@@ -20,16 +8,17 @@ const template = `<!DOCTYPE html>
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f0f11">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <title>{{YEAR}} 阅读记录</title>
-  <link rel="apple-touch-icon" sizes="180x180" href="{{FAVICON_PREFIX}}icons/apple-touch-icon.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="{{FAVICON_PREFIX}}icons/apple-touch-icon-152x152.png">
-  <link rel="apple-touch-icon" sizes="167x167" href="{{FAVICON_PREFIX}}icons/apple-touch-icon-167x167.png">
-  <link rel="icon" type="image/x-icon" href="{{FAVICON_PREFIX}}icons/favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="{{FAVICON_PREFIX}}icons/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="{{FAVICON_PREFIX}}icons/android-chrome-192x192.png">
+  <title>全部年份阅读记录</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="../icons/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="../icons/apple-touch-icon-167x167.png">
+  <link rel="icon" type="image/x-icon" href="../icons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../icons/android-chrome-192x192.png">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="{{FAVICON_PREFIX}}vendor/chart.umd.js"></script>
+  <script src="../vendor/chart.umd.js"></script>
   <style>
+
     /* ===== Reset & Variables ===== */
     *, *::before, *::after {
       box-sizing: border-box;
@@ -995,6 +984,70 @@ const template = `<!DOCTYPE html>
       .panel-body { flex: 1; padding: 0 20px 20px; overflow: visible; }
       .panel-cover { width: 60px; height: 82px; }
     }
+  
+    /* ===== All-Years overview extras ===== */
+    :root {
+      --chart-line: #b45309;
+      --rank-top: var(--accent);
+      --rank-other: var(--text-muted);
+      --cover-chip-bg: rgba(0, 0, 0, 0.55);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --chart-line: #f0a35e;
+        --cover-chip-bg: rgba(0, 0, 0, 0.62);
+      }
+    }
+    .load-error {
+      display: none;
+      background: var(--accent-soft);
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 13px;
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+    }
+    .load-error.visible { display: block; }
+    .cover-item { position: relative; }
+    .cover-chip {
+      position: absolute; top: 6px; right: 6px; z-index: 2;
+      font-size: 9px; font-weight: 700; color: #fff;
+      background: var(--cover-chip-bg);
+      padding: 1px 5px; border-radius: 6px;
+      letter-spacing: 0.03em;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+    .cover-item:hover .cover-chip { opacity: 1; }
+    .year-tag {
+      display: inline-block;
+      font-size: 10px; font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 1px 6px; border-radius: 6px;
+      margin-right: 8px; vertical-align: 1px;
+    }
+    .filter-year-link {
+      margin-left: 8px;
+      font-size: 11px;
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--accent);
+    }
+    .filter-year-link:hover { opacity: 0.8; }
+    .foot {
+      margin-top: 2.5rem;
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; flex-wrap: wrap;
+      font-size: 12px; color: var(--text-muted);
+    }
+    .foot a { color: var(--text-muted); text-decoration: none; }
+    .foot a:hover { color: var(--accent); }
+    .panel-meta { margin-top: 6px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 11px; color: var(--text-muted); }
+    .panel-dates { font-variant-numeric: tabular-nums; }
   </style>
 </head>
 <body>
@@ -1004,10 +1057,12 @@ const template = `<!DOCTYPE html>
     <header>
       <div class="title-block">
         <h1>阅读记录</h1>
-        <p id="subtitle">{{MONTH_RANGE}} {{YEAR}}</p>
+        <p id="subtitle">正在汇总各年度页…</p>
       </div>
-      <div class="year-badge">{{YEAR}}</div>
+      <div class="year-badge" id="yearBadge">ALL</div>
     </header>
+
+    <div class="load-error" id="loadError"></div>
 
     <div class="search-wrap" id="searchWrap">
       <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -1039,9 +1094,9 @@ const template = `<!DOCTYPE html>
 
     <!-- ===== Chart ===== -->
     <div class="chart-wrap">
-      <div class="section-title">每月阅读量</div>
+      <div class="section-title">每年阅读量</div>
       <div class="chart-container">
-        <canvas id="monthChart" role="img"></canvas>
+        <canvas id="yearChart" role="img"></canvas>
       </div>
     </div>
 
@@ -1078,61 +1133,54 @@ const template = `<!DOCTYPE html>
         <button class="sort-btn active" data-sort="finish">时间 ↓</button>
         <button class="sort-btn" data-sort="rating">评分 ↓</button>
         <button class="sort-btn" data-sort="pages">页数 ↓</button>
+        <button class="sort-btn" data-sort="year">年份 ↓</button>
       </div>
       <div class="booklist-content" id="booklist-content"></div>
     </div>
 
     <!-- ===== Footer ===== -->
-<footer id="footer" style="display: flex; align-items: center; justify-content: center; gap: 0;">导出于 {{GENERATED_DATE}} · <a href="https://github.com/Nickilism/reading-tracker" target="_blank" style="color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; margin-left: 0.25em; line-height: 1; margin-bottom: 2px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="display: block;"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a></footer>
+    <div class="foot">
+      <a href="../index.html">← 返回归档首页</a>
+      <span>·</span>
+      <span id="footerNote">数据实时汇总自各年度页</span>
+      <span>·</span>
+      <a href="https://github.com/Nickilism/reading-tracker" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+
   <script>
-    // ========== 数据注入开始 ==========
-    // 以下变量由生成脚本注入
+    // ===== 全部年份总览：常量与状态 =====
+    // 年份范围：起点 2019（归档起始年）固定，终点为当前年份，随年份增加自动扩大
+    const START_YEAR = 2019;
+    const CURRENT_YEAR = new Date().getFullYear();
 
-    const YEAR = {{YEAR}};
-    const GENERATED_DATE = "{{GENERATED_DATE}}";
+    let allBooks = [];          // 合并后的全量书单，每本书带 year
+    let loadedYears = [];       // 成功加载的年份（升序）
+    let failedYears = [];       // 加载失败的年份
+    let yearsAsc = [];          // 图表 X 轴（升序）
+    const yearHtmlCache = {};   // year -> 年度页原始 HTML（供懒加载划线）
+    const wereadCache = {};     // year -> 已解析的 wereadData
+    let dataReady = false;
+    let searchQuery = '';
+    let searchDebounce = null;
+    let currentFilter = 'all';
+    let currentSortField = 'finish';
+    let currentSortDir = 'desc';
+    let booklistOpen = true;
+    const filterMap = { all: () => true };
+    let currentTop10Set = new Set();
 
-    // 12个月颜色配置
-    const MONTH_COLORS = [
-      { bg: '#b5d4f4', color: '#0c447c', label: '1月' },
-      { bg: '#9fe1cb', color: '#085041', label: '2月' },
-      { bg: '#fac775', color: '#633806', label: '3月' },
-      { bg: '#f5c4b3', color: '#712b13', label: '4月' },
-      { bg: '#d4c4f4', color: '#4c147c', label: '5月' },
-      { bg: '#f4d4b5', color: '#7c4414', label: '6月' },
-      { bg: '#b5f4d4', color: '#147c54', label: '7月' },
-      { bg: '#f4b5d4', color: '#7c1454', label: '8月' },
-      { bg: '#d4f4b5', color: '#547c14', label: '9月' },
-      { bg: '#b5d4f4', color: '#147c8c', label: '10月' },
-      { bg: '#f4b5b5', color: '#7c1414', label: '11月' },
-      { bg: '#b5f4f4', color: '#147c7c', label: '12月' },
+    // 每年柱状图配色（与年度页 MONTH_COLORS 一致）
+    const YEAR_COLORS = [
+      { bg: '#b5d4f4', color: '#0c447c' }, { bg: '#9fe1cb', color: '#085041' },
+      { bg: '#fac775', color: '#633806' }, { bg: '#f5c4b3', color: '#712b13' },
+      { bg: '#d4c4f4', color: '#4c147c' }, { bg: '#f4d4b5', color: '#7c4414' },
+      { bg: '#b5f4d4', color: '#147c54' }, { bg: '#f4b5d4', color: '#7c1454' },
+      { bg: '#d4f4b5', color: '#547c14' }, { bg: '#b5d4f4', color: '#147c8c' },
+      { bg: '#f4b5b5', color: '#7c1414' }, { bg: '#b5f4f4', color: '#147c7c' }
     ];
 
-    // 国家前缀映射（支持多种括号格式）
-    const COUNTRY_PREFIX_MAP = {
-      // 方括号
-      '[日]': '日本', '[美]': '美国', '[德]': '德国', '[英]': '英国',
-      '[法]': '法国', '[哥伦比亚]': '哥伦比亚', '[秘鲁]': '秘鲁', '[塞尔维亚]': '塞尔维亚', '[韩]': '韩国', '[俄]': '俄罗斯',
-      '[以色列]': '以色列', '[爱尔兰]': '爱尔兰', '[英美]': '英美', '[荷]': '荷兰',
-      '[意大利]': '意大利', '[奥]': '奥地利', '[奥地利]': '奥地利', '[阿根廷]': '阿根廷',
-      '[波兰]': '波兰', '[葡萄牙]': '葡萄牙', '[古希腊]': '古希腊',
-      '[瑞典]': '瑞典', '[加拿大]': '加拿大', '[澳]': '澳大利亚',
-      '[英国]': '英国', '[加]': '加拿大', '[意]': '意大利', '[波]': '波兰',
-      '[阿]': '阿根廷', '[荷]': '荷兰',
-      // 圆括号
-      '(日)': '日本', '(美)': '美国', '(德)': '德国', '(英)': '英国',
-      '(法)': '法国', '(韩)': '韩国', '(俄)': '俄罗斯', '(荷)': '荷兰',
-      '(意)': '意大利', '(奥)': '奥地利', '(葡萄牙)': '葡萄牙',
-      '(古希腊)': '古希腊', '(俄罗斯)': '俄罗斯',
-      // 中文圆括号
-      '（日）': '日本', '（美）': '美国', '（德）': '德国', '（英）': '英国',
-      '（法）': '法国', '（韩）': '韩国', '（俄）': '俄罗斯',
-      '（意）': '意大利', '（葡萄牙）': '葡萄牙',
-      // 中文方括号 〔 〕
-      '〔美〕': '美国', '〔英〕': '英国', '〔日〕': '日本', '〔德〕': '德国',
-      '〔法〕': '法国', '〔俄〕': '俄罗斯', '〔意〕': '意大利', '〔波〕': '波兰',
-    };
-
-    // 国家旗帜
+    // 国家旗帜（与年度页一致）
     const COUNTRY_FLAGS = {
       '中国': '🇨🇳', '日本': '🇯🇵', '美国': '🇺🇸', '德国': '🇩🇪',
       '英国': '🇬🇧', '法国': '🇫🇷', '塞尔维亚': '🇷🇸', '韩国': '🇰🇷',
@@ -1143,98 +1191,39 @@ const template = `<!DOCTYPE html>
       '哥伦比亚': '🇨🇴', '秘鲁': '🇵🇪',
     };
 
-    // 检测字符串是否包含中文字符
-    function hasChineseChars(str) {
-      return /[\u4e00-\u9fa5]/.test(str);
+    function $(id) { return document.getElementById(id); }
+
+    // ===== 解析工具：字符串感知的平衡括号扫描 =====
+    function extractBalanced(html, marker, openChar, closeChar) {
+      const idx = html.indexOf(marker);
+      if (idx === -1) return null;
+      const start = html.indexOf(openChar, idx);
+      if (start === -1) return null;
+      let depth = 0, inStr = false, esc = false;
+      for (let i = start; i < html.length; i++) {
+        const ch = html[i];
+        if (inStr) {
+          if (esc) esc = false;
+          else if (ch === '\\') esc = true;
+          else if (ch === '"') inStr = false;
+          continue;
+        }
+        if (ch === '"') { inStr = true; continue; }
+        if (ch === openChar) depth++;
+        else if (ch === closeChar) { depth--; if (depth === 0) return html.slice(start, i + 1); }
+      }
+      return null;
     }
 
-    // 标准化作者名字符串，去除各种括号及其内容
-    function stripCountryPrefixes(author) {
-      return author
-        .replace(/\[([^\]]+)\]/g, '')   // [xxx]
-        .replace(/\(([^\)]+)\)/g, '')     // (xxx)
-        .replace(/（([^）]+)）/g, '')      // （xxx）
-        .replace(/《([^》]+)》/g, '')     // 《xxx》
-        .replace(/【([^】]+)】/g, '')     // 【xxx】
-        .trim();
+    function extractBooksJson(html) {
+      return extractBalanced(html, 'const books = ', '[', ']');
     }
 
-    // 国家推断
-    function deriveCountry(author) {
-      // 1. 先匹配前缀映射表
-      for (const [prefix, country] of Object.entries(COUNTRY_PREFIX_MAP)) {
-        if (author.includes(prefix)) return country;
-      }
-      // 2. 无前缀时，根据姓名文字判断
-      const nameOnly = stripCountryPrefixes(author);
-      if (hasChineseChars(nameOnly)) {
-        return '中国';
-      }
-      // 3. 纯英文名默认为美国
-      return '美国';
+    function extractWereadJson(html) {
+      return extractBalanced(html, 'const wereadData = ', '{', '}');
     }
 
-    // 书籍数据（由生成脚本注入）
-    const books = {{BOOKS_JSON}};
-    const wereadData = {{WEREAD_JSON}};
-    const allBooks = books.slice(); // preserve original for repeated filtering
-    let searchQuery = '';
-    let searchDebounce = null;
-
-    // ========== 数据注入结束 ==========
-
-    // ===== 初始化 =====
-    const actualMonths = [...new Set(books.map(b => b.month))].sort((a, b) => a - b);
-    const monthMeta = {};
-    actualMonths.forEach(m => { monthMeta[m] = MONTH_COLORS[m - 1]; });
-
-    const monthLabels = actualMonths.map(m => `${m}月`);
-    const MONTH_RANGE = `${Math.min(...actualMonths)}月 – ${Math.max(...actualMonths)}月`;
-    document.getElementById('subtitle').textContent = 'Nickilism';
-
-    // ===== 统计计算 =====
-    const totalBooks = books.length;
-    const totalPages = books.reduce((sum, b) => sum + (parseInt(b.pages) || 0), 0);
-
-    // 国家统计（只统计非空国家）
-    const countryCount = {};
-    books.forEach(b => {
-      if (b.country) {
-        countryCount[b.country] = (countryCount[b.country] || 0) + 1;
-      }
-    });
-
-    // 每月统计
-    const monthCounts = {};
-    actualMonths.forEach(m => { monthCounts[m] = 0; });
-    books.forEach(b => { if (monthCounts[b.month] !== undefined) monthCounts[b.month]++; });
-
-    // ===== 更新 DOM =====
-    document.getElementById('total-books').textContent = totalBooks;
-    document.getElementById('total-pages').textContent = totalPages;
-
-    // 计算阅读天数中位数
-    const readingDays = books.map(b => {
-      const start = new Date(b.start);
-      const finish = new Date(b.finish);
-      return (finish - start) / (1000 * 60 * 60 * 24);
-    }).sort((a, b) => a - b);
-
-    const medianReadingDays = readingDays.length % 2 === 0
-      ? (readingDays[readingDays.length/2 - 1] + readingDays[readingDays.length/2]) / 2
-      : readingDays[Math.floor(readingDays.length/2)];
-    document.getElementById('avg-reading-time').textContent = medianReadingDays.toFixed(1);
-
-    // 渲染国家分布
-    const countryGrid = document.getElementById('country-grid');
-    Object.entries(countryCount).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
-      const badge = document.createElement('div');
-      badge.className = 'country-badge';
-      badge.innerHTML = `<span class="country-flag">${COUNTRY_FLAGS[country] || ''}</span>${country}<span class="country-count">×${count}</span>`;
-      countryGrid.appendChild(badge);
-    });
-
-    // ===== 星星计算 =====
+    // ===== 星星与格式化（与年度页一致） =====
     function stars(rating) {
       let full, half;
       if (rating >= 9) { full = 5; half = 0; }
@@ -1249,61 +1238,313 @@ const template = `<!DOCTYPE html>
              '<span class="star-empty">☆</span>'.repeat(empty);
     }
 
-    // ===== 筛选器 =====
-    const filterMap = {
-      all: () => true,
-      high: b => b.rating >= 8.4,
-      normal: b => b.rating > 7.9 && b.rating < 8.4,
-      low: b => b.rating <= 7.9,
-      report: b => Boolean(b.report),
-    };
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
 
-    const highCount = allBooks.filter(b => b.rating >= 8.4).length;
-    const normalCount = allBooks.filter(b => b.rating > 7.9 && b.rating < 8.4).length;
-    const lowCount = allBooks.filter(b => b.rating <= 7.9).length;
-    const reportCount = allBooks.filter(b => b.report).length;
+    function formatRatingCount(count) {
+      if (count >= 10000) return (count / 10000).toFixed(1) + '万';
+      if (count >= 1000) return (count / 1000).toFixed(1) + 'k';
+      return String(count);
+    }
 
-    const filterBtns = [
-      { key: 'all', label: `全部 (${totalBooks})` },
-      { key: 'high', label: `🟢 高分 (${highCount})` },
-      { key: 'normal', label: `🟡 普通 (${normalCount})` },
-      { key: 'low', label: `🔴 低分 (${lowCount})` },
-      { key: 'report', label: `📖 阅读报告 (${reportCount})` },
-    ];
+    function coverFallback(title) {
+      return "this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 150%22><rect fill=%22%23f6f5f4%22 width=%22100%22 height=%22150%22/><text x=%2250%22 y=%2280%22 text-anchor=%22middle%22 fill=%22%23a39e98%22 font-size=%2210%22>" + title + "</text></svg>'";
+    }
 
-    // 添加国家筛选按钮
-    Object.entries(countryCount).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
-      filterBtns.push({
-        key: `country-${country}`,
-        label: `${COUNTRY_FLAGS[country] || ''} ${country} (${count})`
+    // ===== 数据加载：逐年抓取并合并 =====
+    async function loadYear(y) {
+      const resp = await fetch('./' + y + '_reading_tracker.html');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const html = await resp.text();
+      const json = extractBooksJson(html);
+      if (!json) return [];
+      const books = JSON.parse(json);
+      books.forEach(function (b) { b.year = y; });
+      yearHtmlCache[y] = html;
+      return books;
+    }
+
+    async function loadAll() {
+      const yrs = [];
+      for (let y = START_YEAR; y <= CURRENT_YEAR; y++) yrs.push(y);
+      const results = await Promise.all(yrs.map(async function (y) {
+        try { return { y: y, books: await loadYear(y) }; }
+        catch (e) { return { y: y, books: null }; }
+      }));
+      results.forEach(function (r) {
+        if (r.books === null) { failedYears.push(r.y); }
+        else { loadedYears.push(r.y); allBooks = allBooks.concat(r.books); }
       });
-      filterMap[`country-${country}`] = b => b.country === country;
-    });
 
-    // 添加月份筛选按钮
-    actualMonths.forEach(m => {
-      const count = allBooks.filter(b => b.month === m).length;
-      filterBtns.push({
-        key: `month-${m}`,
-        label: `${m}月`
+      const loadErrorEl = $('loadError');
+      if (!allBooks.length) {
+        loadErrorEl.textContent = '未能加载任何年度数据：请通过 preview.cmd（HTTP 预览）打开本页，并确认 reading archive/ 下存在 2019 至当前年份的年度页。';
+        loadErrorEl.classList.add('visible');
+        return;
+      }
+      yearsAsc = loadedYears.slice().sort(function (a, b) { return a - b; });
+      $('subtitle').textContent = START_YEAR + ' – ' + CURRENT_YEAR + ' · ' + loadedYears.length + ' 年';
+
+      if (failedYears.length) {
+        $('footerNote').textContent = '已加载 ' + loadedYears.length + '/' + yrs.length + ' 年 · 未加载：' + failedYears.join('、');
+      }
+
+      dataReady = true;
+      bindSearch();
+      buildFilters();
+      initChart();
+      applySearchAndFilter();
+    }
+
+    // ===== 统计计算 =====
+    function computeMedianDays(list) {
+      const days = [];
+      list.forEach(function (b) {
+        if (!b.start || !b.finish) return;
+        const s = new Date(b.start);
+        const f = new Date(b.finish);
+        if (isNaN(s.getTime()) || isNaN(f.getTime())) return;
+        const d = (f - s) / (1000 * 60 * 60 * 24);
+        if (d >= 0) days.push(d);
       });
-      filterMap[`month-${m}`] = b => b.month === m;
-    });
+      if (!days.length) return null;
+      days.sort(function (a, b) { return a - b; });
+      return days.length % 2 === 0
+        ? (days[days.length / 2 - 1] + days[days.length / 2]) / 2
+        : days[Math.floor(days.length / 2)];
+    }
 
-    let currentFilter = 'all';
-    let currentSortField = 'finish';
-    let currentSortDir = 'desc';
-    let booklistOpen = true;
+    function renderCountryGrid(list) {
+      const cc = {};
+      list.forEach(function (b) { if (b.country) cc[b.country] = (cc[b.country] || 0) + 1; });
+      const cg = $('country-grid');
+      cg.innerHTML = '';
+      Object.keys(cc).sort(function (a, b) { return cc[b] - cc[a]; }).forEach(function (country) {
+        const count = cc[country];
+        const badge = document.createElement('div');
+        badge.className = 'country-badge';
+        badge.innerHTML = '<span class="country-flag">' + (COUNTRY_FLAGS[country] || '') + '</span>' + country + '<span class="country-count">×' + count + '</span>';
+        cg.appendChild(badge);
+      });
+    }
 
-    // ===== 搜索 + 筛选组合逻辑 =====
+    function updateStats(list) {
+      $('total-books').textContent = list.length;
+      $('total-pages').textContent = list.reduce(function (s, b) { return s + (parseInt(b.pages, 10) || 0); }, 0).toLocaleString('zh-CN');
+      const median = computeMedianDays(list);
+      $('avg-reading-time').textContent = median === null ? '—' : median.toFixed(1);
+      renderCountryGrid(list);
+      updateFilterCounts(getSearchOnlyBooks());
+    }
+    // ===== 图表：每年阅读量柱 + 累计趋势线（合并一张图） =====
+    let yearChart = null;
+
+    function initChart() {
+      if (!window.Chart || !yearsAsc.length) return;
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const cssVar = function (n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
+      const lineColor = cssVar('--chart-line') || '#b45309';
+      const chartTextColor = isDark ? '#9e9a96' : '#615d59';
+      const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
+      const yearColors = yearsAsc.map(function (y) { return YEAR_COLORS[(y - START_YEAR) % YEAR_COLORS.length]; });
+
+      yearChart = new Chart($('yearChart'), {
+        data: {
+          labels: yearsAsc.map(String),
+          datasets: [
+            { type: 'bar', label: '本数', data: [], backgroundColor: yearColors.map(function (c) { return c.bg; }), borderColor: yearColors.map(function (c) { return c.color; }), borderWidth: 1, borderRadius: 6, order: 2, yAxisID: 'y' },
+            { type: 'line', label: '累计', data: [], borderColor: lineColor, backgroundColor: lineColor, pointBackgroundColor: lineColor, pointRadius: 2, borderWidth: 2, tension: 0.25, fill: false, order: 1, yAxisID: 'y1' }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          layout: { padding: { top: 14 } },
+          plugins: { legend: { display: false } },
+          onClick: function (evt, els) {
+            if (els && els.length && els[0].datasetIndex === 0) {
+              const y = yearsAsc[els[0].index];
+              if (y !== undefined) selectYearFilter(y);
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1, font: { family: 'Inter', size: 11 }, color: chartTextColor },
+              grid: { color: chartGridColor },
+              border: { display: false }
+            },
+            y1: {
+              position: 'right',
+              beginAtZero: true,
+              grid: { display: false },
+              border: { display: false },
+              ticks: { display: false }
+            },
+            x: {
+              ticks: { font: { family: 'Inter', size: 12 }, color: chartTextColor },
+              grid: { display: false },
+              border: { display: false }
+            }
+          }
+        },
+        plugins: [{
+          id: 'yearDataLabels',
+          afterDatasetsDraw: function (chart) {
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.font = '600 11px Inter';
+            ctx.fillStyle = chartTextColor;
+            ctx.textAlign = 'center';
+            chart.data.datasets[0].data.forEach(function (value, index) {
+              if (value > 0) {
+                const x = chart.scales.x.getPixelForValue(index);
+                const yPix = chart.scales.y.getPixelForValue(value);
+                const y = Math.max(yPix - 8, chart.chartArea.top + 2);
+                ctx.fillText(value, x, y);
+              }
+            });
+            ctx.restore();
+          }
+        }]
+      });
+    }
+
+    function updateChart(list) {
+      if (!yearChart) return;
+      const counts = {};
+      yearsAsc.forEach(function (y) { counts[y] = 0; });
+      list.forEach(function (b) { if (counts[b.year] !== undefined) counts[b.year]++; });
+      const barData = yearsAsc.map(function (y) { return counts[y]; });
+      const cum = [];
+      let acc = 0;
+      barData.forEach(function (v) { acc += v; cum.push(acc); });
+      yearChart.data.datasets[0].data = barData;
+      yearChart.data.datasets[1].data = cum;
+      yearChart.options.scales.y.max = Math.max(Math.max.apply(null, barData) + 2, 5);
+      yearChart.update();
+    }
+
+    // ===== 筛选 =====
+    function buildFilters() {
+      const filtersEl = $('filters');
+      filtersEl.innerHTML = '<span class="filter-label">筛选</span>';
+
+      const base = [
+        { key: 'all', label: '全部' },
+        { key: 'top10', label: '🏆 Top10' },
+        { key: 'high', label: '🟢 高分' },
+        { key: 'normal', label: '🟡 普通' },
+        { key: 'low', label: '🔴 低分' },
+        { key: 'report', label: '📖 阅读报告' }
+      ];
+      base.forEach(function (fb) {
+        if (fb.key === 'all') filterMap[fb.key] = function () { return true; };
+        else if (fb.key === 'high') filterMap[fb.key] = function (b) { return b.rating >= 8.4; };
+        else if (fb.key === 'normal') filterMap[fb.key] = function (b) { return b.rating > 7.9 && b.rating < 8.4; };
+        else if (fb.key === 'low') filterMap[fb.key] = function (b) { return b.rating <= 7.9; };
+        else if (fb.key === 'report') filterMap[fb.key] = function (b) { return Boolean(b.report); };
+        else if (fb.key === 'top10') filterMap[fb.key] = function (b) { return currentTop10Set.has(b); };
+        addFilterButton(filtersEl, fb.key, fb.label);
+      });
+
+      const cc = {};
+      allBooks.forEach(function (b) { if (b.country) cc[b.country] = (cc[b.country] || 0) + 1; });
+      Object.keys(cc).sort(function (a, b) { return cc[b] - cc[a]; }).forEach(function (country) {
+        const key = 'country-' + country;
+        filterMap[key] = function (b) { return b.country === country; };
+        addFilterButton(filtersEl, key, (COUNTRY_FLAGS[country] || '') + ' ' + country);
+      });
+
+      // 年份筛选：降序（最新在前），范围随加载到的年份动态变化
+      yearsAsc.slice().reverse().forEach(function (y) {
+        const key = 'year-' + y;
+        filterMap[key] = function (b) { return b.year === y; };
+        addFilterButton(filtersEl, key, y + '年');
+      });
+
+      // 深链：?year=2020
+      const urlParams = new URLSearchParams(window.location.search);
+      const yearParam = urlParams.get('year');
+      if (yearParam && filterMap['year-' + yearParam]) {
+        currentFilter = 'year-' + yearParam;
+      }
+
+      syncActiveFilter();
+    }
+
+    function addFilterButton(container, key, label) {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn';
+      btn.dataset.filterKey = key;
+      btn.dataset.baseLabel = label;
+      btn.textContent = label;
+      btn.addEventListener('click', function () {
+        currentFilter = key;
+        applyRatingDefaultSort();
+        syncActiveFilter();
+        applySearchAndFilter();
+      });
+      container.appendChild(btn);
+    }
+
+    function syncActiveFilter() {
+      document.querySelectorAll('.filter-btn').forEach(function (b) {
+        b.classList.toggle('active', b.dataset.filterKey === currentFilter);
+      });
+      updateYearPageLink();
+    }
+
+    function updateYearPageLink() {
+      let link = $('yearPageLink');
+      if (currentFilter.indexOf('year-') === 0) {
+        const y = currentFilter.slice(5);
+        if (!link) {
+          link = document.createElement('a');
+          link.id = 'yearPageLink';
+          link.className = 'filter-year-link';
+          link.target = '_blank';
+          link.rel = 'noopener';
+          $('filters').appendChild(link);
+        }
+        link.href = './' + y + '_reading_tracker.html';
+        link.textContent = '打开 ' + y + ' 年度页 ↗';
+      } else if (link) {
+        link.remove();
+      }
+    }
+
+    function selectYearFilter(y) {
+      const key = 'year-' + y;
+      currentFilter = (currentFilter === key) ? 'all' : key;
+      syncActiveFilter();
+      applySearchAndFilter();
+    }
+
+    function updateFilterCounts(list) {
+      document.querySelectorAll('.filter-btn').forEach(function (btn) {
+        const key = btn.dataset.filterKey;
+        if (!key) return;
+        if (key === 'all') {
+          btn.textContent = '全部 (' + list.length + ')';
+        } else if (filterMap[key]) {
+          btn.textContent = btn.dataset.baseLabel + ' (' + list.filter(filterMap[key]).length + ')';
+        }
+      });
+    }
+
+    // ===== 搜索 + 筛选组合逻辑（与年度页一致） =====
     function getFilteredBooks() {
       let result = allBooks;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
-        result = result.filter(b =>
-          (b.title && b.title.toLowerCase().includes(q)) ||
-          (b.author && b.author.toLowerCase().includes(q))
-        );
+        result = result.filter(function (b) {
+          return (b.title && b.title.toLowerCase().indexOf(q) !== -1) ||
+                 (b.author && b.author.toLowerCase().indexOf(q) !== -1);
+        });
       }
       if (currentFilter !== 'all') {
         result = result.filter(filterMap[currentFilter]);
@@ -1314,66 +1555,15 @@ const template = `<!DOCTYPE html>
     function getSearchOnlyBooks() {
       if (!searchQuery) return allBooks;
       const q = searchQuery.toLowerCase();
-      return allBooks.filter(b =>
-        (b.title && b.title.toLowerCase().includes(q)) ||
-        (b.author && b.author.toLowerCase().includes(q))
-      );
-    }
-
-    function updateFilterCounts(list) {
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        const key = btn.dataset.filterKey;
-        if (!key) return;
-        if (key === 'all') {
-          btn.textContent = `全部 (${list.length})`;
-        } else if (filterMap[key]) {
-          btn.textContent = btn.dataset.baseLabel + ` (${list.filter(filterMap[key]).length})`;
-        }
+      return allBooks.filter(function (b) {
+        return (b.title && b.title.toLowerCase().indexOf(q) !== -1) ||
+               (b.author && b.author.toLowerCase().indexOf(q) !== -1);
       });
-    }
-
-    function updateStats(list) {
-      const n = list.length;
-      document.getElementById('total-books').textContent = n;
-      document.getElementById('total-pages').textContent =
-        list.reduce((s, b) => s + (parseInt(b.pages) || 0), 0).toLocaleString();
-      if (n) {
-        const days = list.map(b => {
-          const s = new Date(b.start), f = new Date(b.finish);
-          return (f - s) / (1000 * 60 * 60 * 24);
-        }).sort((a, b) => a - b);
-        const median = days.length % 2 === 0
-          ? (days[days.length/2 - 1] + days[days.length/2]) / 2
-          : days[Math.floor(days.length/2)];
-        document.getElementById('avg-reading-time').textContent = median.toFixed(1);
-      } else {
-        document.getElementById('avg-reading-time').textContent = '0';
-      }
-      // Country badges
-      const cc = {};
-      list.forEach(b => { if (b.country) cc[b.country] = (cc[b.country] || 0) + 1; });
-      const cg = document.getElementById('country-grid');
-      cg.innerHTML = '';
-      Object.entries(cc).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
-        const badge = document.createElement('div');
-        badge.className = 'country-badge';
-        badge.innerHTML = `<span class="country-flag">${COUNTRY_FLAGS[country] || ''}</span>${country}<span class="country-count">×${count}</span>`;
-        cg.appendChild(badge);
-      });
-      updateFilterCounts(getSearchOnlyBooks());
-    }
-
-    function updateChart(list) {
-      if (!monthChart) return;
-      const counts = {};
-      actualMonths.forEach(m => { counts[m] = 0; });
-      list.forEach(b => { if (counts[b.month] !== undefined) counts[b.month]++; });
-      monthChart.data.datasets[0].data = actualMonths.map(m => counts[m]);
-      monthChart.options.scales.y.max = Math.max(Math.max(...actualMonths.map(m => counts[m])) + 1, 4);
-      monthChart.update();
     }
 
     function applySearchAndFilter() {
+      if (!dataReady) return;
+      refreshTop10Set();
       const filtered = getFilteredBooks();
       updateStats(filtered);
       updateChart(filtered);
@@ -1381,139 +1571,132 @@ const template = `<!DOCTYPE html>
         renderWall(filtered);
         renderBooklist(getSortedList(filtered));
         if (booklistOpen) {
-          document.getElementById('booklist-content').classList.add('open');
-          document.getElementById('booklist-toggle').classList.add('open');
+          $('booklist-content').classList.add('open');
+          $('booklist-toggle').classList.add('open');
         }
       } else {
-        document.getElementById('cover-wall').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
-        document.getElementById('booklist-content').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
-        document.getElementById('wall-count').textContent = '0 本';
+        $('cover-wall').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
+        $('booklist-content').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
+        $('wall-count').textContent = '0 本';
       }
     }
 
     // ===== 搜索框事件 =====
-    const searchInput = document.getElementById('searchInput');
-    const searchClear = document.getElementById('searchClear');
+    function bindSearch() {
+      const searchInput = $('searchInput');
+      const searchClear = $('searchClear');
+      const urlParams = new URLSearchParams(window.location.search);
+      searchQuery = urlParams.get('search') || '';
+      searchInput.value = searchQuery;
+      if (searchQuery) searchClear.classList.add('visible');
 
-    // 从 URL 预填
-    const urlParams = new URLSearchParams(window.location.search);
-    searchQuery = urlParams.get('search') || '';
-    searchInput.value = searchQuery;
-    if (searchQuery) searchClear.classList.add('visible');
+      searchInput.addEventListener('input', function (e) {
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(function () {
+          searchQuery = e.target.value.trim();
+          const url = new URL(window.location);
+          if (searchQuery) url.searchParams.set('search', searchQuery);
+          else url.searchParams.delete('search');
+          history.replaceState(null, '', url);
+          searchClear.classList.toggle('visible', !!searchQuery);
+          applySearchAndFilter();
+        }, 150);
+      });
 
-    searchInput.addEventListener('input', (e) => {
-      clearTimeout(searchDebounce);
-      searchDebounce = setTimeout(() => {
-        searchQuery = e.target.value.trim();
+      searchClear.addEventListener('click', function () {
+        searchInput.value = '';
+        searchQuery = '';
         const url = new URL(window.location);
-        if (searchQuery) {
-          url.searchParams.set('search', searchQuery);
-        } else {
-          url.searchParams.delete('search');
-        }
+        url.searchParams.delete('search');
         history.replaceState(null, '', url);
-        searchClear.classList.toggle('visible', !!searchQuery);
+        searchClear.classList.remove('visible');
         applySearchAndFilter();
-      }, 150);
-    });
+        searchInput.focus();
+      });
+    }
 
-    searchClear.addEventListener('click', () => {
-      searchInput.value = '';
-      searchQuery = '';
-      searchClear.classList.remove('visible');
-      const url = new URL(window.location);
-      url.searchParams.delete('search');
-      history.replaceState(null, '', url);
-      applySearchAndFilter();
-      searchInput.focus();
-    });
+    // ===== Top10 筛选（评分前 10，分数相同并列纳入） =====
+    function topBooksWithTies(list) {
+      const rated = list.filter(function (b) { return typeof b.rating === 'number'; });
+      rated.sort(function (a, b) {
+        if (b.rating !== a.rating) return b.rating - a.rating;
+        return (b.finish || '').localeCompare(a.finish || '');
+      });
+      const top = rated.slice(0, 10);
+      if (!top.length) return [];
+      const cutoff = top[top.length - 1].rating;
+      return rated.filter(function (b) { return b.rating >= cutoff; });
+    }
 
-    // ===== 筛选按钮 =====
-    const filtersEl = document.getElementById('filters');
-    filterBtns.forEach(fb => {
-      const btn = document.createElement('button');
-      btn.className = 'filter-btn' + (fb.key === 'all' ? ' active' : '');
-      btn.textContent = fb.label;
-      btn.dataset.filterKey = fb.key;
-      btn.dataset.baseLabel = fb.label.replace(/\s*\(\d+\)\s*$/, '');
-      btn.onclick = () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentFilter = fb.key;
-        applySearchAndFilter();
-      };
-      filtersEl.appendChild(btn);
-    });
+    function refreshTop10Set() {
+      currentTop10Set = new Set(topBooksWithTies(getSearchOnlyBooks()));
+    }
 
-    // ===== 渲染封面墙 =====
+    // ===== 书影留存 =====
     function renderWall(list) {
-      document.getElementById('wall-count').textContent = `${list.length} 本`;
-      const wallEl = document.getElementById('cover-wall');
+      const wallEl = $('cover-wall');
       wallEl.innerHTML = '';
-      // 按 finish 时间升序排列
+      $('wall-count').textContent = list.length + ' 本';
       const sorted = getSortedList(list);
-      sorted.forEach(b => {
+      sorted.forEach(function (b) {
+        const idx = allBooks.indexOf(b);
         const item = document.createElement('div');
         item.className = 'cover-item';
-        item.innerHTML = `
-          <div class="cover-link" onclick="openBookPanel(${allBooks.indexOf(b)})" title="${b.title}">
-            <div class="cover-img-wrap">
-              <img src="${b.cover}" alt="${b.title}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 150%22><rect fill=%22%23f6f5f4%22 width=%22100%22 height=%22150%22/><text x=%2250%22 y=%2280%22 text-anchor=%22middle%22 fill=%22%23a39e98%22 font-size=%2210%22>${b.title}</text></svg>'">
-              <div class="cover-overlay">
-                <div class="cover-title">${b.title}</div>
-                <div class="cover-author">${b.author}</div>
-                <div class="cover-rating">${stars(b.rating)} ${b.rating}</div>
-              </div>
-            </div>
-          </div>`;
+        item.innerHTML =
+          '<span class="cover-chip">' + b.year + '</span>' +
+          '<div class="cover-link" onclick="openBookPanel(' + idx + ')" title="' + b.title + '">' +
+            '<div class="cover-img-wrap"><img src="' + b.cover + '" alt="' + b.title + '" loading="lazy" onerror="' + coverFallback(b.title) + '">' +
+            '<div class="cover-overlay">' +
+              '<div class="cover-title">' + b.title + '</div>' +
+              '<div class="cover-author">' + b.author + '</div>' +
+              '<div class="cover-rating">' + stars(b.rating) + ' ' + (b.rating == null || b.rating === '' ? '未评分' : b.rating) + '</div>' +
+            '</div></div>' +
+          '</div>';
         wallEl.appendChild(item);
       });
     }
 
-    // ===== 渲染书单列表 =====
+    // ===== 书籍清单 =====
     function renderBooklist(list) {
-      const content = document.getElementById('booklist-content');
-      content.innerHTML = list.map((b, idx) => {
-        const m = monthMeta[b.month];
+      const content = $('booklist-content');
+      content.innerHTML = list.map(function (b, idx) {
         let reviewSection = '';
         if (b.review) {
           const needsTruncation = b.review.length > 60;
           const truncatedText = needsTruncation ? b.review.substring(0, 60) + '...' : b.review;
-          reviewSection = `
-            <div class="book-review" id="review-${idx}" data-full="${encodeURIComponent(b.review)}" data-truncated="${needsTruncation}">
-              ${truncatedText.replace(/\n/g, '<br>')}
-            </div>
-            ${needsTruncation ? `<button class="review-more-btn" onclick="toggleReview(${idx}, this)">展开</button>` : ''}
-          `;
+          reviewSection = '<div class="book-review" id="review-' + idx + '" data-full="' + encodeURIComponent(b.review) + '" data-truncated="' + needsTruncation + '">' +
+            truncatedText.replace(/\n/g, '<br>') +
+            '</div>' +
+            (needsTruncation ? '<button class="review-more-btn" onclick="toggleReview(' + idx + ', this)">展开</button>' : '');
         }
         const reportBtn = b.report
-          ? `<a class="report-btn" href="${b.report}" target="_blank" rel="noopener">阅读报告</a>`
+          ? '<a class="report-btn" href="' + b.report + '" target="_blank" rel="noopener">阅读报告</a>'
           : '';
-        return `<div class="book-row">
-          <div class="book-info">
-            <div class="book-dates">${b.start}<br>${b.finish}</div>
-            <div class="book-title-row">
-              <div class="book-title"><a href="${b.doubanLink}" target="_blank" style="color:inherit;text-decoration:none;">${b.title}</a></div>
-              ${reportBtn}
-            </div>
-            <div class="book-author">${b.author}</div>
-            <div class="book-meta">
-              <span class="month-tag" style="background:${m.bg};color:${m.color}">${m.label}</span>
-              <span class="star-rating">${stars(b.rating)}</span>
-              <span class="rating-num">${b.rating}</span>
-              ${b.pages ? `<span class="pages-tag">${b.pages}页</span>` : ''}
-            </div>
-            ${reviewSection}
-          </div>
-        </div>`;
+        return '<div class="book-row">' +
+          '<div class="book-info">' +
+            '<div class="book-dates">' + (b.start || '') + '<br>' + (b.finish || '') + '</div>' +
+            '<div class="book-title-row">' +
+              '<div class="book-title"><a href="' + b.doubanLink + '" target="_blank" style="color:inherit;text-decoration:none;">' + b.title + '</a></div>' +
+              reportBtn +
+            '</div>' +
+            '<div class="book-author">' + b.author + '</div>' +
+            '<div class="book-meta">' +
+              '<span class="year-tag">' + b.year + '年</span>' +
+              '<span class="star-rating">' + stars(b.rating) + '</span>' +
+              '<span class="rating-num">' + (b.rating == null || b.rating === '' ? '未评分' : b.rating) + '</span>' +
+              (b.pages ? '<span class="pages-tag">' + b.pages + '页</span>' : '') +
+            '</div>' +
+            reviewSection +
+          '</div>' +
+        '</div>';
       }).join('');
     }
 
     function toggleReview(idx, btn) {
-      const review = document.getElementById(`review-${idx}`);
+      const review = $('review-' + idx);
+      if (!review) return;
       const isCollapsed = btn.textContent === '展开';
       const fullText = decodeURIComponent(review.dataset.full);
-
       if (isCollapsed) {
         review.innerHTML = fullText.replace(/\n/g, '<br>');
         btn.textContent = '收起';
@@ -1525,137 +1708,97 @@ const template = `<!DOCTYPE html>
 
     // ===== 展开/收起书单 =====
     function toggleBooklist() {
-      const toggle = document.getElementById('booklist-toggle');
-      const content = document.getElementById('booklist-content');
+      const toggle = $('booklist-toggle');
+      const content = $('booklist-content');
       booklistOpen = !booklistOpen;
       toggle.classList.toggle('open', booklistOpen);
       content.classList.toggle('open', booklistOpen);
     }
 
-    // ===== 排序函数 =====
+    // ===== 排序 =====
     function getSortedList(list) {
-      const sorted = [...list];
+      const sorted = list.slice();
       const dir = currentSortDir === 'desc' ? -1 : 1;
       switch (currentSortField) {
-        case 'finish': return sorted.sort((a, b) => a.finish.localeCompare(b.finish) * dir);
-        case 'rating': return sorted.sort((a, b) => (a.rating - b.rating) * dir);
-        case 'pages': return sorted.sort((a, b) => ((parseInt(a.pages) || 0) - (parseInt(b.pages) || 0)) * dir);
+        case 'finish': return sorted.sort(function (a, b) { return (a.finish || '').localeCompare(b.finish || '') * dir; });
+        case 'rating': return sorted.sort(function (a, b) { return ((a.rating || 0) - (b.rating || 0)) * dir; });
+        case 'pages': return sorted.sort(function (a, b) { return ((parseInt(a.pages, 10) || 0) - (parseInt(b.pages, 10) || 0)) * dir; });
+        case 'year': return sorted.sort(function (a, b) { return (a.year - b.year) * dir; });
         default: return sorted;
       }
     }
 
-    // ===== 排序按钮事件 =====
-    document.querySelectorAll('.sort-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const field = btn.dataset.sort;
-        if (currentSortField === field) {
-          // 同字段点击 → 切换方向
-          currentSortDir = currentSortDir === 'desc' ? 'asc' : 'desc';
-        } else {
-          // 不同字段 → 切换到该字段，默认降序
-          currentSortField = field;
-          currentSortDir = 'desc';
-        }
-        // 更新按钮文字
-        const fieldLabels = { finish: '时间', rating: '评分', pages: '页数' };
-        document.querySelectorAll('.sort-btn').forEach(b => {
-          const f = b.dataset.sort;
-          const a = (currentSortField === f) ? currentSortDir : 'desc';
-          b.textContent = fieldLabels[f] + (a === 'desc' ? ' ↓' : ' ↑');
-          b.classList.toggle('active', currentSortField === f);
-        });
-        applySearchAndFilter();
-      });
-    });
+    // ===== 排序 =====
+    const RATING_SORT_KEYS = { top10: true, high: true, normal: true, low: true };
 
-    // ===== 图表 =====
-    const maxMonthlyCount = Math.max(...actualMonths.map(m => monthCounts[m]));
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const chartTextColor = isDark ? '#9e9a96' : '#615d59';
-    const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
-    // Chart.js 由仓库本地资源提供；若未加载成功则降级为不渲染图表，不影响书单/笔记等其它功能
-    let monthChart = null;
-    if (window.Chart) {
-      monthChart = new Chart(document.getElementById('monthChart'), {
-      type: 'bar',
-      data: {
-        labels: monthLabels,
-        datasets: [{
-          label: '本数',
-          data: actualMonths.map(m => monthCounts[m]),
-          backgroundColor: actualMonths.map(m => MONTH_COLORS[m - 1].bg),
-          borderColor: actualMonths.map(m => MONTH_COLORS[m - 1].color),
-          borderWidth: 1,
-          borderRadius: 6,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            max: Math.max(maxMonthlyCount + 1, 4),
-            ticks: { stepSize: 1, font: { family: 'Inter', size: 11 }, color: chartTextColor },
-            grid: { color: chartGridColor },
-            border: { display: false }
-          },
-          x: {
-            ticks: { font: { family: 'Inter', size: 12 }, color: chartTextColor },
-            grid: { display: false },
-            border: { display: false }
-          }
-        }
-      },
-      plugins: [{
-        id: 'monthDataLabels',
-        afterDatasetsDraw(chart) {
-          const { ctx, data, scales } = chart;
-          ctx.save();
-          ctx.font = '600 11px Inter';
-          ctx.fillStyle = chartTextColor;
-          ctx.textAlign = 'center';
-          data.datasets[0].data.forEach((value, index) => {
-            if (value > 0) {
-              const x = scales.x.getPixelForValue(index);
-              const y = scales.y.getPixelForValue(value) - 6;
-              ctx.fillText(value, x, y);
-            }
-          });
-          ctx.restore();
-        }
-      }]
-    });
+    function renderSortButtons() {
+      const fieldLabels = { finish: '时间', rating: '评分', pages: '页数', year: '年份' };
+      document.querySelectorAll('.sort-btn').forEach(function (b) {
+        const f = b.dataset.sort;
+        const a = (currentSortField === f) ? currentSortDir : 'desc';
+        b.textContent = fieldLabels[f] + (a === 'desc' ? ' ↓' : ' ↑');
+        b.classList.toggle('active', currentSortField === f);
+      });
     }
 
-    // ===== Book Notes Panel =====
-    const panelOverlay = document.getElementById('panelOverlay');
-    const bookPanel = document.getElementById('bookPanel');
-    const panelClose = document.getElementById('panelClose');
-    const panelBackBtn = document.getElementById('panelBackBtn');
-    const panelHeader = document.getElementById('panelHeader');
-    const panelBody = document.getElementById('panelBody');
+    // 评分类筛选激活时，列表默认按评分从高到低排序
+    function applyRatingDefaultSort() {
+      if (RATING_SORT_KEYS[currentFilter] && currentSortField !== 'rating') {
+        currentSortField = 'rating';
+        currentSortDir = 'desc';
+        renderSortButtons();
+      }
+    }
+
+    function bindSort() {
+      document.querySelectorAll('.sort-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const field = btn.dataset.sort;
+          if (currentSortField === field) {
+            currentSortDir = currentSortDir === 'desc' ? 'asc' : 'desc';
+          } else {
+            currentSortField = field;
+            currentSortDir = 'desc';
+          }
+          renderSortButtons();
+          applySearchAndFilter();
+        });
+      });
+    }
+    // ===== 笔记 / 划线面板（懒加载 weread） =====
+    const panelOverlay = $('panelOverlay');
+    const bookPanel = $('bookPanel');
+    const panelClose = $('panelClose');
+    const panelBackBtn = $('panelBackBtn');
+    const panelHeader = $('panelHeader');
+    const panelBody = $('panelBody');
+    let panelOpen = false;
+    let closingFromPopstate = false;
+    let currentOpenIndex = -1;
 
     function isMobile() {
       return window.innerWidth < 600;
     }
 
-    let panelOpen = false;
-    let closingFromPopstate = false;
+    async function getWereadForYear(year) {
+      if (wereadCache[year] !== undefined) return wereadCache[year];
+      wereadCache[year] = null;
+      if (!yearHtmlCache[year]) return null;
+      try {
+        const json = extractWereadJson(yearHtmlCache[year]);
+        wereadCache[year] = json ? JSON.parse(json) : null;
+      } catch (e) { /* 保持 null，不阻断面板 */ }
+      return wereadCache[year];
+    }
 
-    function openBookPanel(bookIndex) {
+    async function openBookPanel(bookIndex) {
       const b = allBooks[bookIndex];
       if (!b) return;
-      const weread = b.wereadId ? wereadData[b.wereadId] : null;
-      renderPanelContent(b, weread);
+      currentOpenIndex = bookIndex;
+      renderPanelContent(b, null);
       if (isMobile()) {
-        // 移动端：用 history 管理导航，支持左边缘滑动返回
         history.pushState({ panel: true }, '');
       } else {
-        // 桌面端：锁定背景滚动
         const scrollY = window.scrollY;
         document.body.style.position = 'fixed';
         document.body.style.top = '-' + scrollY + 'px';
@@ -1668,11 +1811,17 @@ const template = `<!DOCTYPE html>
       bookPanel.classList.add('active');
       panelOpen = true;
       panelBody.scrollTop = 0;
+
+      // 懒加载该书所在年份的划线数据（同一本书仍打开时才刷新）
+      const wdata = await getWereadForYear(b.year);
+      const weread = (wdata && b.wereadId) ? wdata[b.wereadId] : null;
+      if (currentOpenIndex === bookIndex && panelOpen) {
+        renderPanelContent(b, weread);
+      }
     }
 
     function closeBookPanel() {
       if (isMobile() && !closingFromPopstate) {
-        // 移动端：通过 history.back() 关闭，popstate 会处理动画
         closingFromPopstate = true;
         history.back();
         return;
@@ -1680,7 +1829,6 @@ const template = `<!DOCTYPE html>
       bookPanel.classList.remove('active');
       if (!isMobile()) {
         panelOverlay.classList.remove('active');
-        // 桌面端：恢复背景滚动
         const scrollY = parseInt(document.body.dataset.scrollY || '0', 10);
         document.body.style.position = '';
         document.body.style.top = '';
@@ -1690,11 +1838,11 @@ const template = `<!DOCTYPE html>
         window.scrollTo(0, scrollY);
       }
       panelOpen = false;
+      currentOpenIndex = -1;
       closingFromPopstate = false;
     }
 
-    // 浏览器返回按钮 / 左边缘滑动返回
-    window.addEventListener('popstate', (e) => {
+    window.addEventListener('popstate', function () {
       if (panelOpen) {
         closingFromPopstate = true;
         closeBookPanel();
@@ -1704,10 +1852,8 @@ const template = `<!DOCTYPE html>
     panelOverlay.addEventListener('click', closeBookPanel);
     panelClose.addEventListener('click', closeBookPanel);
     panelBackBtn.addEventListener('click', closeBookPanel);
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && panelOpen) {
-        closeBookPanel();
-      }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && panelOpen) closeBookPanel();
     });
 
     function renderPanelContent(book, weread) {
@@ -1719,19 +1865,19 @@ const template = `<!DOCTYPE html>
         '<div class="panel-book-info">' +
           '<div class="panel-title">' + book.title + '</div>' +
           '<div class="panel-author">' + book.author + '</div>' +
+          '<div class="panel-meta"><span class="year-tag">' + book.year + '年</span>' +
+            (book.start ? '<span class="panel-dates">' + book.start + ' → ' + book.finish + '</span>' : '') +
+          '</div>' +
           (book.report
             ? '<a class="report-btn panel-report-btn" href="' + book.report + '" target="_blank" rel="noopener">阅读报告</a>'
             : '') +
           (weread && weread.rating
-            ? '<div class="panel-rating">微信读书推荐值 <span class="panel-rating-score">' +
-              (weread.rating / 10).toFixed(1) + '%</span> · ' +
-              formatRatingCount(weread.ratingCount) + '人评价</div>'
-            : '')
-        + '</div>';
+            ? '<div class="panel-rating">微信读书推荐值 <span class="panel-rating-score">' + (weread.rating / 10).toFixed(1) + '%</span> · ' + formatRatingCount(weread.ratingCount) + '人评价</div>'
+            : '') +
+        '</div>';
 
       let html = '';
 
-      // 书籍简介（可折叠）
       if (book.summary) {
         const needsCollapse = book.summary.length > 150;
         html += '<div class="panel-section">';
@@ -1739,19 +1885,16 @@ const template = `<!DOCTYPE html>
         html += '<span class="panel-section-title" style="margin-bottom:0">书籍简介</span>';
         html += '<span class="panel-summary-arrow">▼</span>';
         html += '</div>';
-        html += '<div class="panel-summary-text' + (needsCollapse ? ' collapsed' : '') + '" id="panelSummaryText">' +
-          book.summary.replace(/\n/g, '<br>') + '</div>';
+        html += '<div class="panel-summary-text' + (needsCollapse ? ' collapsed' : '') + '" id="panelSummaryText">' + book.summary.replace(/\n/g, '<br>') + '</div>';
         html += '</div>';
       }
 
-      // 全书点评
       if (book.review) {
         html += '<div class="panel-section">';
         html += '<div class="panel-section-title">全书点评</div>';
         html += '<div class="panel-review-card">';
         const needsCollapse = book.review.length > 200;
-        html += '<div class="panel-review-text' + (needsCollapse ? ' collapsed' : '') + '" id="panelReviewText">' +
-          book.review.replace(/\n/g, '<br>') + '</div>';
+        html += '<div class="panel-review-text' + (needsCollapse ? ' collapsed' : '') + '" id="panelReviewText">' + book.review.replace(/\n/g, '<br>') + '</div>';
         if (needsCollapse) {
           html += '<button class="panel-review-toggle" onclick="togglePanelReview(this)">展开全文</button>';
         }
@@ -1767,7 +1910,6 @@ const template = `<!DOCTYPE html>
         return;
       }
 
-      // Tabs
       const hlCount = weread.highlights ? weread.highlights.length : 0;
       const thCount = weread.thoughts ? weread.thoughts.length : 0;
       const popCount = weread.popularHighlights ? weread.popularHighlights.length : 0;
@@ -1778,10 +1920,9 @@ const template = `<!DOCTYPE html>
       html += '<button class="panel-tab" data-tab="popular">热门划线 (' + popCount + ')</button>';
       html += '</div>';
 
-      // Highlights tab
       html += '<div class="panel-tab-content active" data-tab-content="highlights">';
       if (hlCount > 0) {
-        weread.highlights.forEach(function(h) {
+        weread.highlights.forEach(function (h) {
           html += '<div class="panel-note-item">';
           html += '<div class="panel-note-text">' + escapeHtml(h.text) + '</div>';
           if (h.chapter) html += '<div class="panel-note-chapter">——' + escapeHtml(h.chapter) + '</div>';
@@ -1792,14 +1933,11 @@ const template = `<!DOCTYPE html>
       }
       html += '</div>';
 
-      // Thoughts tab
       html += '<div class="panel-tab-content" data-tab-content="thoughts">';
       if (thCount > 0) {
-        weread.thoughts.forEach(function(t) {
+        weread.thoughts.forEach(function (t) {
           html += '<div class="panel-note-item">';
-          if (t.quote) {
-            html += '<div class="panel-quote">' + escapeHtml(t.quote) + '</div>';
-          }
+          if (t.quote) html += '<div class="panel-quote">' + escapeHtml(t.quote) + '</div>';
           html += '<div class="panel-thought-content">' + escapeHtml(t.text) + '</div>';
           if (t.chapter) html += '<div class="panel-note-chapter">——' + escapeHtml(t.chapter) + '</div>';
           html += '</div>';
@@ -1809,10 +1947,9 @@ const template = `<!DOCTYPE html>
       }
       html += '</div>';
 
-      // Popular highlights tab
       html += '<div class="panel-tab-content" data-tab-content="popular">';
       if (popCount > 0) {
-        weread.popularHighlights.forEach(function(p) {
+        weread.popularHighlights.forEach(function (p) {
           html += '<div class="panel-note-item">';
           html += '<div class="panel-note-text">' + escapeHtml(p.text) + '</div>';
           html += '<div class="panel-note-count">' + p.count + '人划线</div>';
@@ -1826,21 +1963,20 @@ const template = `<!DOCTYPE html>
 
       panelBody.innerHTML = html;
 
-      // Tab click handlers
-      panelBody.querySelectorAll('.panel-tab').forEach(function(tab) {
-        tab.addEventListener('click', function() {
-          panelBody.querySelectorAll('.panel-tab').forEach(function(t) { t.classList.remove('active'); });
-          panelBody.querySelectorAll('.panel-tab-content').forEach(function(c) { c.classList.remove('active'); });
+      panelBody.querySelectorAll('.panel-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          panelBody.querySelectorAll('.panel-tab').forEach(function (t) { t.classList.remove('active'); });
+          panelBody.querySelectorAll('.panel-tab-content').forEach(function (c) { c.classList.remove('active'); });
           tab.classList.add('active');
           panelBody.querySelector('[data-tab-content="' + tab.dataset.tab + '"]').classList.add('active');
-          // 切换 tab 后重置滚动位置，防止抖动
           panelBody.scrollTop = 0;
         });
       });
     }
 
     function togglePanelReview(btn) {
-      var textEl = document.getElementById('panelReviewText');
+      const textEl = $('panelReviewText');
+      if (!textEl) return;
       if (textEl.classList.contains('collapsed')) {
         textEl.classList.remove('collapsed');
         btn.textContent = '收起';
@@ -1851,8 +1987,9 @@ const template = `<!DOCTYPE html>
     }
 
     function togglePanelSummary(toggleEl) {
-      var textEl = document.getElementById('panelSummaryText');
-      var arrow = toggleEl.querySelector('.panel-summary-arrow');
+      const textEl = $('panelSummaryText');
+      const arrow = toggleEl.querySelector('.panel-summary-arrow');
+      if (!textEl) return;
       if (textEl.classList.contains('collapsed')) {
         textEl.classList.remove('collapsed');
         arrow.textContent = '▲';
@@ -1862,23 +1999,9 @@ const template = `<!DOCTYPE html>
       }
     }
 
-    function formatRatingCount(count) {
-      if (count >= 10000) return (count / 10000).toFixed(1) + '万';
-      if (count >= 1000) return (count / 1000).toFixed(1) + 'k';
-      return String(count);
-    }
-
-    function escapeHtml(str) {
-      var div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
-    }
-
-    // ===== 初始渲染 =====
-    applySearchAndFilter();
+    // ===== 启动 =====
+    bindSort();
+    loadAll();
   </script>
 </body>
 </html>
-`;
-
-module.exports = template;

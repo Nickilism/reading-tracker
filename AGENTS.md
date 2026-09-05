@@ -26,6 +26,7 @@
 | `weread-match.js` | Airtable/微信读书书籍匹配 | 保持匹配规则可解释，避免无依据地降低匹配门槛 |
 | `weread-cache.js` / `weread-cache.json` | 微信读书增量缓存 | JSON 是构建产物兼缓存；只在需要刷新数据时更新 |
 | `reading archive/YYYY_reading_tracker.html` | 年度生成页面（含当年） | 由主生成器生成，统一存放在此目录 |
+| `reading archive/all.html` | 全部年份总览页（运行时汇总各年度页） | 非生成产物、手工维护；年份范围随当前年份自动扩展，不写死终点 |
 | `report-pages.js` | 阅读报告页构建（纯函数） | 两个生成器共享；修改后需重新生成受影响年度页面与报告页 |
 | `cover-mirror.js` | 封面本地化镜像 | 由 URL 哈希计算本地文件名、识别本仓库 raw 链接、下载缺失封面；生成器与 sync-covers 共用 |
 | `sync-covers.js` | 年度页封面同步/迁移 | 原地把 `reading archive/*.html` 中外链封面替换为 `covers/` 本地路径；不访问 Airtable |
@@ -75,6 +76,7 @@ Airtable Report 附件 (.md/.html)
 - `template.js` 是被读取并提取的模板文本，不是可直接执行的普通 JavaScript 模块；不要对它直接运行 `node --check`。
 - 生成器会注入 `{{YEAR}}`、`{{GENERATED_DATE}}`、`{{BOOKS_JSON}}`、`{{COUNTRY_PREFIX_MAP}}`、`{{WEREAD_JSON}}`、`{{FAVICON_PREFIX}}`。增删占位符时，必须同步更新生成器。
 - 年度页和归档页共用一套设计语言。改视觉规范时，先改 `index.html`，再同步 `template.js`，最后重新生成受影响年度页面。
+- 全部年份总览页 `reading archive/all.html` 沿用同一套设计语言与交互模式；改动 `index.html` / `template.js` 的视觉或交互时，需同步检查并更新 `all.html`。
 - 颜色必须通过 CSS 变量定义和引用；不要在组件样式中新增硬编码 hex/rgba 色值。
 - 保持页面主体宽度和基础布局：`.page { max-width: 780px; margin: 0 auto; }`，`body { padding: 2.5rem 1rem 2rem; }`。
 - 页面应持续支持系统深色模式、移动端笔记底部面板和桌面端右侧笔记面板。
