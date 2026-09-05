@@ -16,6 +16,7 @@ https://nickilism.github.io/reading-tracker/
 - 深色模式支持
 - 点击封面查看读书笔记面板
 - 阅读报告：Airtable `Report` 附件（.md/.html）自动生成独立报告页，书单与详情面板提供「阅读报告」入口
+- 全部年份总览：`reading archive/all.html` 运行时汇总 2019 至当前年份的全部记录（每年阅读量 + 累计趋势、年份筛选、跨年高分榜），随新年度自动扩展
 - 封面本地化：封面镜像到仓库 `covers/`，页面只从 GitHub Pages 加载
 
 ## 前提条件
@@ -71,6 +72,7 @@ GitHub Pages (gh-pages 分支)
 | `covers/` | 封面资源目录：文件名 = URL SHA-1，随页面一起发布，CI 只自动回写此目录 |
 | `vendor/` | 本地化第三方前端库：Chart.js 4.4.1，随页面一起发布，由年度页相对路径引用 |
 | `index.html` | 归档页面，聚合所有年度数据 |
+| `reading archive/all.html` | 全部年份总览页：运行时聚合各年度页（2019 至当前年，自动扩展） |
 | `.github/workflows/deploy.yml` | GitHub Actions 工作流 |
 
 ## Airtable 表结构要求
