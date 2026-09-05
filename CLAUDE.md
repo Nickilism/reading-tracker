@@ -177,3 +177,5 @@ h1 基础 1.75rem，>=768px 时 2.25rem，<=480px 时 1.55rem
 2. 同步改 `template.js`
 3. 同步总览页 `reading archive/all.html`（同一套视觉与交互；改设计语言或交互时需检查）
 4. 重新生成年度 HTML：`node reading-tracker-github.js <year>`
+
+> 注：`COUNTRY_PREFIX_MAP` / `COUNTRY_FLAGS` 存在多份手维护副本（见 AGENTS.md「模板与设计规则」），改动后运行 `node --test` 校验。

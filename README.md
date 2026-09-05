@@ -292,7 +292,9 @@ const year = process.argv[2] || String(new Date().getFullYear());
 
 ### 修改国家前缀映射
 
-编辑 `reading-tracker-github.js` 中的 `COUNTRY_PREFIX_MAP` 对象
+需同步修改 3 处 `COUNTRY_PREFIX_MAP`：`reading-tracker-github.js`、
+`reading-tracker-year-github.js`、`template.js`；需显示国旗时再同步 2 处 `COUNTRY_FLAGS`：
+`template.js` 与 `reading archive/all.html`。改完运行 `node --test` 校验各副本一致。
 
 ## 常见问题
 

@@ -77,6 +77,7 @@ Airtable Report 附件 (.md/.html)
 - 生成器会注入 `{{YEAR}}`、`{{GENERATED_DATE}}`、`{{BOOKS_JSON}}`、`{{COUNTRY_PREFIX_MAP}}`、`{{WEREAD_JSON}}`、`{{FAVICON_PREFIX}}`。增删占位符时，必须同步更新生成器。
 - 年度页和归档页共用一套设计语言。改视觉规范时，先改 `index.html`，再同步 `template.js`，最后重新生成受影响年度页面。
 - 全部年份总览页 `reading archive/all.html` 沿用同一套设计语言与交互模式；改动 `index.html` / `template.js` 的视觉或交互时，需同步检查并更新 `all.html`。
+- 国别映射与国旗表存在多份手维护副本，必须同步修改：`COUNTRY_PREFIX_MAP` 位于 `reading-tracker-github.js`、`reading-tracker-year-github.js`、`template.js`（各 1 份）；`COUNTRY_FLAGS` 位于 `template.js` 与 `reading archive/all.html`（各 1 份）。新增/调整国家（作者前缀或旗帜，如 `[挪]` / 🇳🇴）时，务必更新全部副本，并运行 `node --test` 校验（含 country-sync 测试），防止再次出现国旗/前缀缺失。
 - 颜色必须通过 CSS 变量定义和引用；不要在组件样式中新增硬编码 hex/rgba 色值。
 - 保持页面主体宽度和基础布局：`.page { max-width: 780px; margin: 0 auto; }`，`body { padding: 2.5rem 1rem 2rem; }`。
 - 移动端顶部（≤480px）规则在 `index.html`、`template.js`、`reading archive/all.html` 保持一致：`body` padding 收紧为 `1.5rem 0.75rem 1.5rem`、`h1` 为 `1.55rem`；右上角年份数字不随窄屏缩小（基础 3rem，≥768px 为 4rem）。
@@ -107,6 +108,9 @@ node builder_offline.js 2026
 
 # 把年度页外链封面同步/迁移到 covers/（历史页迁移或新封面补漏）
 node sync-covers.js [年份]
+
+# 跑回归测试（含国别映射/国旗表同步校验）
+node --test
 ```
 
 - 运行主生成器前，明确告知它会访问外部 API 并可能改写 `weread-cache.json` 和目标年度 HTML。
