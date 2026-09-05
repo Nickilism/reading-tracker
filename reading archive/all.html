@@ -1,0 +1,2030 @@
+<!DOCTYPE html>
+<html lang="zh" id="html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafaf9">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f0f11">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <title>全部年份阅读记录</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="../icons/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="../icons/apple-touch-icon-167x167.png">
+  <link rel="icon" type="image/x-icon" href="../icons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../icons/android-chrome-192x192.png">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="../vendor/chart.umd.js"></script>
+  <style>
+
+    /* ===== Reset & Variables ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #fafaf9;
+      --bg-alt: #f2f0ee;
+      --bg-card: #ffffff;
+      --text: #1a1817;
+      --text-secondary: #5c5855;
+      --text-muted: #9c9793;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.10);
+      --border-card: rgba(0, 0, 0, 0.05);
+      --accent: #0066cc;
+      --accent-soft: #e8f2fb;
+      --stat-num: #1a1817;
+      --stat-label: #8a8580;
+      --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 2px 6px rgba(0, 0, 0, 0.04);
+      --card-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.08);
+      --skeleton-base: #e8e5e2;
+      --skeleton-shine: #f5f3f1;
+      --badge-bg: #0075de;
+      --badge-text: #ffffff;
+      --summary-bg: #ffffff;
+      --summary-border: rgba(0, 0, 0, 0.05);
+      --summary-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.04);
+      --divider: rgba(0, 0, 0, 0.08);
+      --header-dot: #0066cc;
+      --star-empty: rgba(0, 0, 0, 0.15);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f0f11;
+        --bg-alt: #1a1a1d;
+        --bg-card: #161618;
+        --text: rgba(255, 255, 255, 0.91);
+        --text-secondary: #a19d98;
+        --text-muted: #6e6a65;
+        --border: rgba(255, 255, 255, 0.06);
+        --border-strong: rgba(255, 255, 255, 0.12);
+        --border-card: rgba(255, 255, 255, 0.05);
+        --accent: #5ba4f0;
+        --accent-soft: rgba(91, 164, 240, 0.10);
+        --stat-num: rgba(255, 255, 255, 0.88);
+        --stat-label: rgba(255, 255, 255, 0.38);
+        --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.2), 0 8px 20px rgba(0, 0, 0, 0.35);
+        --skeleton-base: #252528;
+        --skeleton-shine: #323236;
+        --badge-bg: #4da3f0;
+        --badge-text: #121214;
+        --summary-bg: #161618;
+        --summary-border: rgba(255, 255, 255, 0.06);
+        --summary-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 6px 16px rgba(0, 0, 0, 0.3);
+        --divider: rgba(255, 255, 255, 0.08);
+        --header-dot: #5ba4f0;
+        --star-empty: rgba(255, 255, 255, 0.15);
+      }
+    }
+
+    /* ===== Base ===== */
+    body {
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2.5rem 1rem 2rem;
+      line-height: 1.5;
+      transition: background 0.25s ease, color 0.25s ease;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .page {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    /* ===== Header ===== */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.25rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .title-block h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.625px;
+      color: var(--text);
+      line-height: 1.1;
+    }
+
+    .title-block p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .year-badge {
+      font-family: 'DM Serif Display', serif;
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--bg-alt);
+      line-height: 1;
+      user-select: none;
+      letter-spacing: -1px;
+      margin-left: auto;
+    }
+
+    /* ── Search Input ───────────────── */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.7rem 2.6rem 0.7rem 2.6rem;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--bg-alt);
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      box-shadow: none;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      font-size: 16px;
+      line-height: 1;
+      display: none;
+    }
+
+    .search-clear.visible {
+      display: block;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .filtered-query {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .clear-filter {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.15rem 0.6rem;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .clear-filter:hover {
+      background: var(--bg-alt);
+      color: var(--text);
+    }
+
+    .title-block h1 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    @media (min-width: 768px) {
+      .title-block h1 { font-size: 2.25rem; letter-spacing: -1px; }
+      .year-badge { font-size: 4rem; }
+    }
+
+    /* ===== Stats Grid ===== */
+    .stats-grid {
+      display: flex;
+      gap: 0;
+      padding: 0;
+      background: var(--summary-bg);
+      border-radius: 14px;
+      border: 1px solid var(--summary-border);
+      box-shadow: var(--summary-shadow);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .stat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.35rem 0.75rem 1.25rem;
+      position: relative;
+      text-align: center;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      transition: none;
+    }
+
+    .stat + .stat {
+      border-left: 1px solid var(--divider);
+    }
+
+    .stat-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--stat-num);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-label {
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--stat-label);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* ===== Country Stats ===== */
+    .country-section {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .section-title {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .country-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .country-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+      cursor: default;
+    }
+
+    .country-badge:hover {
+      box-shadow: var(--card-shadow-hover);
+      transform: translateY(-1px);
+    }
+
+    .country-flag { font-size: 14px; }
+    .country-count { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+    /* ===== Chart ===== */
+    .chart-wrap {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 160px;
+    }
+
+    /* ===== Filters ===== */
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    .filter-btn {
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 5px 14px;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--text);
+      color: var(--text);
+    }
+
+    .filter-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* ===== Cover Wall ===== */
+    .wall-section {
+      margin-top: 2rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+    }
+
+    .wall-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .wall-header h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.25px;
+    }
+
+    .wall-header span {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
+
+    #cover-wall {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    @media (min-width: 600px) {
+      #cover-wall { grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    }
+
+    @media (min-width: 900px) {
+      #cover-wall { grid-template-columns: repeat(5, 1fr); gap: 14px; }
+    }
+
+    .cover-link {
+      display: block;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--bg-alt);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .cover-link:hover {
+      transform: scale(1.03);
+      box-shadow: var(--card-shadow-hover);
+    }
+
+    .cover-img-wrap { position: relative; }
+    .cover-img-wrap img { display: block; width: 100%; height: auto; }
+
+    .cover-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 30%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 10px 9px;
+    }
+
+    .cover-link:hover .cover-overlay { opacity: 1; }
+    .cover-title { font-size: 11px; font-weight: 600; color: #fff; line-height: 1.3; margin-bottom: 2px; }
+    .cover-author { font-size: 9px; color: rgba(255,255,255,0.7); margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cover-rating { font-size: 11px; color: #f5a623; }
+
+    /* ===== Collapsible Book List ===== */
+    .booklist-section {
+      margin-top: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+    }
+
+    .booklist-toggle {
+      width: 100%;
+      background: var(--bg-alt);
+      border: none;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: background 0.15s;
+    }
+
+    .booklist-toggle:hover { background: var(--bg-alt); filter: brightness(0.95); }
+
+    .sort-bar {
+      display: flex;
+      gap: 6px;
+      padding: 10px 18px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .sort-btn {
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .sort-btn:hover { border-color: var(--text); color: var(--text); }
+    .sort-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .booklist-toggle .arrow {
+      font-size: 10px;
+      transition: transform 0.2s;
+    }
+
+    .booklist-toggle.open .arrow { transform: rotate(180deg); }
+
+    .booklist-content { display: none; padding: 0; }
+    .booklist-content.open { display: block; }
+
+    .book-row {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 14px 18px;
+    }
+
+    .book-row:first-child { border-top: none; }
+
+    .book-info { /* block layout; dates float right inside */ }
+
+    .book-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+      line-height: 1.4;
+    }
+
+    .book-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 3px;
+    }
+
+    .book-title-row .book-title { margin-bottom: 0; }
+
+    .report-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .report-btn:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .book-author {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .book-review {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-top: 8px;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      clear: right;
+    }
+
+    .review-more-btn {
+      background: none;
+      border: none;
+      padding: 4px 0;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      margin-top: 4px;
+      transition: color 0.15s;
+    }
+
+    .review-more-btn:hover { color: var(--accent-hover); }
+
+    .book-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .month-tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .star-rating { font-size: 11px; letter-spacing: 1px; }
+
+    .star-filled {
+      background: linear-gradient(to right, #f5a623 100%, #f5a623 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .star-half {
+      background: linear-gradient(to right, #f5a623 0%, #f5a623 50%, var(--star-empty) 50%, var(--star-empty) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .star-empty { color: var(--star-empty); }
+    .rating-num { font-size: 10px; color: var(--text-muted); font-weight: 600; }
+    .pages-tag { font-size: 10px; color: var(--text-muted); }
+
+    .book-dates {
+      float: right;
+      margin-left: 12px;
+      margin-bottom: 4px;
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      white-space: nowrap;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      margin-top: 2.5rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 480px) {
+      .stat-value { font-size: 1.55rem; }
+      .stat { padding: 1rem 0.5rem; }
+      .stat-label { font-size: 9.5px; letter-spacing: 0.04em; }
+      .stats-grid { flex-wrap: wrap; border-radius: 12px; }
+    }
+
+    /* ===== Book Notes Panel ===== */
+    .panel-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0s 0.3s;
+      pointer-events: none;
+    }
+    .panel-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity 0.3s ease, visibility 0s 0s;
+    }
+    @media (prefers-color-scheme: dark) {
+      .panel-overlay { background: rgba(0, 0, 0, 0.5); }
+    }
+
+    .book-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(480px, 90vw);
+      height: 100vh;
+      background: var(--bg);
+      z-index: 1000;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+    }
+    .book-panel.active {
+      transform: translateX(0);
+    }
+
+    .panel-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 8px;
+      z-index: 2;
+      transition: color 0.15s;
+    }
+    .panel-close:hover { color: var(--text); }
+
+    .panel-header {
+      display: flex;
+      gap: 16px;
+      padding: 24px 24px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-cover {
+      width: 80px;
+      height: 110px;
+      border-radius: 4px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .panel-book-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+    }
+    .panel-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+    .panel-author {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .panel-report-btn {
+      align-self: flex-start;
+      margin-bottom: 8px;
+    }
+    .panel-rating {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .panel-rating-score {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-gutter: stable;
+      padding: 0 24px 24px;
+    }
+
+    .panel-section {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-section:last-child { border-bottom: none; }
+
+    .panel-section-title {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .panel-summary-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+    .panel-summary-arrow {
+      font-size: 10px;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+    .panel-summary-text {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+    .panel-summary-text.collapsed {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .panel-review-card {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-top: 8px;
+    }
+    .panel-review-text {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .panel-review-text.collapsed {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .panel-review-toggle {
+      background: none;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      margin-top: 6px;
+      padding: 0;
+    }
+
+    .panel-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 1;
+    }
+    .panel-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 10px 4px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      text-align: center;
+    }
+    .panel-tab:hover { color: var(--text-secondary); }
+    .panel-tab.active {
+      color: var(--text);
+      border-bottom-color: var(--text);
+    }
+
+    .panel-tab-content {
+      display: none;
+      padding: 12px 0;
+      min-height: 100px;
+    }
+    .panel-tab-content.active { display: block; }
+
+    .panel-note-item {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-note-item:last-child { border-bottom: none; }
+    .panel-note-text {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .panel-note-chapter {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .panel-note-count {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .panel-quote {
+      border-left: 3px solid var(--border);
+      background: var(--bg-alt);
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .panel-thought-content {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+      margin-top: 6px;
+    }
+
+    .panel-empty {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* Back button (mobile only) */
+    .panel-back-btn {
+      display: none;
+    }
+
+    /* Mobile: full-screen push from right */
+    @media (max-width: 599px) {
+      .panel-overlay { display: none; }
+      .panel-back-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: sticky;
+        top: 0;
+        left: 0;
+        width: 44px;
+        height: 44px;
+        padding-top: env(safe-area-inset-top, 0);
+        background: color-mix(in srgb, var(--bg) 80%, transparent);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: none;
+        font-size: 24px;
+        color: var(--text);
+        cursor: pointer;
+        z-index: 10;
+        padding-left: 0;
+        padding-right: 0;
+        flex-shrink: 0;
+      }
+      .book-panel {
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        height: 100dvh;
+        border-radius: 0;
+        transform: translateX(100%);
+        box-shadow: none;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+      .book-panel.active { transform: translateX(0); }
+      .panel-close { display: none; }
+      .panel-header { padding: 12px 20px 14px; }
+      .panel-body { flex: 1; padding: 0 20px 20px; overflow: visible; }
+      .panel-cover { width: 60px; height: 82px; }
+    }
+  
+    /* ===== All-Years overview extras ===== */
+    :root {
+      --chart-line: #b45309;
+      --rank-top: var(--accent);
+      --rank-other: var(--text-muted);
+      --cover-chip-bg: rgba(0, 0, 0, 0.55);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --chart-line: #f0a35e;
+        --cover-chip-bg: rgba(0, 0, 0, 0.62);
+      }
+    }
+    .load-error {
+      display: none;
+      background: var(--accent-soft);
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 13px;
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+    }
+    .load-error.visible { display: block; }
+    .top10-section {
+      margin-top: 2rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+    }
+    .top10-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+    .top10-header h2 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.25px; }
+    .top10-header span { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
+    .top10-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    @media (min-width: 600px) { .top10-grid { grid-template-columns: repeat(5, 1fr); gap: 12px; } }
+    @media (min-width: 900px) { .top10-grid { grid-template-columns: repeat(5, 1fr); gap: 14px; } }
+    .cover-item { position: relative; }
+    .rank-badge {
+      position: absolute; top: 6px; left: 6px; z-index: 2;
+      min-width: 20px; height: 20px; padding: 0 5px;
+      border-radius: 999px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff;
+      background: var(--rank-other);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    .rank-badge.rank-top { background: var(--rank-top); }
+    .cover-chip {
+      position: absolute; top: 6px; right: 6px; z-index: 2;
+      font-size: 9px; font-weight: 700; color: #fff;
+      background: var(--cover-chip-bg);
+      padding: 1px 5px; border-radius: 6px;
+      letter-spacing: 0.03em;
+    }
+    .year-tag {
+      display: inline-block;
+      font-size: 10px; font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 1px 6px; border-radius: 6px;
+      margin-right: 8px; vertical-align: 1px;
+    }
+    .filter-year-link {
+      margin-left: 8px;
+      font-size: 11px;
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--accent);
+    }
+    .filter-year-link:hover { opacity: 0.8; }
+    .foot {
+      margin-top: 2.5rem;
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; flex-wrap: wrap;
+      font-size: 12px; color: var(--text-muted);
+    }
+    .foot a { color: var(--text-muted); text-decoration: none; }
+    .foot a:hover { color: var(--accent); }
+    .panel-meta { margin-top: 6px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 11px; color: var(--text-muted); }
+    .panel-dates { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- ===== Header ===== -->
+    <header>
+      <div class="title-block">
+        <h1>阅读记录 · 全部年份</h1>
+        <p id="subtitle">正在汇总各年度页…</p>
+      </div>
+      <div class="year-badge" id="yearBadge">ALL</div>
+    </header>
+
+    <div class="load-error" id="loadError"></div>
+
+    <div class="search-wrap" id="searchWrap">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索书名或作者..." autocomplete="off">
+      <button class="search-clear" id="searchClear" aria-label="清除搜索">✕</button>
+    </div>
+
+    <!-- ===== Stats Grid ===== -->
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-value" id="total-books">—</div>
+        <div class="stat-label">已读书目</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="total-pages">—</div>
+        <div class="stat-label">总页数</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="avg-reading-time">—</div>
+        <div class="stat-label">阅读天数中位数</div>
+      </div>
+    </div>
+
+    <!-- ===== Country Stats ===== -->
+    <div class="country-section">
+      <div class="section-title">国家分布</div>
+      <div class="country-grid" id="country-grid"></div>
+    </div>
+
+    <!-- ===== Chart ===== -->
+    <div class="chart-wrap">
+      <div class="section-title">每年阅读量</div>
+      <div class="chart-container">
+        <canvas id="yearChart" role="img"></canvas>
+      </div>
+    </div>
+
+    <!-- ===== Top 10 ===== -->
+    <div class="top10-section">
+      <div class="top10-header">
+        <h2>高分榜 · Top 10</h2>
+        <span id="top10-count">— 本</span>
+      </div>
+      <div class="top10-grid" id="top10-grid"></div>
+    </div>
+
+    <!-- ===== Filters ===== -->
+    <div class="filters" id="filters">
+      <span class="filter-label">筛选</span>
+    </div>
+
+    <!-- ===== Cover Wall ===== -->
+    <div class="wall-section">
+      <div class="wall-header">
+        <h2>书影留存</h2>
+        <span id="wall-count">— 本</span>
+      </div>
+      <div id="cover-wall"></div>
+    </div>
+
+    <!-- ===== Book Notes Panel ===== -->
+    <div class="panel-overlay" id="panelOverlay"></div>
+    <div class="book-panel" id="bookPanel">
+      <button class="panel-back-btn" id="panelBackBtn" aria-label="返回">‹</button>
+      <button class="panel-close" id="panelClose" aria-label="关闭">✕</button>
+      <div class="panel-header" id="panelHeader"></div>
+      <div class="panel-body" id="panelBody"></div>
+    </div>
+
+    <!-- ===== Book List ===== -->
+    <div class="booklist-section">
+      <button class="booklist-toggle" id="booklist-toggle" onclick="toggleBooklist()">
+        <span>书籍清单</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="sort-bar" id="sort-bar">
+        <button class="sort-btn active" data-sort="finish">时间 ↓</button>
+        <button class="sort-btn" data-sort="rating">评分 ↓</button>
+        <button class="sort-btn" data-sort="pages">页数 ↓</button>
+        <button class="sort-btn" data-sort="year">年份 ↓</button>
+      </div>
+      <div class="booklist-content" id="booklist-content"></div>
+    </div>
+
+    <!-- ===== Footer ===== -->
+    <div class="foot">
+      <a href="../index.html">← 返回归档首页</a>
+      <span>·</span>
+      <span id="footerNote">数据实时汇总自各年度页</span>
+      <span>·</span>
+      <a href="https://github.com/Nickilism/reading-tracker" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+
+  <script>
+    // ===== 全部年份总览：常量与状态 =====
+    // 年份范围：起点 2019（归档起始年）固定，终点为当前年份，随年份增加自动扩大
+    const START_YEAR = 2019;
+    const CURRENT_YEAR = new Date().getFullYear();
+
+    let allBooks = [];          // 合并后的全量书单，每本书带 year
+    let loadedYears = [];       // 成功加载的年份（升序）
+    let failedYears = [];       // 加载失败的年份
+    let yearsAsc = [];          // 图表 X 轴（升序）
+    const yearHtmlCache = {};   // year -> 年度页原始 HTML（供懒加载划线）
+    const wereadCache = {};     // year -> 已解析的 wereadData
+    let dataReady = false;
+    let searchQuery = '';
+    let searchDebounce = null;
+    let currentFilter = 'all';
+    let currentSortField = 'finish';
+    let currentSortDir = 'desc';
+    let booklistOpen = true;
+    const filterMap = { all: () => true };
+
+    // 国家旗帜（与年度页一致）
+    const COUNTRY_FLAGS = {
+      '中国': '🇨🇳', '日本': '🇯🇵', '美国': '🇺🇸', '德国': '🇩🇪',
+      '英国': '🇬🇧', '法国': '🇫🇷', '塞尔维亚': '🇷🇸', '韩国': '🇰🇷',
+      '俄罗斯': '🇷🇺', '以色列': '🇮🇱', '爱尔兰': '🇮🇪', '英美': '🇺🇸',
+      '荷兰': '🇳🇱', '意大利': '🇮🇹', '奥地利': '🇦🇹', '阿根廷': '🇦🇷',
+      '波兰': '🇵🇱', '葡萄牙': '🇵🇹', '古希腊': '🇬🇷', '瑞典': '🇸🇪',
+      '加拿大': '🇨🇦', '澳大利亚': '🇦🇺', '西班牙': '🇪🇸', '捷克': '🇨🇿',
+      '哥伦比亚': '🇨🇴', '秘鲁': '🇵🇪',
+    };
+
+    function $(id) { return document.getElementById(id); }
+
+    // ===== 解析工具：字符串感知的平衡括号扫描 =====
+    function extractBalanced(html, marker, openChar, closeChar) {
+      const idx = html.indexOf(marker);
+      if (idx === -1) return null;
+      const start = html.indexOf(openChar, idx);
+      if (start === -1) return null;
+      let depth = 0, inStr = false, esc = false;
+      for (let i = start; i < html.length; i++) {
+        const ch = html[i];
+        if (inStr) {
+          if (esc) esc = false;
+          else if (ch === '\\') esc = true;
+          else if (ch === '"') inStr = false;
+          continue;
+        }
+        if (ch === '"') { inStr = true; continue; }
+        if (ch === openChar) depth++;
+        else if (ch === closeChar) { depth--; if (depth === 0) return html.slice(start, i + 1); }
+      }
+      return null;
+    }
+
+    function extractBooksJson(html) {
+      return extractBalanced(html, 'const books = ', '[', ']');
+    }
+
+    function extractWereadJson(html) {
+      return extractBalanced(html, 'const wereadData = ', '{', '}');
+    }
+
+    // ===== 星星与格式化（与年度页一致） =====
+    function stars(rating) {
+      let full, half;
+      if (rating >= 9) { full = 5; half = 0; }
+      else if (rating >= 8.5) { full = 4; half = 1; }
+      else if (rating >= 8.0) { full = 4; half = 0; }
+      else if (rating >= 7.5) { full = 3; half = 1; }
+      else if (rating >= 7.0) { full = 3; half = 0; }
+      else { full = 2; half = 0; }
+      const empty = 5 - full - half;
+      return '<span class="star-filled">★</span>'.repeat(full) +
+             (half ? '<span class="star-half">★</span>' : '') +
+             '<span class="star-empty">☆</span>'.repeat(empty);
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function formatRatingCount(count) {
+      if (count >= 10000) return (count / 10000).toFixed(1) + '万';
+      if (count >= 1000) return (count / 1000).toFixed(1) + 'k';
+      return String(count);
+    }
+
+    function coverFallback(title) {
+      return "this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 150%22><rect fill=%22%23f6f5f4%22 width=%22100%22 height=%22150%22/><text x=%2250%22 y=%2280%22 text-anchor=%22middle%22 fill=%22%23a39e98%22 font-size=%2210%22>" + title + "</text></svg>'";
+    }
+
+    // ===== 数据加载：逐年抓取并合并 =====
+    async function loadYear(y) {
+      const resp = await fetch('./' + y + '_reading_tracker.html');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const html = await resp.text();
+      const json = extractBooksJson(html);
+      if (!json) return [];
+      const books = JSON.parse(json);
+      books.forEach(function (b) { b.year = y; });
+      yearHtmlCache[y] = html;
+      return books;
+    }
+
+    async function loadAll() {
+      const yrs = [];
+      for (let y = START_YEAR; y <= CURRENT_YEAR; y++) yrs.push(y);
+      const results = await Promise.all(yrs.map(async function (y) {
+        try { return { y: y, books: await loadYear(y) }; }
+        catch (e) { return { y: y, books: null }; }
+      }));
+      results.forEach(function (r) {
+        if (r.books === null) { failedYears.push(r.y); }
+        else { loadedYears.push(r.y); allBooks = allBooks.concat(r.books); }
+      });
+
+      const loadErrorEl = $('loadError');
+      if (!allBooks.length) {
+        loadErrorEl.textContent = '未能加载任何年度数据：请通过 preview.cmd（HTTP 预览）打开本页，并确认 reading archive/ 下存在 2019 至当前年份的年度页。';
+        loadErrorEl.classList.add('visible');
+        return;
+      }
+      yearsAsc = loadedYears.slice().sort(function (a, b) { return a - b; });
+      $('subtitle').textContent = START_YEAR + ' – ' + CURRENT_YEAR + ' · ' + loadedYears.length + ' 年';
+
+      if (failedYears.length) {
+        $('footerNote').textContent = '已加载 ' + loadedYears.length + '/' + yrs.length + ' 年 · 未加载：' + failedYears.join('、');
+      }
+
+      dataReady = true;
+      bindSearch();
+      buildFilters();
+      initChart();
+      applySearchAndFilter();
+    }
+
+    // ===== 统计计算 =====
+    function computeMedianDays(list) {
+      const days = [];
+      list.forEach(function (b) {
+        if (!b.start || !b.finish) return;
+        const s = new Date(b.start);
+        const f = new Date(b.finish);
+        if (isNaN(s.getTime()) || isNaN(f.getTime())) return;
+        const d = (f - s) / (1000 * 60 * 60 * 24);
+        if (d >= 0) days.push(d);
+      });
+      if (!days.length) return null;
+      days.sort(function (a, b) { return a - b; });
+      return days.length % 2 === 0
+        ? (days[days.length / 2 - 1] + days[days.length / 2]) / 2
+        : days[Math.floor(days.length / 2)];
+    }
+
+    function renderCountryGrid(list) {
+      const cc = {};
+      list.forEach(function (b) { if (b.country) cc[b.country] = (cc[b.country] || 0) + 1; });
+      const cg = $('country-grid');
+      cg.innerHTML = '';
+      Object.keys(cc).sort(function (a, b) { return cc[b] - cc[a]; }).forEach(function (country) {
+        const count = cc[country];
+        const badge = document.createElement('div');
+        badge.className = 'country-badge';
+        badge.innerHTML = '<span class="country-flag">' + (COUNTRY_FLAGS[country] || '') + '</span>' + country + '<span class="country-count">×' + count + '</span>';
+        cg.appendChild(badge);
+      });
+    }
+
+    function updateStats(list) {
+      $('total-books').textContent = list.length;
+      $('total-pages').textContent = list.reduce(function (s, b) { return s + (parseInt(b.pages, 10) || 0); }, 0).toLocaleString('zh-CN');
+      const median = computeMedianDays(list);
+      $('avg-reading-time').textContent = median === null ? '—' : median.toFixed(1);
+      renderCountryGrid(list);
+      updateFilterCounts(getSearchOnlyBooks());
+    }
+    // ===== 图表：每年阅读量柱 + 累计趋势线（合并一张图） =====
+    let yearChart = null;
+
+    function initChart() {
+      if (!window.Chart || !yearsAsc.length) return;
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const cssVar = function (n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
+      const barColor = cssVar('--accent') || (isDark ? '#5ba4f0' : '#0066cc');
+      const lineColor = cssVar('--chart-line') || '#b45309';
+      const chartTextColor = isDark ? '#9e9a96' : '#615d59';
+      const chartGridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
+
+      yearChart = new Chart($('yearChart'), {
+        data: {
+          labels: yearsAsc.map(String),
+          datasets: [
+            { type: 'bar', label: '本数', data: [], backgroundColor: barColor, borderRadius: 6, order: 2, yAxisID: 'y' },
+            { type: 'line', label: '累计', data: [], borderColor: lineColor, backgroundColor: lineColor, pointBackgroundColor: lineColor, pointRadius: 2, borderWidth: 2, tension: 0.25, fill: false, order: 1, yAxisID: 'y1' }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          onClick: function (evt, els) {
+            if (els && els.length && els[0].datasetIndex === 0) {
+              const y = yearsAsc[els[0].index];
+              if (y !== undefined) selectYearFilter(y);
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1, font: { family: 'Inter', size: 11 }, color: chartTextColor },
+              grid: { color: chartGridColor },
+              border: { display: false }
+            },
+            y1: {
+              position: 'right',
+              beginAtZero: true,
+              grid: { display: false },
+              border: { display: false },
+              ticks: { display: false }
+            },
+            x: {
+              ticks: { font: { family: 'Inter', size: 12 }, color: chartTextColor },
+              grid: { display: false },
+              border: { display: false }
+            }
+          }
+        },
+        plugins: [{
+          id: 'yearDataLabels',
+          afterDatasetsDraw: function (chart) {
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.font = '600 11px Inter';
+            ctx.fillStyle = chartTextColor;
+            ctx.textAlign = 'center';
+            chart.data.datasets[0].data.forEach(function (value, index) {
+              if (value > 0) {
+                const x = chart.scales.x.getPixelForValue(index);
+                const y = chart.scales.y.getPixelForValue(value) - 6;
+                ctx.fillText(value, x, y);
+              }
+            });
+            ctx.restore();
+          }
+        }]
+      });
+    }
+
+    function updateChart(list) {
+      if (!yearChart) return;
+      const counts = {};
+      yearsAsc.forEach(function (y) { counts[y] = 0; });
+      list.forEach(function (b) { if (counts[b.year] !== undefined) counts[b.year]++; });
+      const barData = yearsAsc.map(function (y) { return counts[y]; });
+      const cum = [];
+      let acc = 0;
+      barData.forEach(function (v) { acc += v; cum.push(acc); });
+      yearChart.data.datasets[0].data = barData;
+      yearChart.data.datasets[1].data = cum;
+      yearChart.options.scales.y.max = Math.max(Math.max.apply(null, barData) + 1, 4);
+      yearChart.update();
+    }
+
+    // ===== 筛选 =====
+    function buildFilters() {
+      const filtersEl = $('filters');
+      filtersEl.innerHTML = '<span class="filter-label">筛选</span>';
+
+      const base = [
+        { key: 'all', label: '全部' },
+        { key: 'high', label: '🟢 高分' },
+        { key: 'normal', label: '🟡 普通' },
+        { key: 'low', label: '🔴 低分' },
+        { key: 'report', label: '📖 阅读报告' }
+      ];
+      base.forEach(function (fb) {
+        filterMap[fb.key] = fb.key === 'all'
+          ? function () { return true; }
+          : (fb.key === 'high' ? function (b) { return b.rating >= 8.4; }
+            : fb.key === 'normal' ? function (b) { return b.rating > 7.9 && b.rating < 8.4; }
+            : fb.key === 'low' ? function (b) { return b.rating <= 7.9; }
+            : function (b) { return Boolean(b.report); });
+        addFilterButton(filtersEl, fb.key, fb.label);
+      });
+
+      const cc = {};
+      allBooks.forEach(function (b) { if (b.country) cc[b.country] = (cc[b.country] || 0) + 1; });
+      Object.keys(cc).sort(function (a, b) { return cc[b] - cc[a]; }).forEach(function (country) {
+        const key = 'country-' + country;
+        filterMap[key] = function (b) { return b.country === country; };
+        addFilterButton(filtersEl, key, (COUNTRY_FLAGS[country] || '') + ' ' + country);
+      });
+
+      // 年份筛选：降序（最新在前），范围随加载到的年份动态变化
+      yearsAsc.slice().reverse().forEach(function (y) {
+        const key = 'year-' + y;
+        filterMap[key] = function (b) { return b.year === y; };
+        addFilterButton(filtersEl, key, y + '年');
+      });
+
+      // 深链：?year=2020
+      const urlParams = new URLSearchParams(window.location.search);
+      const yearParam = urlParams.get('year');
+      if (yearParam && filterMap['year-' + yearParam]) {
+        currentFilter = 'year-' + yearParam;
+      }
+
+      syncActiveFilter();
+    }
+
+    function addFilterButton(container, key, label) {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn';
+      btn.dataset.filterKey = key;
+      btn.dataset.baseLabel = label;
+      btn.textContent = label;
+      btn.addEventListener('click', function () {
+        currentFilter = key;
+        syncActiveFilter();
+        applySearchAndFilter();
+      });
+      container.appendChild(btn);
+    }
+
+    function syncActiveFilter() {
+      document.querySelectorAll('.filter-btn').forEach(function (b) {
+        b.classList.toggle('active', b.dataset.filterKey === currentFilter);
+      });
+      updateYearPageLink();
+    }
+
+    function updateYearPageLink() {
+      let link = $('yearPageLink');
+      if (currentFilter.indexOf('year-') === 0) {
+        const y = currentFilter.slice(5);
+        if (!link) {
+          link = document.createElement('a');
+          link.id = 'yearPageLink';
+          link.className = 'filter-year-link';
+          link.target = '_blank';
+          link.rel = 'noopener';
+          $('filters').appendChild(link);
+        }
+        link.href = './' + y + '_reading_tracker.html';
+        link.textContent = '打开 ' + y + ' 年度页 ↗';
+      } else if (link) {
+        link.remove();
+      }
+    }
+
+    function selectYearFilter(y) {
+      const key = 'year-' + y;
+      currentFilter = (currentFilter === key) ? 'all' : key;
+      syncActiveFilter();
+      applySearchAndFilter();
+    }
+
+    function updateFilterCounts(list) {
+      document.querySelectorAll('.filter-btn').forEach(function (btn) {
+        const key = btn.dataset.filterKey;
+        if (!key) return;
+        if (key === 'all') {
+          btn.textContent = '全部 (' + list.length + ')';
+        } else if (filterMap[key]) {
+          btn.textContent = btn.dataset.baseLabel + ' (' + list.filter(filterMap[key]).length + ')';
+        }
+      });
+    }
+
+    // ===== 搜索 + 筛选组合逻辑（与年度页一致） =====
+    function getFilteredBooks() {
+      let result = allBooks;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        result = result.filter(function (b) {
+          return (b.title && b.title.toLowerCase().indexOf(q) !== -1) ||
+                 (b.author && b.author.toLowerCase().indexOf(q) !== -1);
+        });
+      }
+      if (currentFilter !== 'all') {
+        result = result.filter(filterMap[currentFilter]);
+      }
+      return result;
+    }
+
+    function getSearchOnlyBooks() {
+      if (!searchQuery) return allBooks;
+      const q = searchQuery.toLowerCase();
+      return allBooks.filter(function (b) {
+        return (b.title && b.title.toLowerCase().indexOf(q) !== -1) ||
+               (b.author && b.author.toLowerCase().indexOf(q) !== -1);
+      });
+    }
+
+    function applySearchAndFilter() {
+      if (!dataReady) return;
+      const filtered = getFilteredBooks();
+      updateStats(filtered);
+      updateChart(filtered);
+      renderTop10(filtered);
+      if (filtered.length > 0) {
+        renderWall(filtered);
+        renderBooklist(getSortedList(filtered));
+        if (booklistOpen) {
+          $('booklist-content').classList.add('open');
+          $('booklist-toggle').classList.add('open');
+        }
+      } else {
+        $('cover-wall').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
+        $('booklist-content').innerHTML = '<div class="no-results">没有找到匹配的书籍</div>';
+        $('wall-count').textContent = '0 本';
+        $('top10-count').textContent = '0 本';
+      }
+    }
+
+    // ===== 搜索框事件 =====
+    function bindSearch() {
+      const searchInput = $('searchInput');
+      const searchClear = $('searchClear');
+      const urlParams = new URLSearchParams(window.location.search);
+      searchQuery = urlParams.get('search') || '';
+      searchInput.value = searchQuery;
+      if (searchQuery) searchClear.classList.add('visible');
+
+      searchInput.addEventListener('input', function (e) {
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(function () {
+          searchQuery = e.target.value.trim();
+          const url = new URL(window.location);
+          if (searchQuery) url.searchParams.set('search', searchQuery);
+          else url.searchParams.delete('search');
+          history.replaceState(null, '', url);
+          searchClear.classList.toggle('visible', !!searchQuery);
+          applySearchAndFilter();
+        }, 150);
+      });
+
+      searchClear.addEventListener('click', function () {
+        searchInput.value = '';
+        searchQuery = '';
+        const url = new URL(window.location);
+        url.searchParams.delete('search');
+        history.replaceState(null, '', url);
+        searchClear.classList.remove('visible');
+        applySearchAndFilter();
+        searchInput.focus();
+      });
+    }
+
+    // ===== 高分榜 Top 10（随当前范围联动） =====
+    function rankTopBooks(list) {
+      const rated = list.filter(function (b) { return typeof b.rating === 'number'; });
+      rated.sort(function (a, b) {
+        if (b.rating !== a.rating) return b.rating - a.rating;
+        return (b.finish || '').localeCompare(a.finish || '');
+      });
+      return rated.slice(0, 10);
+    }
+
+    function renderTop10(list) {
+      const grid = $('top10-grid');
+      const top = rankTopBooks(list);
+      $('top10-count').textContent = top.length + ' 本';
+      if (!top.length) {
+        grid.innerHTML = '<div class="no-results">当前范围暂无评分书籍</div>';
+        return;
+      }
+      grid.innerHTML = '';
+      top.forEach(function (b, i) {
+        const idx = allBooks.indexOf(b);
+        const item = document.createElement('div');
+        item.className = 'cover-item';
+        item.innerHTML =
+          '<span class="rank-badge' + (i < 3 ? ' rank-top' : '') + '">' + (i + 1) + '</span>' +
+          '<span class="cover-chip">' + b.year + '</span>' +
+          '<div class="cover-link" onclick="openBookPanel(' + idx + ')" title="' + b.title + '">' +
+            '<div class="cover-img-wrap"><img src="' + b.cover + '" alt="' + b.title + '" loading="lazy" onerror="' + coverFallback(b.title) + '">' +
+            '<div class="cover-overlay">' +
+              '<div class="cover-title">' + b.title + '</div>' +
+              '<div class="cover-author">' + b.author + '</div>' +
+              '<div class="cover-rating">' + stars(b.rating) + ' ' + b.rating + '</div>' +
+            '</div></div>' +
+          '</div>';
+        grid.appendChild(item);
+      });
+    }
+
+    // ===== 书影留存 =====
+    function renderWall(list) {
+      const wallEl = $('cover-wall');
+      wallEl.innerHTML = '';
+      $('wall-count').textContent = list.length + ' 本';
+      const sorted = getSortedList(list);
+      sorted.forEach(function (b) {
+        const idx = allBooks.indexOf(b);
+        const item = document.createElement('div');
+        item.className = 'cover-item';
+        item.innerHTML =
+          '<span class="cover-chip">' + b.year + '</span>' +
+          '<div class="cover-link" onclick="openBookPanel(' + idx + ')" title="' + b.title + '">' +
+            '<div class="cover-img-wrap"><img src="' + b.cover + '" alt="' + b.title + '" loading="lazy" onerror="' + coverFallback(b.title) + '">' +
+            '<div class="cover-overlay">' +
+              '<div class="cover-title">' + b.title + '</div>' +
+              '<div class="cover-author">' + b.author + '</div>' +
+              '<div class="cover-rating">' + stars(b.rating) + ' ' + (b.rating == null || b.rating === '' ? '未评分' : b.rating) + '</div>' +
+            '</div></div>' +
+          '</div>';
+        wallEl.appendChild(item);
+      });
+    }
+
+    // ===== 书籍清单 =====
+    function renderBooklist(list) {
+      const content = $('booklist-content');
+      content.innerHTML = list.map(function (b, idx) {
+        let reviewSection = '';
+        if (b.review) {
+          const needsTruncation = b.review.length > 60;
+          const truncatedText = needsTruncation ? b.review.substring(0, 60) + '...' : b.review;
+          reviewSection = '<div class="book-review" id="review-' + idx + '" data-full="' + encodeURIComponent(b.review) + '" data-truncated="' + needsTruncation + '">' +
+            truncatedText.replace(/\n/g, '<br>') +
+            '</div>' +
+            (needsTruncation ? '<button class="review-more-btn" onclick="toggleReview(' + idx + ', this)">展开</button>' : '');
+        }
+        const reportBtn = b.report
+          ? '<a class="report-btn" href="' + b.report + '" target="_blank" rel="noopener">阅读报告</a>'
+          : '';
+        return '<div class="book-row">' +
+          '<div class="book-info">' +
+            '<div class="book-dates">' + (b.start || '') + '<br>' + (b.finish || '') + '</div>' +
+            '<div class="book-title-row">' +
+              '<div class="book-title"><a href="' + b.doubanLink + '" target="_blank" style="color:inherit;text-decoration:none;">' + b.title + '</a></div>' +
+              reportBtn +
+            '</div>' +
+            '<div class="book-author">' + b.author + '</div>' +
+            '<div class="book-meta">' +
+              '<span class="year-tag">' + b.year + '年</span>' +
+              '<span class="star-rating">' + stars(b.rating) + '</span>' +
+              '<span class="rating-num">' + (b.rating == null || b.rating === '' ? '未评分' : b.rating) + '</span>' +
+              (b.pages ? '<span class="pages-tag">' + b.pages + '页</span>' : '') +
+            '</div>' +
+            reviewSection +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function toggleReview(idx, btn) {
+      const review = $('review-' + idx);
+      if (!review) return;
+      const isCollapsed = btn.textContent === '展开';
+      const fullText = decodeURIComponent(review.dataset.full);
+      if (isCollapsed) {
+        review.innerHTML = fullText.replace(/\n/g, '<br>');
+        btn.textContent = '收起';
+      } else {
+        review.innerHTML = fullText.substring(0, 60) + '...';
+        btn.textContent = '展开';
+      }
+    }
+
+    // ===== 展开/收起书单 =====
+    function toggleBooklist() {
+      const toggle = $('booklist-toggle');
+      const content = $('booklist-content');
+      booklistOpen = !booklistOpen;
+      toggle.classList.toggle('open', booklistOpen);
+      content.classList.toggle('open', booklistOpen);
+    }
+
+    // ===== 排序 =====
+    function getSortedList(list) {
+      const sorted = list.slice();
+      const dir = currentSortDir === 'desc' ? -1 : 1;
+      switch (currentSortField) {
+        case 'finish': return sorted.sort(function (a, b) { return (a.finish || '').localeCompare(b.finish || '') * dir; });
+        case 'rating': return sorted.sort(function (a, b) { return ((a.rating || 0) - (b.rating || 0)) * dir; });
+        case 'pages': return sorted.sort(function (a, b) { return ((parseInt(a.pages, 10) || 0) - (parseInt(b.pages, 10) || 0)) * dir; });
+        case 'year': return sorted.sort(function (a, b) { return (a.year - b.year) * dir; });
+        default: return sorted;
+      }
+    }
+
+    // ===== 排序按钮事件 =====
+    function bindSort() {
+      const fieldLabels = { finish: '时间', rating: '评分', pages: '页数', year: '年份' };
+      document.querySelectorAll('.sort-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const field = btn.dataset.sort;
+          if (currentSortField === field) {
+            currentSortDir = currentSortDir === 'desc' ? 'asc' : 'desc';
+          } else {
+            currentSortField = field;
+            currentSortDir = 'desc';
+          }
+          document.querySelectorAll('.sort-btn').forEach(function (b) {
+            const f = b.dataset.sort;
+            const a = (currentSortField === f) ? currentSortDir : 'desc';
+            b.textContent = fieldLabels[f] + (a === 'desc' ? ' ↓' : ' ↑');
+            b.classList.toggle('active', currentSortField === f);
+          });
+          applySearchAndFilter();
+        });
+      });
+    }
+    // ===== 笔记 / 划线面板（懒加载 weread） =====
+    const panelOverlay = $('panelOverlay');
+    const bookPanel = $('bookPanel');
+    const panelClose = $('panelClose');
+    const panelBackBtn = $('panelBackBtn');
+    const panelHeader = $('panelHeader');
+    const panelBody = $('panelBody');
+    let panelOpen = false;
+    let closingFromPopstate = false;
+    let currentOpenIndex = -1;
+
+    function isMobile() {
+      return window.innerWidth < 600;
+    }
+
+    async function getWereadForYear(year) {
+      if (wereadCache[year] !== undefined) return wereadCache[year];
+      wereadCache[year] = null;
+      if (!yearHtmlCache[year]) return null;
+      try {
+        const json = extractWereadJson(yearHtmlCache[year]);
+        wereadCache[year] = json ? JSON.parse(json) : null;
+      } catch (e) { /* 保持 null，不阻断面板 */ }
+      return wereadCache[year];
+    }
+
+    async function openBookPanel(bookIndex) {
+      const b = allBooks[bookIndex];
+      if (!b) return;
+      currentOpenIndex = bookIndex;
+      renderPanelContent(b, null);
+      if (isMobile()) {
+        history.pushState({ panel: true }, '');
+      } else {
+        const scrollY = window.scrollY;
+        document.body.style.position = 'fixed';
+        document.body.style.top = '-' + scrollY + 'px';
+        document.body.style.width = '100%';
+        const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
+        document.body.style.paddingRight = scrollbarW + 'px';
+        document.body.dataset.scrollY = scrollY;
+        panelOverlay.classList.add('active');
+      }
+      bookPanel.classList.add('active');
+      panelOpen = true;
+      panelBody.scrollTop = 0;
+
+      // 懒加载该书所在年份的划线数据（同一本书仍打开时才刷新）
+      const wdata = await getWereadForYear(b.year);
+      const weread = (wdata && b.wereadId) ? wdata[b.wereadId] : null;
+      if (currentOpenIndex === bookIndex && panelOpen) {
+        renderPanelContent(b, weread);
+      }
+    }
+
+    function closeBookPanel() {
+      if (isMobile() && !closingFromPopstate) {
+        closingFromPopstate = true;
+        history.back();
+        return;
+      }
+      bookPanel.classList.remove('active');
+      if (!isMobile()) {
+        panelOverlay.classList.remove('active');
+        const scrollY = parseInt(document.body.dataset.scrollY || '0', 10);
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.paddingRight = '';
+        delete document.body.dataset.scrollY;
+        window.scrollTo(0, scrollY);
+      }
+      panelOpen = false;
+      currentOpenIndex = -1;
+      closingFromPopstate = false;
+    }
+
+    window.addEventListener('popstate', function () {
+      if (panelOpen) {
+        closingFromPopstate = true;
+        closeBookPanel();
+      }
+    });
+
+    panelOverlay.addEventListener('click', closeBookPanel);
+    panelClose.addEventListener('click', closeBookPanel);
+    panelBackBtn.addEventListener('click', closeBookPanel);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && panelOpen) closeBookPanel();
+    });
+
+    function renderPanelContent(book, weread) {
+      const coverHtml = book.doubanLink
+        ? '<a href="' + book.doubanLink + '" target="_blank" style="display:block;flex-shrink:0;"><img class="panel-cover" src="' + book.cover + '" alt="' + book.title + '" onerror="this.style.display=\'none\'"></a>'
+        : '<img class="panel-cover" src="' + book.cover + '" alt="' + book.title + '" onerror="this.style.display=\'none\'">';
+      panelHeader.innerHTML =
+        coverHtml +
+        '<div class="panel-book-info">' +
+          '<div class="panel-title">' + book.title + '</div>' +
+          '<div class="panel-author">' + book.author + '</div>' +
+          '<div class="panel-meta"><span class="year-tag">' + book.year + '年</span>' +
+            (book.start ? '<span class="panel-dates">' + book.start + ' → ' + book.finish + '</span>' : '') +
+          '</div>' +
+          (book.report
+            ? '<a class="report-btn panel-report-btn" href="' + book.report + '" target="_blank" rel="noopener">阅读报告</a>'
+            : '') +
+          (weread && weread.rating
+            ? '<div class="panel-rating">微信读书推荐值 <span class="panel-rating-score">' + (weread.rating / 10).toFixed(1) + '%</span> · ' + formatRatingCount(weread.ratingCount) + '人评价</div>'
+            : '') +
+        '</div>';
+
+      let html = '';
+
+      if (book.summary) {
+        const needsCollapse = book.summary.length > 150;
+        html += '<div class="panel-section">';
+        html += '<div class="panel-summary-toggle" onclick="togglePanelSummary(this)">';
+        html += '<span class="panel-section-title" style="margin-bottom:0">书籍简介</span>';
+        html += '<span class="panel-summary-arrow">▼</span>';
+        html += '</div>';
+        html += '<div class="panel-summary-text' + (needsCollapse ? ' collapsed' : '') + '" id="panelSummaryText">' + book.summary.replace(/\n/g, '<br>') + '</div>';
+        html += '</div>';
+      }
+
+      if (book.review) {
+        html += '<div class="panel-section">';
+        html += '<div class="panel-section-title">全书点评</div>';
+        html += '<div class="panel-review-card">';
+        const needsCollapse = book.review.length > 200;
+        html += '<div class="panel-review-text' + (needsCollapse ? ' collapsed' : '') + '" id="panelReviewText">' + book.review.replace(/\n/g, '<br>') + '</div>';
+        if (needsCollapse) {
+          html += '<button class="panel-review-toggle" onclick="togglePanelReview(this)">展开全文</button>';
+        }
+        html += '</div>';
+        html += '</div>';
+      }
+
+      if (!weread) {
+        if (!book.review && !book.summary) {
+          html += '<div class="panel-empty">暂无微信读书笔记</div>';
+        }
+        panelBody.innerHTML = html;
+        return;
+      }
+
+      const hlCount = weread.highlights ? weread.highlights.length : 0;
+      const thCount = weread.thoughts ? weread.thoughts.length : 0;
+      const popCount = weread.popularHighlights ? weread.popularHighlights.length : 0;
+
+      html += '<div class="panel-tabs">';
+      html += '<button class="panel-tab active" data-tab="highlights">划线 (' + hlCount + ')</button>';
+      html += '<button class="panel-tab" data-tab="thoughts">想法 (' + thCount + ')</button>';
+      html += '<button class="panel-tab" data-tab="popular">热门划线 (' + popCount + ')</button>';
+      html += '</div>';
+
+      html += '<div class="panel-tab-content active" data-tab-content="highlights">';
+      if (hlCount > 0) {
+        weread.highlights.forEach(function (h) {
+          html += '<div class="panel-note-item">';
+          html += '<div class="panel-note-text">' + escapeHtml(h.text) + '</div>';
+          if (h.chapter) html += '<div class="panel-note-chapter">——' + escapeHtml(h.chapter) + '</div>';
+          html += '</div>';
+        });
+      } else {
+        html += '<div class="panel-empty">暂无划线</div>';
+      }
+      html += '</div>';
+
+      html += '<div class="panel-tab-content" data-tab-content="thoughts">';
+      if (thCount > 0) {
+        weread.thoughts.forEach(function (t) {
+          html += '<div class="panel-note-item">';
+          if (t.quote) html += '<div class="panel-quote">' + escapeHtml(t.quote) + '</div>';
+          html += '<div class="panel-thought-content">' + escapeHtml(t.text) + '</div>';
+          if (t.chapter) html += '<div class="panel-note-chapter">——' + escapeHtml(t.chapter) + '</div>';
+          html += '</div>';
+        });
+      } else {
+        html += '<div class="panel-empty">暂无想法</div>';
+      }
+      html += '</div>';
+
+      html += '<div class="panel-tab-content" data-tab-content="popular">';
+      if (popCount > 0) {
+        weread.popularHighlights.forEach(function (p) {
+          html += '<div class="panel-note-item">';
+          html += '<div class="panel-note-text">' + escapeHtml(p.text) + '</div>';
+          html += '<div class="panel-note-count">' + p.count + '人划线</div>';
+          if (p.chapter) html += '<div class="panel-note-chapter">——' + escapeHtml(p.chapter) + '</div>';
+          html += '</div>';
+        });
+      } else {
+        html += '<div class="panel-empty">暂无热门划线</div>';
+      }
+      html += '</div>';
+
+      panelBody.innerHTML = html;
+
+      panelBody.querySelectorAll('.panel-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          panelBody.querySelectorAll('.panel-tab').forEach(function (t) { t.classList.remove('active'); });
+          panelBody.querySelectorAll('.panel-tab-content').forEach(function (c) { c.classList.remove('active'); });
+          tab.classList.add('active');
+          panelBody.querySelector('[data-tab-content="' + tab.dataset.tab + '"]').classList.add('active');
+          panelBody.scrollTop = 0;
+        });
+      });
+    }
+
+    function togglePanelReview(btn) {
+      const textEl = $('panelReviewText');
+      if (!textEl) return;
+      if (textEl.classList.contains('collapsed')) {
+        textEl.classList.remove('collapsed');
+        btn.textContent = '收起';
+      } else {
+        textEl.classList.add('collapsed');
+        btn.textContent = '展开全文';
+      }
+    }
+
+    function togglePanelSummary(toggleEl) {
+      const textEl = $('panelSummaryText');
+      const arrow = toggleEl.querySelector('.panel-summary-arrow');
+      if (!textEl) return;
+      if (textEl.classList.contains('collapsed')) {
+        textEl.classList.remove('collapsed');
+        arrow.textContent = '▲';
+      } else {
+        textEl.classList.add('collapsed');
+        arrow.textContent = '▼';
+      }
+    }
+
+    // ===== 启动 =====
+    bindSort();
+    loadAll();
+  </script>
+</body>
+</html>
