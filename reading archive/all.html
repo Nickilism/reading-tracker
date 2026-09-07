@@ -1664,6 +1664,12 @@
       });
     }
 
+    // 每年标签配色（与顶部柱状图 YEAR_COLORS 一致，风格同年度页月份标签）
+    function yearTag(y) {
+      const c = YEAR_COLORS[(y - START_YEAR) % YEAR_COLORS.length];
+      return '<span class="year-tag" style="background:' + c.bg + ';color:' + c.color + '">' + y + '年</span>';
+    }
+
     // ===== 书籍清单 =====
     function renderBooklist(list) {
       const content = $('booklist-content');
@@ -1689,7 +1695,7 @@
             '</div>' +
             '<div class="book-author">' + b.author + '</div>' +
             '<div class="book-meta">' +
-              '<span class="year-tag">' + b.year + '年</span>' +
+              yearTag(b.year) +
               '<span class="star-rating">' + stars(b.rating) + '</span>' +
               '<span class="rating-num">' + (b.rating == null || b.rating === '' ? '未评分' : b.rating) + '</span>' +
               (b.pages ? '<span class="pages-tag">' + b.pages + '页</span>' : '') +
@@ -1873,7 +1879,7 @@
         '<div class="panel-book-info">' +
           '<div class="panel-title">' + book.title + '</div>' +
           '<div class="panel-author">' + book.author + '</div>' +
-          '<div class="panel-meta"><span class="year-tag">' + book.year + '年</span>' +
+          '<div class="panel-meta">' + yearTag(book.year) +
             (book.start ? '<span class="panel-dates">' + book.start + ' → ' + book.finish + '</span>' : '') +
           '</div>' +
           (book.report
