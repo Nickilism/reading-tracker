@@ -35,3 +35,13 @@ test('国别映射应识别《两种孤独》的哥伦比亚和秘鲁作者', ()
     );
   }
 });
+
+test('国别映射应识别方括号国家全称 [日本]', () => {
+  const author = '[日本]东野圭吾';
+
+  for (const file of generatorFiles) {
+    const { COUNTRY_PREFIX_MAP, deriveCountry } = loadCountryDerivation(file);
+    assert.equal(COUNTRY_PREFIX_MAP['[日本]'], '日本', file);
+    assert.equal(deriveCountry(author), '日本', file);
+  }
+});
