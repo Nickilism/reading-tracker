@@ -1150,37 +1150,50 @@ const template = `<!DOCTYPE html>
       '挪威': '🇳🇴', '南非': '🇿🇦',
       '加拿大': '🇨🇦', '澳大利亚': '🇦🇺', '西班牙': '🇪🇸', '捷克': '🇨🇿',
       '哥伦比亚': '🇨🇴', '秘鲁': '🇵🇪',
+      '巴西': '🇧🇷', '丹麦': '🇩🇰', '未标注': '🏳️',
     };
 
-    // 检测字符串是否包含中文字符
-    function hasChineseChars(str) {
-      return /[\u4e00-\u9fa5]/.test(str);
-    }
+    // 括号内的简称/别名 → 国名（补充 COUNTRY_PREFIX_MAP 去掉括号后的文字）
+    const COUNTRY_ALIASES = {
+      '中': '中国', '中国': '中国', '清': '中国', '明': '中国', '唐': '中国',
+      '宋': '中国', '元': '中国', '汉': '中国', '丹': '丹麦', '丹麦': '丹麦',
+      '徳': '德国',
+    };
 
-    // 标准化作者名字符串，去除各种括号及其内容
-    function stripCountryPrefixes(author) {
-      return author
-        .replace(/\[([^\]]+)\]/g, '')   // [xxx]
-        .replace(/\(([^\)]+)\)/g, '')     // (xxx)
-        .replace(/（([^）]+)）/g, '')      // （xxx）
-        .replace(/《([^》]+)》/g, '')     // 《xxx》
-        .replace(/【([^】]+)】/g, '')     // 【xxx】
-        .trim();
-    }
+    const UNKNOWN_COUNTRY = '未标注';
 
-    // 国家推断
-    function deriveCountry(author) {
-      // 1. 先匹配前缀映射表
+    function lookupCountryAlias(text) {
       for (const [prefix, country] of Object.entries(COUNTRY_PREFIX_MAP)) {
-        if (author.includes(prefix)) return country;
+        if (prefix.slice(1, -1) === text) return country;
       }
-      // 2. 无前缀时，根据姓名文字判断
-      const nameOnly = stripCountryPrefixes(author);
-      if (hasChineseChars(nameOnly)) {
-        return '中国';
+      return COUNTRY_ALIASES[text] || '';
+    }
+
+    // 返回 { country, reason }；reason: prefix | bracket | chinese | translit | translator | latin
+    function deriveCountryInfo(author, translator) {
+      const a = String(author || '');
+      // 1. 开头任意括号：[] () （） 【】 〔〕 ［］
+      const m = a.match(/^\s*[\[(（【〔［]\s*([^\])）】〕］]+?)\s*[\])）】〕］]/);
+      if (m) {
+        const known = lookupCountryAlias(m[1]);
+        return known ? { country: known, reason: 'prefix' } : { country: m[1], reason: 'bracket' };
       }
-      // 3. 纯英文名默认为美国
-      return '美国';
+      // 2. 名字中间出现的已知前缀
+      for (const [prefix, country] of Object.entries(COUNTRY_PREFIX_MAP)) {
+        if (a.includes(prefix)) return { country, reason: 'prefix' };
+      }
+      // 3. 无前缀：去掉括号内容（常为外文原名）后判断
+      const nameOnly = a.replace(/[\[(（【〔［《][^\])）】〕］》]*[\])）】〕］》]/g, '').trim();
+      if (/[\u4e00-\u9fa5]/.test(nameOnly)) {
+        if (/[·.•・．‧]/.test(nameOnly)) return { country: UNKNOWN_COUNTRY, reason: 'translit' };
+        if (String(translator || '').trim()) return { country: UNKNOWN_COUNTRY, reason: 'translator' };
+        return { country: '中国', reason: 'chinese' };
+      }
+      return { country: UNKNOWN_COUNTRY, reason: 'latin' };
+    }
+
+    function deriveCountry(author, translator) {
+      return deriveCountryInfo(author, translator).country;
     }
 
     // 书籍数据（由生成脚本注入）
@@ -1236,7 +1249,7 @@ const template = `<!DOCTYPE html>
 
     // 渲染国家分布
     const countryGrid = document.getElementById('country-grid');
-    Object.entries(countryCount).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
+    Object.entries(countryCount).sort((a, b) => (a[0] === '未标注') - (b[0] === '未标注') || b[1] - a[1]).forEach(([country, count]) => {
       const badge = document.createElement('div');
       badge.className = 'country-badge';
       badge.innerHTML = `<span class="country-flag">${COUNTRY_FLAGS[country] || ''}</span>${country}<span class="country-count">×${count}</span>`;
@@ -1281,7 +1294,7 @@ const template = `<!DOCTYPE html>
     ];
 
     // 添加国家筛选按钮
-    Object.entries(countryCount).sort((a, b) => b[1] - a[1]).forEach(([country, count]) => {
+    Object.entries(countryCount).sort((a, b) => (a[0] === '未标注') - (b[0] === '未标注') || b[1] - a[1]).forEach(([country, count]) => {
       filterBtns.push({
         key: `country-${country}`,
         label: `${COUNTRY_FLAGS[country] || ''} ${country} (${count})`

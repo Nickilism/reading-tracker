@@ -1198,6 +1198,7 @@
       '挪威': '🇳🇴', '南非': '🇿🇦',
       '加拿大': '🇨🇦', '澳大利亚': '🇦🇺', '西班牙': '🇪🇸', '捷克': '🇨🇿',
       '哥伦比亚': '🇨🇴', '秘鲁': '🇵🇪',
+      '巴西': '🇧🇷', '丹麦': '🇩🇰', '未标注': '🏳️',
     };
 
     function $(id) { return document.getElementById(id); }
@@ -1331,7 +1332,7 @@
       list.forEach(function (b) { if (b.country) cc[b.country] = (cc[b.country] || 0) + 1; });
       const cg = $('country-grid');
       cg.innerHTML = '';
-      Object.keys(cc).sort(function (a, b) { return cc[b] - cc[a]; }).forEach(function (country) {
+      Object.keys(cc).sort(function (a, b) { return (a === '未标注') - (b === '未标注') || cc[b] - cc[a]; }).forEach(function (country) {
         const count = cc[country];
         const badge = document.createElement('div');
         badge.className = 'country-badge';
@@ -1462,7 +1463,7 @@
 
       const cc = {};
       allBooks.forEach(function (b) { if (b.country) cc[b.country] = (cc[b.country] || 0) + 1; });
-      Object.keys(cc).sort(function (a, b) { return cc[b] - cc[a]; }).forEach(function (country) {
+      Object.keys(cc).sort(function (a, b) { return (a === '未标注') - (b === '未标注') || cc[b] - cc[a]; }).forEach(function (country) {
         const key = 'country-' + country;
         filterMap[key] = function (b) { return b.country === country; };
         addFilterButton(filtersEl, key, (COUNTRY_FLAGS[country] || '') + ' ' + country);
