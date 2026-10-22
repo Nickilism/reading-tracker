@@ -45,3 +45,12 @@ test('国别映射应识别方括号国家全称 [日本]', () => {
     assert.equal(deriveCountry(author), '日本', file);
   }
 });
+
+test('国别映射应识别《启蒙运动》的南非作者', () => {
+  const author = '[南非]劳埃德·斯宾塞/著, 安杰伊·克劳泽/插图';
+  for (const file of generatorFiles) {
+    const { COUNTRY_PREFIX_MAP, deriveCountry } = loadCountryDerivation(file);
+    assert.equal(COUNTRY_PREFIX_MAP['[南非]'], '南非', file);
+    assert.equal(deriveCountry(author), '南非', file);
+  }
+});
