@@ -42,18 +42,24 @@ jobs:
         env:
           AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
           WEAREAD_API_KEY: ${{ secrets.WEAREAD_API_KEY }}
-        run: node reading-tracker-github.js
+        run: |
+          node reading-tracker-github.js
+          # 1 月同时重建上一年，接住「12 月读完、1 月才录入/修改」的书（年份按 UTC，与生成器默认年份一致）
+          if [ "$(date -u +%m)" = "01" ]; then
+            node reading-tracker-github.js "$(( $(date -u +%Y) - 1 ))"
+          fi
 
-      - name: Sync cover files back to main
+      - name: Sync generated files back to main
+        # 让 main 与 gh-pages 内容一致：年度页、阅读报告、封面、微信读书缓存
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add covers/ 2>/dev/null || true
+          git add "reading archive/" covers/ weread-cache.json 2>/dev/null || true
           if git diff --cached --quiet; then
-            echo "No new cover files to sync"
+            echo "No generated changes to sync"
           else
-            git commit -m "chore: sync cover files from CI"
-            git push origin HEAD:main || echo "::warning::Cover sync push failed; will retry on next run"
+            git commit -m "chore: sync generated files from CI"
+            git push origin HEAD:main || echo "::warning::Generated files sync push failed; will retry on next run"
           fi
 
       - name: Deploy to GitHub Pages
