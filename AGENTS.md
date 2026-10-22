@@ -24,15 +24,15 @@
 | `index.html` | 跨年度归档入口与视觉规范源 | 与 `template.js` 共同维护，优先在此确定视觉规范 |
 | `weread-api.js` | 微信读书 API 客户端 | 仅负责请求封装与接口参数 |
 | `weread-match.js` | Airtable/微信读书书籍匹配 | 保持匹配规则可解释，避免无依据地降低匹配门槛 |
-| `weread-cache.js` / `weread-cache.json` | 微信读书增量缓存 | JSON 是构建产物兼缓存；只在需要刷新数据时更新 |
-| `reading archive/YYYY_reading_tracker.html` | 年度生成页面（含当年） | 由主生成器生成，统一存放在此目录 |
+| `weread-cache.js` / `weread-cache.json` | 微信读书增量缓存 | JSON 是构建产物兼缓存；CI 自动回写，本地只在需要刷新数据时更新 |
+| `reading archive/YYYY_reading_tracker.html` | 年度生成页面（含当年） | 由主生成器生成，统一存放在此目录；当年页（1 月含上一年）由 CI 自动回写 main |
 | `reading archive/all.html` | 全部年份总览页（运行时汇总各年度页） | 非生成产物、手工维护；年份范围随当前年份自动扩展，不写死终点 |
 | `report-pages.js` | 阅读报告页构建（纯函数） | 两个生成器共享；修改后需重新生成受影响年度页面与报告页 |
 | `cover-mirror.js` | 封面本地化镜像 | 由 URL 哈希计算本地文件名、识别本仓库 raw 链接、下载缺失封面；生成器与 sync-covers 共用 |
 | `sync-covers.js` | 年度页封面同步/迁移 | 原地把 `reading archive/*.html` 中外链封面替换为 `covers/` 本地路径；不访问 Airtable |
-| `covers/` | 封面镜像资源目录 | 资源兼构建产物；文件名 = URL 哈希；CI 只自动回写此目录 |
+| `covers/` | 封面镜像资源目录 | 资源兼构建产物；文件名 = URL 哈希；CI 自动回写 |
 | `vendor/` | 本地化第三方前端库（Chart.js 4.4.1） | 静态资源，版本固定；由年度页相对路径引用 |
-| `reading archive/reports/YYYY/<recId>.html` | 年度阅读报告页（构建产物） | 由生成器根据 Airtable `Report` 附件生成；文件名 = Airtable 记录 ID，不要手改 |
+| `reading archive/reports/YYYY/<recId>.html` | 年度阅读报告页（构建产物） | 由生成器根据 Airtable `Report` 附件生成；文件名 = Airtable 记录 ID，不要手改；CI 自动回写当年 |
 | `builder_offline.js` | 离线页面构建器 | 读取已有年度页面、内联 Chart.js 与 covers/ 封面（缺失远程封面才下载），不访问 Airtable |
 | `preview.js` | 本地预览服务器 | 双击 `preview.cmd` 时启动；仅监听本机 127.0.0.1，不访问 Airtable |
 | `preview.cmd` | 预览启动器 | 双击即可启动本地预览并自动打开浏览器 |
@@ -121,8 +121,10 @@ node --test
 
 ## 自动化与发布
 
-- 工作流在核心文件推送、`repository_dispatch`（`airtable-update`）、手动触发及每周一/周四 06:00 UTC 时运行。
-- 工作流生成当年页面并发布整个仓库到 `gh-pages` 分支。因此改动发布范围或部署配置属于高风险操作，必须先取得用户明确授权。
+- 工作流在核心文件推送、`repository_dispatch`（`airtable-update`）及手动触发时运行（定时触发已在 55f8f24 移除）。
+- 工作流生成当年页面（1 月同时重建上一年），把生成物（`reading archive/`、`covers/`、`weread-cache.json`）以 `chore: sync generated files from CI` 回写 main，再发布整个仓库到 `gh-pages` 分支，使 main 与 gh-pages 内容一致。
+- 本地改代码时，验证用的构建会改写当年页、报告、封面和缓存：这些由 CI 维护，不要提交，提交前丢弃；push 前先 `git pull --rebase`（CI 会往 main 推提交）。例外：代码改动影响到往年页面时，往年页面需本地重新生成并随代码提交，CI 不会重建它们。
+- 因此改动发布范围或部署配置属于高风险操作，必须先取得用户明确授权。
 - Airtable/Zapier 触发与 GitHub Secrets 均是外部配置；本仓库代码改动不得假设这些配置可用。
 
 ## 任务路由
