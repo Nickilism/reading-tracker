@@ -5,6 +5,7 @@ const test = require('node:test');
 
 const PREFIX_DECL = 'const COUNTRY_PREFIX_MAP';
 const FLAGS_DECL = 'const COUNTRY_FLAGS';
+const ALIAS_DECL = 'const COUNTRY_ALIASES';
 const PREFIX_FILES = [
   'reading-tracker-github.js',
   'reading-tracker-year-github.js',
@@ -46,4 +47,11 @@ test('COUNTRY_FLAGS 两份副本（template.js 与 all.html）应完全一致', 
   const t = loadMap('template.js', FLAGS_DECL);
   const a = loadMap('reading archive/all.html', FLAGS_DECL);
   assert.deepEqual(a, t, 'all.html 的 COUNTRY_FLAGS 与 template.js 不一致（新增国家时请同步国旗）');
+});
+
+test('COUNTRY_ALIASES 三份副本（两个生成器 + template.js）应完全一致', () => {
+  const maps = PREFIX_FILES.map((f) => loadMap(f, ALIAS_DECL));
+  for (let i = 1; i < maps.length; i++) {
+    assert.deepEqual(maps[i], maps[0], PREFIX_FILES[i] + ' 与 ' + PREFIX_FILES[0] + ' 的 COUNTRY_ALIASES 不一致');
+  }
 });

@@ -64,13 +64,47 @@ const COUNTRY_PREFIX_MAP = {
 };
 
 
-function deriveCountry(author) {
+// 括号内的简称/别名 → 国名（补充 COUNTRY_PREFIX_MAP 去掉括号后的文字）
+const COUNTRY_ALIASES = {
+  '中': '中国', '中国': '中国', '清': '中国', '明': '中国', '唐': '中国',
+  '宋': '中国', '元': '中国', '汉': '中国', '丹': '丹麦', '丹麦': '丹麦',
+  '徳': '德国',
+};
+
+const UNKNOWN_COUNTRY = '未标注';
+
+function lookupCountryAlias(text) {
   for (const [prefix, country] of Object.entries(COUNTRY_PREFIX_MAP)) {
-    if (author.includes(prefix)) return country;
+    if (prefix.slice(1, -1) === text) return country;
   }
-  const nameOnly = author.replace(/[\[\(（【】『』""''【】《》<>]+/g, '').trim();
-  if (/[\u4e00-\u9fa5]/.test(nameOnly)) return '中国';
-  return '美国';
+  return COUNTRY_ALIASES[text] || '';
+}
+
+// 返回 { country, reason }；reason: prefix | bracket | chinese | translit | translator | latin
+function deriveCountryInfo(author, translator) {
+  const a = String(author || '');
+  // 1. 开头任意括号：[] () （） 【】 〔〕 ［］
+  const m = a.match(/^\s*[\[(（【〔［]\s*([^\])）】〕］]+?)\s*[\])）】〕］]/);
+  if (m) {
+    const known = lookupCountryAlias(m[1]);
+    return known ? { country: known, reason: 'prefix' } : { country: m[1], reason: 'bracket' };
+  }
+  // 2. 名字中间出现的已知前缀
+  for (const [prefix, country] of Object.entries(COUNTRY_PREFIX_MAP)) {
+    if (a.includes(prefix)) return { country, reason: 'prefix' };
+  }
+  // 3. 无前缀：去掉括号内容（常为外文原名）后判断
+  const nameOnly = a.replace(/[\[(（【〔［《][^\])）】〕］》]*[\])）】〕］》]/g, '').trim();
+  if (/[\u4e00-\u9fa5]/.test(nameOnly)) {
+    if (/[·.•・．‧]/.test(nameOnly)) return { country: UNKNOWN_COUNTRY, reason: 'translit' };
+    if (String(translator || '').trim()) return { country: UNKNOWN_COUNTRY, reason: 'translator' };
+    return { country: '中国', reason: 'chinese' };
+  }
+  return { country: UNKNOWN_COUNTRY, reason: 'latin' };
+}
+
+function deriveCountry(author, translator) {
+  return deriveCountryInfo(author, translator).country;
 }
 
 function processBooks(records) {
@@ -89,6 +123,7 @@ function processBooks(records) {
     return {
       title: b.Title || '',
       author: b.Author || '',
+      translator: b.Translator || '',
       start,
       finish,
       rating: rating !== undefined && rating !== null ? rating : '',
@@ -107,9 +142,31 @@ function processBooks(records) {
 function addDerived(books) {
   books.forEach(b => {
     b.month = b.finish ? new Date(b.finish + 'T00:00:00').getMonth() + 1 : 0;
-    b.country = deriveCountry(b.author);
+    b.country = deriveCountry(b.author, b.translator);
   });
   return books;
+}
+
+// 国别构建提醒：只警告，不让构建失败
+function warnCountries(books) {
+  const flagBlock = (templateContent.match(/const COUNTRY_FLAGS = \{([\s\S]*?)\};/) || [])[1] || '';
+  const flagged = new Set([...flagBlock.matchAll(/'([^']+)'\s*:/g)].map(x => x[1]));
+  const unknown = [], unmapped = [], noFlag = [];
+  books.forEach(b => {
+    const info = deriveCountryInfo(b.author, b.translator);
+    const label = '《' + (b.title || '(未命名)') + '》 ' + b.author;
+    if (info.country === UNKNOWN_COUNTRY) unknown.push(label);
+    else if (info.reason === 'bracket') unmapped.push(label + ' → ' + info.country);
+    if (!flagged.has(info.country)) noFlag.push(label + ' → ' + info.country);
+  });
+  const show = (title, list) => {
+    if (!list.length) return;
+    console.warn('\n⚠️ 国别提醒 · ' + title + '（' + list.length + '）:');
+    list.forEach(s => console.warn('  ' + s));
+  };
+  show('未标注，可在 Airtable Author 前补 [国别] 前缀', unknown);
+  show('括号文字不在简称表，已直接用作国名', unmapped);
+  show('该国别没有国旗', noFlag);
 }
 
 function downloadUrl(url) {
@@ -253,6 +310,7 @@ async function generateForYear(year) {
     }
     console.log('获取到 ' + records.length + ' 条记录');
     const processed = addDerived(processBooks(records));
+    warnCountries(processed);
     await fetchReports(processed, year);
     await mirrorCovers(processed);
     const html = generate(year, processed);
