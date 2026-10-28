@@ -12,7 +12,7 @@ https://nickilism.github.io/reading-tracker/
 - 集成微信读书笔记（划线、想法、热门划线）
 - 生成美观的阅读记录展示页面
 - 支持按年份筛选和统计
-- 自动事件触发或定时更新
+- Airtable 记录更新后自动触发部署（Zapier），也可手动运行
 - 深色模式支持
 - 点击封面查看读书笔记面板
 - 阅读报告：Airtable `Report` 附件（.md/.html）自动生成独立报告页，书单与详情面板提供「阅读报告」入口
@@ -45,9 +45,13 @@ reading archive/reports/{年份}/{记录ID}.html
 weread-api.js → weread-match.js → weread-cache.json
     ↓ 模板注入
 template.js → reading archive/{year}_reading_tracker.html
+    ↓ CI 回写生成物（年度页、报告、covers/、weread-cache.json）
+main 分支（chore: sync generated files from CI）
     ↓ 部署
-GitHub Pages (gh-pages 分支)
+GitHub Pages (gh-pages 分支，内容与 main 一致)
 ```
+
+CI 默认只构建当年；每年 1 月额外重建上一年，以接住「12 月读完、1 月才录入或修改」的书。
 
 ### 微信读书集成流程
 
@@ -69,7 +73,7 @@ GitHub Pages (gh-pages 分支)
 | `report-pages.js` | 阅读报告页构建（Markdown 转换 / HTML iframe 包装，纯函数） |
 | `cover-mirror.js` | 封面本地化镜像：URL 哈希命名、本仓库 raw 链接直连、缺失封面自动下载 |
 | `sync-covers.js` | 年度页封面同步/迁移：原地把外链封面改写为 `../covers/<file>` |
-| `covers/` | 封面资源目录：文件名 = URL SHA-1，随页面一起发布，CI 只自动回写此目录 |
+| `covers/` | 封面资源目录：文件名 = URL SHA-1，随页面一起发布，由 CI 自动回写 |
 | `vendor/` | 本地化第三方前端库：Chart.js 4.4.1，随页面一起发布，由年度页相对路径引用 |
 | `index.html` | 归档页面，聚合所有年度数据 |
 | `reading archive/all.html` | 全部年份总览页：运行时聚合各年度页（2019 至当前年，自动扩展） |
@@ -83,6 +87,7 @@ GitHub Pages (gh-pages 分支)
 |--------|------|------|
 | Title | 文本 | 书名 |
 | Author | 文本 | 作者（可含国家前缀，如 `[日]村上春树`） |
+| Translator | 文本（可空） | 译者；无国家前缀的中文作者名若有译者，国别记为「未标注」 |
 | Start Time | 日期 | 开始阅读时间 |
 | Finish Time | 日期 | 完成阅读时间 |
 | My Rating | 数字 | 评分（1-10） |
@@ -97,12 +102,18 @@ GitHub Pages (gh-pages 分支)
 
 ### 国家前缀格式
 
-作者字段支持国家前缀，用于统计书籍来源国家：
-- 方括号：`[日]`、`[美]`、`[德]`
-- 圆括号：`(英)`、`(法)`、`(俄)`
-- 其他：`〔中〕`、`【意】`
+作者字段开头的国家前缀用于统计书籍来源国家，支持以下括号：`[]`、`()`、`（）`、`【】`、`〔〕`、`［］`，如 `[日]`、`(英)`、`（清）`、`【韩】`。
 
-未标记的中文名默认为中国，未标记的非中文名默认为美国。
+括号内文字的识别顺序：
+1. 先查简称表 `COUNTRY_PREFIX_MAP`（如 `日 → 日本`、`美 → 美国`）及别名 `COUNTRY_ALIASES`（`中/清/明/唐/宋/元/汉 → 中国`、`丹 → 丹麦`、`徳 → 德国`）；
+2. 都不在表中时，括号文字直接作为国名（如 `[巴西] → 巴西`），构建时警告但不失败。
+
+没有前缀时：
+- 中文名含音译分隔点（`·` `.` `•` `・` `．` `‧`），或 `Translator` 非空 → `未标注`；
+- 其他中文名 → `中国`；
+- 纯外文名 → `未标注`。
+
+「未标注」在页面上显示为 `🏳️ 未标注`，可筛选，并排在国别统计最后。构建日志会列出未标注的作者、未进入简称表的括号国名，以及没有国旗的国家，方便回到 Airtable 补前缀。
 
 ## 环境变量
 
@@ -248,7 +259,6 @@ git push -u origin main
 |------|------|
 | **Zapier 自动触发** | Airtable 记录更新时自动触发（推荐） |
 | **手动触发** | GitHub Actions 页面手动运行 |
-| **定时触发** | 每周一、周四 UTC 6:00 自动运行 |
 | **Push 触发** | 推送 `template.js`、`reading-tracker-github.js` 等文件时触发 |
 
 ## 构建命令
@@ -292,7 +302,7 @@ const year = process.argv[2] || String(new Date().getFullYear());
 
 ### 修改国家前缀映射
 
-需同步修改 3 处 `COUNTRY_PREFIX_MAP`：`reading-tracker-github.js`、
+需同步修改 3 处 `COUNTRY_PREFIX_MAP` 与 `COUNTRY_ALIASES`：`reading-tracker-github.js`、
 `reading-tracker-year-github.js`、`template.js`；需显示国旗时再同步 2 处 `COUNTRY_FLAGS`：
 `template.js` 与 `reading archive/all.html`。改完运行 `node --test` 校验各副本一致。
 
@@ -315,8 +325,8 @@ node reading-tracker-github.js 2025 --no-cache
 ### Q: 本地构建和 CI 构建有什么区别？
 
 A: 
-- **CI 构建**：自动部署到 GitHub Pages，更新 `weread-cache.json` 并提交
-- **本地构建**：用于测试，不会自动部署，建议先 `git pull` 获取最新缓存
+- **CI 构建**：构建当年（1 月含上一年），把年度页、报告页、`covers/`、`weread-cache.json` 回写 main，再部署到 GitHub Pages
+- **本地构建**：用于验证，不会自动部署。当年的生成物由 CI 维护，本地验证后丢弃、不要提交；开工前 `git pull`，push 前 `git pull --rebase`。例外：代码改动影响往年页面时，往年页面需本地重新生成并随代码提交
 
 ### Q: 归档页面如何工作？
 
@@ -324,7 +334,7 @@ A: `index.html` 在浏览器端动态加载所有年度 HTML 文件，提取嵌�
 
 ### Q: 有报告的书没有显示「阅读报告」按钮？
 
-A: 确认 Airtable `Report` 字段已上传附件且文件后缀为 `.md` 或 `.html`，然后重新构建（推送 `main` 触发 CI，或本地运行 `node reading-tracker-github.js <年份>`）。报告页生成在 `reading archive/reports/<年份>/` 下，文件名为 Airtable 记录 ID。
+A: 确认 Airtable `Report` 字段已上传附件且文件后缀为 `.md` 或 `.html`，然后重新构建：只改了附件时 Zapier 不一定会触发，可在 GitHub Actions 手动运行 "Deploy Reading Tracker"。报告页生成在 `reading archive/reports/<年份>/` 下，文件名为 Airtable 记录 ID。
 
 ## 相关文档
 
